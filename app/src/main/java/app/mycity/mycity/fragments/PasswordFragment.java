@@ -18,15 +18,15 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class EmailFragment extends Fragment {
+public class PasswordFragment extends Fragment {
 
     DataStore dataStore;
 
-    @BindView(R.id.firstNameEt)
-    EditText email;
+    @BindView(R.id.confirmPasswordEt)
+    EditText confirmPassword;
 
-    @BindView(R.id.progressBarContainer)
-    ConstraintLayout progressBarContainer;
+    @BindView(R.id.passwordEt)
+    EditText password;
 
     @BindView(R.id.emailFragmentTextViewInfo)
     TextView info;
@@ -34,7 +34,7 @@ public class EmailFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.email_fragment, container, false);
+        View view = inflater.inflate(R.layout.password_fragment, container, false);
 
         ButterKnife.bind(this, view);
         return view;
@@ -43,7 +43,6 @@ public class EmailFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        progressBarContainer.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -53,21 +52,8 @@ public class EmailFragment extends Fragment {
     }
 
     @OnClick(R.id.confirmEmail)
-    public void confirmEmail(View view){
-        dataStore.setEmail(email.getText().toString());
-        progressBarContainer.setVisibility(View.VISIBLE);
-        dataStore.checkEmail();
-    }
-
-    public void emailExist() {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                progressBarContainer.setVisibility(View.GONE);
-                info.setTextColor(Color.parseColor("#ff0000"));
-                info.setText("Данный code уже занят, выберите другой или восстановите доступ");
-            }
-        });
-
+    public void setPassword(View view){
+        dataStore.setPassword(password.getText().toString(), confirmPassword.getText().toString());
+        dataStore.commitPassword();
     }
 }

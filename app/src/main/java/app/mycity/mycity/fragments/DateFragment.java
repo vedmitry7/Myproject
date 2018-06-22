@@ -10,13 +10,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.Spinner;
+import android.widget.RadioGroup;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.util.Calendar;
 
@@ -30,23 +27,19 @@ public class DateFragment extends Fragment {
 
     DataStore dataStore;
 
-/*    @BindView(R.id.firstName)
+    @BindView(R.id.birthday)
+    TextView birthday;
+
+    @BindView(R.id.firstNameEt)
     EditText firstName;
 
-    @BindView(R.id.secondName)
+    @BindView(R.id.secondNameEt)
     EditText secondName;
 
-    @BindView(R.id.spinnerNumberDay)
-    Spinner day;
+    @BindView(R.id.radioGroup)
+    RadioGroup radioGroup;
 
-    @BindView(R.id.spinnerNumberMonth)
-    Spinner month;
-
-    @BindView(R.id.spinnerNumberYear)
-    Spinner year;*/
-
-    @BindView(R.id.bday)
-    TextView bday;
+    private String sex = "2";
 
     @Nullable
     @Override
@@ -61,35 +54,19 @@ public class DateFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-      /*  String[] days = new String[31];
-        for (int i = 0; i < days.length; i++) {
-            days[i] = String.valueOf(i+1);
-        }
-
-        MyCustomAdapter daysAdapter = new MyCustomAdapter(getActivity(), R.layout.spinner_row, days);
-        daysAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        day.setAdapter(daysAdapter);
-        day.setSelection(0);
-
-        String[] months = new String[12];
-        for (int i = 0; i < months.length; i++) {
-            months[i] = String.valueOf(i+1);
-        }
-
-        MyCustomAdapter monthAdapter = new MyCustomAdapter(getActivity(), R.layout.spinner_row, months);
-        daysAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        month.setAdapter(monthAdapter);
-        month.setSelection(0);
-
-        String[] years = new String[118];
-        for (int i = 0; i < years.length; i++) {
-            years[i] = String.valueOf(i+1900);
-        }
-
-        MyCustomAdapter yearsAdapter = new MyCustomAdapter(getActivity(), R.layout.spinner_row, years);
-        daysAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        year.setAdapter(yearsAdapter);
-        year.setSelection(100);*/
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                switch (i){
+                    case R.id.male:
+                        sex = "2";
+                        break;
+                    case R.id.female:
+                        sex = "1";
+                        break;
+                }
+            }
+        });
     }
 
     @Override
@@ -100,7 +77,8 @@ public class DateFragment extends Fragment {
 
     @OnClick(R.id.dateFragmentNext)
     public void next(View view){
-        dataStore.nextStep();
+        dataStore.setInfo(firstName.getText().toString(), secondName.getText().toString(), birthday.getText().toString(), sex);
+        dataStore.nextEmailStep();
         Log.i("TAG", "next");
     }
 
@@ -117,51 +95,13 @@ public class DateFragment extends Fragment {
             public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
                 Log.i("TAG", "Date " + i + " " + i1 + " " + i2);
                 String date = i2+"."+i1+"."+i;
-                bday.setTextColor(Color.parseColor("#000000"));
-                bday.setText(date);
+                birthday.setTextColor(Color.parseColor("#000000"));
+                birthday.setText(date);
             }
         },
                 mYear,
                 mMonth,
                 mDay)
                 .show();
-    }
-
-
-
-
-    public class MyCustomAdapter extends ArrayAdapter<String> {
-
-        private String[] date;
-
-        public MyCustomAdapter(Context context, int textViewResourceId,
-                               String[] objects) {
-            super(context, textViewResourceId, objects);
-            date = objects;
-        }
-
-        @Override
-        public View getDropDownView(int position, View convertView,
-                                    ViewGroup parent) {
-
-            return getCustomView(position, convertView, parent);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-
-            return getCustomView(position, convertView, parent);
-        }
-
-        public View getCustomView(int position, View convertView,
-                                  ViewGroup parent) {
-
-            LayoutInflater inflater = DateFragment.this.getActivity().getLayoutInflater();
-            View row = inflater.inflate(R.layout.spinner_row, parent, false);
-            TextView label = row.findViewById(R.id.spinnertext);
-            label.setText(date[position]);
-
-            return row;
-        }
     }
 }

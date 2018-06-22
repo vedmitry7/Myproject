@@ -9,12 +9,12 @@
 
 
     <EditText
-        android:id="@+id/firstName"
+        android:id="@+id/codeEt"
         android:layout_width="match_parent"
         android:layout_height="@dimen/reg_item_height"
         android:layout_marginTop="24dp"
         android:background="@android:color/white"
-        android:hint="Подтверждение Email"
+        android:hint="Email code"
         android:inputType="textEmailAddress"
         android:paddingLeft="@dimen/padding16"
         android:paddingRight="@dimen/padding16"
@@ -29,13 +29,13 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@android:color/black"
-        app:layout_constraintTop_toBottomOf="@+id/firstName" />
+        app:layout_constraintTop_toBottomOf="@+id/codeEt" />
 
 
 
     <Button
         android:background="@color/colorAccent"
-        android:id="@+id/button"
+        android:id="@+id/confirmEmail"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Далее"
@@ -58,20 +58,17 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/emailFragmentTextViewInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
         android:gravity="center"
         android:paddingLeft="@dimen/padding16"
         android:paddingRight="@dimen/padding16"
-        android:textSize="16sp"
-        android:textColor="@color/colorAccent"
-        android:text="Отправить запрос повторно"
-        app:layout_constraintBottom_toTopOf="@+id/button"
+        android:text="На вашу почту будет отправленно письмо с кодом подтверждения"
+        app:layout_constraintBottom_toTopOf="@+id/confirmEmail"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view"
         tools:ignore="MissingConstraints" />
+
 </android.support.constraint.ConstraintLayout>
