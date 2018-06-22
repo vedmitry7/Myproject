@@ -20,7 +20,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class EnterActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
 
     @BindView(R.id.textRegistration)
     TextView textView;
@@ -41,7 +41,7 @@ public class EnterActivity extends AppCompatActivity {
 
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-        setContentView(R.layout.activity_enter);
+        setContentView(R.layout.activity_login);
 
         ButterKnife.bind(this);
     }

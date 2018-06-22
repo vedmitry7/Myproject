@@ -1,7 +1,9 @@
 package app.mycity.mycity.fragments;
 
+import android.app.DatePickerDialog;
 import android.app.Fragment;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -9,9 +11,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
+
+import java.util.Calendar;
 
 import app.mycity.mycity.DataStore;
 import app.mycity.mycity.R;
@@ -96,6 +103,31 @@ public class DateFragment extends Fragment {
         dataStore.nextStep();
         Log.i("TAG", "next");
     }
+
+    @OnClick(R.id.imageViewSetDate)
+    public void setDate(View view){
+        Log.i("TAG", "setDate");
+        final Calendar c = Calendar.getInstance();
+        int mYear = c.get(Calendar.YEAR);
+        int mMonth = c.get(Calendar.MONTH);
+        int mDay = c.get(Calendar.DAY_OF_MONTH);
+
+        new DatePickerDialog(this.getActivity(), new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+                Log.i("TAG", "Date " + i + " " + i1 + " " + i2);
+                String date = i2+"."+i1+"."+i;
+                bday.setTextColor(Color.parseColor("#000000"));
+                bday.setText(date);
+            }
+        },
+                mYear,
+                mMonth,
+                mDay)
+                .show();
+    }
+
+
 
 
     public class MyCustomAdapter extends ArrayAdapter<String> {

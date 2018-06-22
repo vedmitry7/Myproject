@@ -9,6 +9,7 @@
 
 
     <EditText
+        android:textColor="@color/reg_dialog_text_color"
         android:hint="Имя"
         android:paddingRight="@dimen/padding16"
         android:paddingLeft="@dimen/padding16"
@@ -80,6 +81,7 @@
 
 
     <TextView
+
         android:id="@+id/bday"
         android:layout_width="0dp"
         android:layout_height="48dp"
@@ -89,7 +91,7 @@
         android:paddingLeft="@dimen/padding16"
         android:text="Дата рождения"
         android:textSize="18sp"
-        app:layout_constraintEnd_toStartOf="@+id/imageView2"
+        app:layout_constraintEnd_toStartOf="@+id/imageViewSetDate"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view2" />
 
@@ -132,7 +134,7 @@
     </RadioGroup>
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/imageViewSetDate"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_marginEnd="16dp"
