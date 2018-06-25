@@ -2,10 +2,8 @@ package app.mycity.mycity.fragments;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,10 +20,10 @@ public class PasswordFragment extends Fragment {
 
     DataStore dataStore;
 
-    @BindView(R.id.confirmPasswordEt)
+    @BindView(R.id.passwordFragConfirmPasswordEt)
     EditText confirmPassword;
 
-    @BindView(R.id.passwordEt)
+    @BindView(R.id.passwordFragPasswordEt)
     EditText password;
 
     @BindView(R.id.emailFragmentTextViewInfo)
@@ -51,7 +49,7 @@ public class PasswordFragment extends Fragment {
         dataStore = (DataStore) context;
     }
 
-    @OnClick(R.id.confirmEmail)
+    @OnClick(R.id.passwordFragNext)
     public void setPassword(View view){
         dataStore.setPassword(password.getText().toString(), confirmPassword.getText().toString());
         dataStore.commitPassword();

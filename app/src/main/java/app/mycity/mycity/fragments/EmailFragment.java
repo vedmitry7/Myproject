@@ -22,10 +22,10 @@ public class EmailFragment extends Fragment {
 
     DataStore dataStore;
 
-    @BindView(R.id.firstNameEt)
+    @BindView(R.id.emailFragEmailEt)
     EditText email;
 
-    @BindView(R.id.progressBarContainer)
+    @BindView(R.id.emailFragProgressBarContainer)
     ConstraintLayout progressBarContainer;
 
     @BindView(R.id.emailFragmentTextViewInfo)
@@ -52,7 +52,7 @@ public class EmailFragment extends Fragment {
         dataStore = (DataStore) context;
     }
 
-    @OnClick(R.id.confirmEmail)
+    @OnClick(R.id.passwordFragNext)
     public void confirmEmail(View view){
         dataStore.setEmail(email.getText().toString());
         progressBarContainer.setVisibility(View.VISIBLE);

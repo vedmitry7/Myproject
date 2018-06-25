@@ -16,19 +16,14 @@ import java.io.IOException;
 
 import app.mycity.mycity.DataStore;
 import app.mycity.mycity.R;
-import app.mycity.mycity.api.ApiFactory;
-import app.mycity.mycity.api.model.FullResponse;
 import app.mycity.mycity.fragments.ConfirmEmailFragment;
-import app.mycity.mycity.fragments.DateFragment;
+import app.mycity.mycity.fragments.DataFragment;
 import app.mycity.mycity.fragments.EmailFragment;
 import app.mycity.mycity.fragments.PasswordFragment;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class RegistrationActivity extends AppCompatActivity implements DataStore {
 
@@ -53,7 +48,7 @@ public class RegistrationActivity extends AppCompatActivity implements DataStore
 
         setContentView(R.layout.activity_authorization);
 
-        DateFragment fragment = new DateFragment();
+        DataFragment fragment = new DataFragment();
 
         fragmentManager = getFragmentManager();
 

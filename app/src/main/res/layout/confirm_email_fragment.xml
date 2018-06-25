@@ -35,7 +35,7 @@
 
     <Button
         android:background="@color/colorAccent"
-        android:id="@+id/confirmEmail"
+        android:id="@+id/passwordFragNext"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Далее"
@@ -66,7 +66,7 @@
         android:paddingLeft="@dimen/padding16"
         android:paddingRight="@dimen/padding16"
         android:text="На вашу почту будет отправленно письмо с кодом подтверждения"
-        app:layout_constraintBottom_toTopOf="@+id/confirmEmail"
+        app:layout_constraintBottom_toTopOf="@+id/passwordFragNext"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="MissingConstraints" />

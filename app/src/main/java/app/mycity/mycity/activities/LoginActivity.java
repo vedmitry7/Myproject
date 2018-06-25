@@ -30,13 +30,13 @@ import okhttp3.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
-    @BindView(R.id.textRegistration)
+    @BindView(R.id.loginActRegistrationButtonTv)
     TextView textView;
 
-    @BindView(R.id.login)
+    @BindView(R.id.loginActLoginEt)
     EditText login;
 
-    @BindView(R.id.password)
+    @BindView(R.id.loginActPasswordEt)
     EditText password;
 
     @Override
@@ -47,25 +47,24 @@ public class LoginActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         setContentView(R.layout.activity_login);
 
         ButterKnife.bind(this);
     }
 
-    @OnClick(R.id.textRegistration)
+    @OnClick(R.id.loginActRegistrationButtonTv)
     public void onClick(View v){
         Intent intent = new Intent(this, RegistrationActivity.class);
         startActivity(intent);
     }
 
+    @OnClick(R.id.loginActForgetPasswordButtonTv)
     public void forgetPassword(View view) {
-
     }
 
 
-    @OnClick(R.id.enterButton)
+    @OnClick(R.id.loginActEnterButton)
     public void enter(View v) {
        /* ApiFactory.getApi().auth(login.getText().toString(), password.getText().toString()).enqueue(new Callback<FullResponse>() {
             @Override

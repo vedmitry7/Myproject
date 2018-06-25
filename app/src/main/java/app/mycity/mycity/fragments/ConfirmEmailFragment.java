@@ -43,7 +43,7 @@ public class ConfirmEmailFragment extends Fragment {
         dataStore = (DataStore) context;
     }
 
-    @OnClick(R.id.confirmEmail)
+    @OnClick(R.id.passwordFragNext)
     public void confirmEmail(View view){
         Log.i("TAG", "confirmCode");
         dataStore.setCode(code.getText().toString());

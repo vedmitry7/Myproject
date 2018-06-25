@@ -23,20 +23,20 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class DateFragment extends Fragment {
+public class DataFragment extends Fragment {
 
     DataStore dataStore;
 
-    @BindView(R.id.birthday)
+    @BindView(R.id.dataFragBirthdayTv)
     TextView birthday;
 
-    @BindView(R.id.firstNameEt)
+    @BindView(R.id.dataFragFirstNameEt)
     EditText firstName;
 
-    @BindView(R.id.secondNameEt)
+    @BindView(R.id.dataFragSecondNameEt)
     EditText secondName;
 
-    @BindView(R.id.radioGroup)
+    @BindView(R.id.dataFragSexRadioGroup)
     RadioGroup radioGroup;
 
     private String sex = "2";
@@ -75,15 +75,24 @@ public class DateFragment extends Fragment {
         dataStore = (DataStore) context;
     }
 
-    @OnClick(R.id.dateFragmentNext)
+    @OnClick(R.id.dataFragmentNext)
     public void next(View view){
         dataStore.setInfo(firstName.getText().toString(), secondName.getText().toString(), birthday.getText().toString(), sex);
         dataStore.nextEmailStep();
         Log.i("TAG", "next");
     }
 
-    @OnClick(R.id.imageViewSetDate)
+    @OnClick(R.id.dataFragBirthdayIb)
     public void setDate(View view){
+        setDate();
+    }
+
+    @OnClick(R.id.dataFragBirthdayTv)
+    public void setDate2(View view){
+        setDate();
+    }
+
+    private void setDate() {
         Log.i("TAG", "setDate");
         final Calendar c = Calendar.getInstance();
         int mYear = c.get(Calendar.YEAR);

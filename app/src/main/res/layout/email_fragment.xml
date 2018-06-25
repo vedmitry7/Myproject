@@ -12,7 +12,7 @@
 
 
     <EditText
-        android:id="@+id/firstNameEt"
+        android:id="@+id/emailFragEmailEt"
         android:layout_width="match_parent"
         android:layout_height="@dimen/reg_item_height"
         android:layout_marginTop="24dp"
@@ -32,11 +32,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@android:color/black"
-        app:layout_constraintTop_toBottomOf="@+id/firstNameEt" />
-
-
-
-
+        app:layout_constraintTop_toBottomOf="@+id/emailFragEmailEt" />
 
     <TextView
         android:textColor="@android:color/black"
@@ -77,7 +73,7 @@
 
         <Button
             android:background="@color/colorAccent"
-            android:id="@+id/confirmEmail"
+            android:id="@+id/passwordFragNext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Далее"
@@ -89,7 +85,7 @@
 
     <android.support.constraint.ConstraintLayout
 
-        android:id="@+id/progressBarContainer"
+        android:id="@+id/emailFragProgressBarContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/white"
