@@ -17,8 +17,8 @@
 
     <ImageButton
         android:id="@+id/imageButton2"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:background="@mipmap/ic_chat2"
@@ -28,8 +28,8 @@
 
     <ImageButton
         android:id="@+id/imageButton"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:background="@drawable/ic_notification"
@@ -39,8 +39,8 @@
 
     <ImageButton
         android:id="@+id/avatar"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:background="@mipmap/ic_avatar"
@@ -51,7 +51,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/toolBarTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"

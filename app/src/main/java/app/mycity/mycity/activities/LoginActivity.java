@@ -140,14 +140,24 @@ public class LoginActivity extends AppCompatActivity {
                 Log.i("TAG", "jsonInnerObj = " + String.valueOf(jsonObject!=null));
 
 
-                String code = null;
+                String userId = null;
+                String acccesToken = null;
+                String refreshToken = null;
+                String expiriedAt = null;
 
                 try {
-                     code = innerObject.getString("user_id");
-                    Log.i("TAG", code);
+                     userId = innerObject.getString("user_id");
+                     acccesToken = innerObject.getString("access_token");
+                     refreshToken = innerObject.getString("refresh_token");
+                     expiriedAt = innerObject.getString("expired_at");
+                    Log.i("TAG", userId + " " + acccesToken +  " " + refreshToken + " " + expiriedAt);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
+                LoginActivity.this.finish();
 
             }
         });
