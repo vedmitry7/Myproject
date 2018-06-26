@@ -26,7 +26,7 @@ public class ConfirmEmailFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.confirm_email_fragment, container, false);
+        View view = inflater.inflate(R.layout.fragment_confirm_email, container, false);
 
         ButterKnife.bind(this, view);
         return view;

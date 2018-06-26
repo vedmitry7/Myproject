@@ -32,7 +32,7 @@ public class PasswordFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.password_fragment, container, false);
+        View view = inflater.inflate(R.layout.fragment_password, container, false);
 
         ButterKnife.bind(this, view);
         return view;

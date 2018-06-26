@@ -15,7 +15,7 @@ public class PlacesFragment extends android.support.v4.app.Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.places_fragment, container, false);
+        View view = inflater.inflate(R.layout.fragment_places, container, false);
 
         ButterKnife.bind(this, view);
         return view;

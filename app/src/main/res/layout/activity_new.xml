@@ -16,7 +16,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
 
-        <include layout="@layout/sdfsf" />
+        <include layout="@layout/content_act_new" />
 
     </android.support.v7.widget.Toolbar>
 
