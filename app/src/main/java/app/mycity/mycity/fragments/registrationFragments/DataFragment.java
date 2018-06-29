@@ -1,4 +1,4 @@
-package app.mycity.mycity.fragments;
+package app.mycity.mycity.fragments.registrationFragments;
 
 import android.app.DatePickerDialog;
 import android.app.Fragment;

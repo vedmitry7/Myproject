@@ -16,10 +16,10 @@ import java.io.IOException;
 
 import app.mycity.mycity.DataStore;
 import app.mycity.mycity.R;
-import app.mycity.mycity.fragments.ConfirmEmailFragment;
-import app.mycity.mycity.fragments.DataFragment;
-import app.mycity.mycity.fragments.EmailFragment;
-import app.mycity.mycity.fragments.PasswordFragment;
+import app.mycity.mycity.fragments.registrationFragments.ConfirmEmailFragment;
+import app.mycity.mycity.fragments.registrationFragments.DataFragment;
+import app.mycity.mycity.fragments.registrationFragments.EmailFragment;
+import app.mycity.mycity.fragments.registrationFragments.PasswordFragment;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;

@@ -10,23 +10,15 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-
+import app.mycity.mycity.Constants;
+import app.mycity.mycity.PersistantStorage;
 import app.mycity.mycity.R;
+import app.mycity.mycity.api.ApiFactory;
+import app.mycity.mycity.api.model.ResponseAuth;
+import app.mycity.mycity.api.model.ResponseContainer;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -42,12 +34,9 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         setContentView(R.layout.activity_login);
 
         ButterKnife.bind(this);
@@ -66,41 +55,49 @@ public class LoginActivity extends AppCompatActivity {
 
     @OnClick(R.id.loginActEnterButton)
     public void enter(View v) {
-       /* ApiFactory.getApi().auth(login.getText().toString(), password.getText().toString()).enqueue(new Callback<FullResponse>() {
+
+        ApiFactory.getApi().authorize(login.getText().toString(), password.getText().toString()).enqueue(new retrofit2.Callback<ResponseContainer<ResponseAuth>>() {
             @Override
-            public void onResponse(Call<FullResponse> call, Response<FullResponse> response) {
-                app.mycity.mycity.api.model.Response resp = response.body().getResponse();
-                Log.i("TAG", resp.toString());
-                Log.i("TAG", resp.toString());
+            public void onResponse(retrofit2.Call<ResponseContainer<ResponseAuth>> call, retrofit2.Response<ResponseContainer<ResponseAuth>> response) {
+/**
+ Impossible to catch error
+ Log.i("TAG", String.valueOf(response.body() != null)); true
+ Log.i("TAG", String.valueOf(response.isSuccessful())); true
+ Log.i("TAG", String.valueOf(response.errorBody() == null)); true
+ **/
+                ResponseAuth responseAuth = response.body().getResponse();
+                if(responseAuth != null){
+                    Log.i("TAG", "USER ID - " + String.valueOf(responseAuth.getUserId()));
+                    Log.i("TAG", "TOKEN - " + responseAuth.getAccessToken());
+
+                    PersistantStorage.addProperty(Constants.KEY_MY_ID, responseAuth.getUserId());
+                    PersistantStorage.addProperty(Constants.KEY_ACCESS_TOKEN, responseAuth.getAccessToken());
+                    PersistantStorage.addProperty(Constants.KEY_REFRESH_TOKEN, responseAuth.getRefreshToken());
+                    PersistantStorage.addProperty(Constants.KEY_EXPIRED_AT, responseAuth.getExpiredAt());
+
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    LoginActivity.this.finish();
+
+                } else {
+                    Log.i("TAG", "error");
+
+                    // some error
+                }
 
             }
 
             @Override
-            public void onFailure(Call<FullResponse> call, Throwable t) {
+            public void onFailure(retrofit2.Call<ResponseContainer<ResponseAuth>> call, Throwable t) {
 
             }
-        });*/
-
-   /*    ApiFactory.getApi().auth(login.getText().toString(), password.getText().toString()).enqueue(new Callback<JsonObject>() {
-           @Override
-           public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-               Log.i("TAG", response.toString());
-              JsonObject object = response.body();
-               Log.i("TAG", object.getAsString());
-
-           }
-
-           @Override
-           public void onFailure(Call<JsonObject> call, Throwable t) {
-
-           }
-       });*/
-
+        });
+/*
         OkHttpClient client = new OkHttpClient();
 
         RequestBody body = new FormBody.Builder()
                 .add("email", "vedmitry7@gmail.com")
-                .add("password", "mycitypass")
+                .add("password", "123456789")
                 .build();
 
         Request request = new Request.Builder().url("http://192.168.0.104/api/auth.authorize")
@@ -111,11 +108,20 @@ public class LoginActivity extends AppCompatActivity {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                Log.i("TAG", "FAILURE - " + e.getLocalizedMessage());
+                Log.i("TAG", "FAILURE - " + e.getMessage());
+                Log.i("TAG", "FAILURE - " + e.getCause());
+
+                if(e instanceof ConnectException){
+                    Log.i("TAG", "FAILURE - conn exc" );
+                }
 
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+
+
                 String responseString = response.body().string();
                 Log.i("TAG", responseString);
                 String responseClear = responseString.substring(1,responseString.length()-1);
@@ -150,6 +156,11 @@ public class LoginActivity extends AppCompatActivity {
                      acccesToken = innerObject.getString("access_token");
                      refreshToken = innerObject.getString("refresh_token");
                      expiriedAt = innerObject.getString("expired_at");
+
+                    PersistantStorage.addProperty(Constants.KEY_MY_ID, userId);
+                    PersistantStorage.addProperty(Constants.KEY_ACCESS_TOKEN, acccesToken);
+                    PersistantStorage.addProperty(Constants.KEY_REFRESH_TOKEN, refreshToken);
+
                     Log.i("TAG", userId + " " + acccesToken +  " " + refreshToken + " " + expiriedAt);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -160,6 +171,6 @@ public class LoginActivity extends AppCompatActivity {
                 LoginActivity.this.finish();
 
             }
-        });
+        });*/
     }
 }

@@ -1,4 +1,4 @@
-package app.mycity.mycity.fragments.main;
+package app.mycity.mycity.fragments.mainScreen;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -10,12 +10,12 @@ import android.view.ViewGroup;
 import app.mycity.mycity.R;
 import butterknife.ButterKnife;
 
-public class TopFragment extends android.support.v4.app.Fragment {
+public class SearchFragment extends android.support.v4.app.Fragment {
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_top, container, false);
+        View view = inflater.inflate(R.layout.fragment_search, container, false);
 
         ButterKnife.bind(this, view);
         return view;

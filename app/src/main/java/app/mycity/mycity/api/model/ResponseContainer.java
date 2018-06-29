@@ -3,18 +3,17 @@ package app.mycity.mycity.api.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class FullResponse {
+public class ResponseContainer<T> {
 
     @SerializedName("response")
     @Expose
-    private Response response;
+    private T response;
 
-    public Response getResponse() {
+    public T getResponse() {
         return response;
     }
 
-    public void setResponse(Response response) {
+    public void setResponse(T response) {
         this.response = response;
     }
-
 }

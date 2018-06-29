@@ -87,7 +87,7 @@
                 android:background="@android:color/white"
                 android:hint="password"
                 android:inputType="textPassword"
-                android:text="mycitypass"
+                android:text="123456789"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/imageView"
                 app:layout_constraintStart_toStartOf="parent"

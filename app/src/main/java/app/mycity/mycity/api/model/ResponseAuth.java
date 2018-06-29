@@ -3,11 +3,11 @@ package app.mycity.mycity.api.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Response {
+public class ResponseAuth {
 
     @SerializedName("user_id")
     @Expose
-    private Integer userId;
+    private String userId;
     @SerializedName("access_token")
     @Expose
     private String accessToken;
@@ -16,13 +16,13 @@ public class Response {
     private String refreshToken;
     @SerializedName("expired_at")
     @Expose
-    private Integer expiredAt;
+    private String expiredAt;
 
-    public Integer getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
@@ -42,11 +42,11 @@ public class Response {
         this.refreshToken = refreshToken;
     }
 
-    public Integer getExpiredAt() {
+    public String getExpiredAt() {
         return expiredAt;
     }
 
-    public void setExpiredAt(Integer expiredAt) {
+    public void setExpiredAt(String expiredAt) {
         this.expiredAt = expiredAt;
     }
 

@@ -1,32 +1,21 @@
-package app.mycity.mycity.fragments;
+package app.mycity.mycity.fragments.mainScreen;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 
-import app.mycity.mycity.DataStore;
 import app.mycity.mycity.R;
-import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
-public class ConfirmEmailFragment extends Fragment {
-
-    DataStore dataStore;
-
-    @BindView(R.id.codeEt)
-    EditText code;
+public class PlacesFragment extends android.support.v4.app.Fragment {
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_confirm_email, container, false);
+        View view = inflater.inflate(R.layout.fragment_places, container, false);
 
         ButterKnife.bind(this, view);
         return view;
@@ -40,14 +29,6 @@ public class ConfirmEmailFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        dataStore = (DataStore) context;
-    }
-
-    @OnClick(R.id.passwordFragNext)
-    public void confirmEmail(View view){
-        Log.i("TAG", "confirmCode");
-        dataStore.setCode(code.getText().toString());
-        dataStore.checkEmailCode();
     }
 
 }

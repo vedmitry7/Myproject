@@ -9,10 +9,10 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 
 import app.mycity.mycity.fragments.SimpleFragment;
-import app.mycity.mycity.fragments.main.FeedFragment;
-import app.mycity.mycity.fragments.main.PlacesFragment;
-import app.mycity.mycity.fragments.main.SearchFragment;
-import app.mycity.mycity.fragments.main.TopFragment;
+import app.mycity.mycity.fragments.mainScreen.FeedFragment;
+import app.mycity.mycity.fragments.mainScreen.PlacesFragment;
+import app.mycity.mycity.fragments.mainScreen.SearchFragment;
+import app.mycity.mycity.fragments.mainScreen.TopFragment;
 
 public class PagerAdapter extends FragmentPagerAdapter implements ViewPager.OnPageChangeListener {
 
