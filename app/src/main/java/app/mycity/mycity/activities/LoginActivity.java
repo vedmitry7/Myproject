@@ -1,6 +1,7 @@
 package app.mycity.mycity.activities;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -25,6 +26,9 @@ public class LoginActivity extends AppCompatActivity {
     @BindView(R.id.loginActRegistrationButtonTv)
     TextView textView;
 
+    @BindView(R.id.loginLabel)
+    TextView label;
+
     @BindView(R.id.loginActLoginEt)
     EditText login;
 
@@ -40,6 +44,8 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         ButterKnife.bind(this);
+        Typeface type = Typeface.createFromAsset(getAssets(),"abril_fatface_regular.otf");
+        label.setTypeface(type);
     }
 
     @OnClick(R.id.loginActRegistrationButtonTv)

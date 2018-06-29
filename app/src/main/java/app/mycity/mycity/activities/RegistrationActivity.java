@@ -3,11 +3,13 @@ package app.mycity.mycity.activities;
 import android.annotation.SuppressLint;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,6 +22,8 @@ import app.mycity.mycity.fragments.registrationFragments.ConfirmEmailFragment;
 import app.mycity.mycity.fragments.registrationFragments.DataFragment;
 import app.mycity.mycity.fragments.registrationFragments.EmailFragment;
 import app.mycity.mycity.fragments.registrationFragments.PasswordFragment;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -28,17 +32,19 @@ import okhttp3.RequestBody;
 public class RegistrationActivity extends AppCompatActivity implements DataStore {
 
 
+    @BindView(R.id.registrationLabel)
+    TextView label;
+
     String firstName;
     String secondName;
     String birthday;
     String email;
     String sex, code;
     String password, confirm;
-
     EmailFragment emailFragment;
-
-
     FragmentManager fragmentManager;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +53,7 @@ public class RegistrationActivity extends AppCompatActivity implements DataStore
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_authorization);
+        ButterKnife.bind(this);
 
         DataFragment fragment = new DataFragment();
 
@@ -56,6 +63,9 @@ public class RegistrationActivity extends AppCompatActivity implements DataStore
         transaction.replace(R.id.fragmentContainer, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
+
+        Typeface type = Typeface.createFromAsset(getAssets(),"abril_fatface_regular.otf");
+        label.setTypeface(type);
     }
 
     @Override

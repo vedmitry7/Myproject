@@ -100,7 +100,7 @@
 
 
             <ImageView
-                android:src="@drawable/ic_account_black_36dp"
+                android:src="@drawable/ic_account_black_24dp"
                 android:id="@+id/imageViewAccount"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
