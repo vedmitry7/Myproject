@@ -1,8 +1,11 @@
 package app.mycity.mycity.activities;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -35,14 +38,15 @@ public class RegistrationActivity extends AppCompatActivity implements DataStore
     @BindView(R.id.registrationLabel)
     TextView label;
 
-    String firstName;
-    String secondName;
-    String birthday;
-    String email;
-    String sex, code;
-    String password, confirm;
-    EmailFragment emailFragment;
-    FragmentManager fragmentManager;
+    private String firstName;
+    private String secondName;
+    private String birthday;
+    private String email;
+    private String sex, code;
+    private String password, confirm;
+    private  EmailFragment emailFragment;
+    private  ConfirmEmailFragment confirmEmailFragment;
+    private FragmentManager fragmentManager;
 
 
     @Override
@@ -52,7 +56,7 @@ public class RegistrationActivity extends AppCompatActivity implements DataStore
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        setContentView(R.layout.activity_authorization);
+        setContentView(R.layout.activity_registration);
         ButterKnife.bind(this);
 
         DataFragment fragment = new DataFragment();
@@ -60,7 +64,7 @@ public class RegistrationActivity extends AppCompatActivity implements DataStore
         fragmentManager = getFragmentManager();
 
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.fragmentContainer, fragment);
+        transaction.add(R.id.fragmentContainer, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
 
@@ -123,7 +127,7 @@ public class RegistrationActivity extends AppCompatActivity implements DataStore
     @Override
     public void nextConfirmEmailCodeStep() {
 
-        ConfirmEmailFragment emailFragment = new ConfirmEmailFragment();
+        confirmEmailFragment = new ConfirmEmailFragment();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
         transaction.replace(R.id.fragmentContainer, emailFragment);
@@ -134,6 +138,9 @@ public class RegistrationActivity extends AppCompatActivity implements DataStore
     }
 
     private void registration() {
+
+        Log.d("TAG", "Registration");
+
         OkHttpClient client = new OkHttpClient();
 
         RequestBody body = new FormBody.Builder()
@@ -195,6 +202,7 @@ public class RegistrationActivity extends AppCompatActivity implements DataStore
 
     @Override
     public void checkEmail() {
+        Log.i("TAG", "checking.........");
         OkHttpClient client = new OkHttpClient();
 
         RequestBody body = new FormBody.Builder()
@@ -328,7 +336,7 @@ public class RegistrationActivity extends AppCompatActivity implements DataStore
 
                     } else {
                         Log.i("TAG", "Wrong");
-
+                        confirmEmailFragment.codeIsWrong();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -403,11 +411,50 @@ public class RegistrationActivity extends AppCompatActivity implements DataStore
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }*/
-
-
-
-
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.i("TAG", "back key");
+        Fragment currentFrag = fragmentManager.findFragmentById(R.id.fragmentContainer);
+
+        if(currentFrag instanceof DataFragment){
+            this.finish();
+        }
+
+        if(currentFrag instanceof EmailFragment){
+            if(emailFragment.isWaitAnswer()){
+                showDialog("Отменить подтверждение email?");
+            } else {
+                super.onBackPressed();
+            }
+        }
+
+        if(currentFrag instanceof ConfirmEmailFragment){
+            showDialog("Отменить подтверждение email?");
+        }
+    }
+
+    private void showDialog(String s) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(s);
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                RegistrationActivity.super.onBackPressed();
+            }
+        });
+        builder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }
