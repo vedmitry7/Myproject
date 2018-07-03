@@ -1,4 +1,4 @@
-package app.mycity.mycity.fragments;
+package app.mycity.mycity.views.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -15,9 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import app.mycity.mycity.Constants;
-import app.mycity.mycity.PersistantStorage;
+import app.mycity.mycity.SharedManager;
 import app.mycity.mycity.R;
-import app.mycity.mycity.adapters.FriendsRecyclerAdapter;
+import app.mycity.mycity.views.adapters.FriendsRecyclerAdapter;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.User;
@@ -25,7 +25,7 @@ import app.mycity.mycity.api.model.UsersContainer;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MyFriendsOnlineFragment extends Fragment {
+public class FriendsOnlineListFragment extends Fragment {
 
 
     @BindView(R.id.myAllFriendsRecyclerAdapter)
@@ -34,13 +34,15 @@ public class MyFriendsOnlineFragment extends Fragment {
     FriendsRecyclerAdapter adapter;
     List<User> userList;
 
-
+    String id;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_my_all_friends, container, false);
         Log.d("TAG", "Create " + this.getClass().getSimpleName());
 
+        if(getArguments() != null)
+            id = getArguments().getString("ID");
 
         ButterKnife.bind(this, view);
         return view;
@@ -56,7 +58,13 @@ public class MyFriendsOnlineFragment extends Fragment {
         adapter = new FriendsRecyclerAdapter(userList);
         recyclerView.setAdapter(adapter);
 
-        getFriendsList();
+        if(id != null && !id.equals("")) {
+            getFriendsListById();
+        }
+        else{
+            getFriendsList();
+        }
+
 
     }
 
@@ -70,7 +78,30 @@ public class MyFriendsOnlineFragment extends Fragment {
     private void getFriendsList(){
 
         Log.d("TAG", "Get friends List");
-        ApiFactory.getApi().getUsersOnlineWithFields(PersistantStorage.getProperty(Constants.KEY_ACCESS_TOKEN), "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
+        ApiFactory.getApi().getUsersOnlineWithFields(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
+            @Override
+            public void onResponse(retrofit2.Call<ResponseContainer<UsersContainer>> call, retrofit2.Response<ResponseContainer<UsersContainer>> response) {
+                UsersContainer users = response.body().getResponse();
+                if(users != null){
+                    userList = users.getFriends();
+                    Log.d("TAG", "Users online loaded. List size = " + userList.size());
+                    adapter.update(userList);
+                } else {
+
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<ResponseContainer<UsersContainer>> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void getFriendsListById(){
+
+        Log.d("TAG", "Get friends List");
+        ApiFactory.getApi().getUsersOnlineById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), id, "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<UsersContainer>> call, retrofit2.Response<ResponseContainer<UsersContainer>> response) {
                 UsersContainer users = response.body().getResponse();
