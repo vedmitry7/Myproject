@@ -1,4 +1,4 @@
-package app.mycity.mycity.activities;
+package app.mycity.mycity.views.activities;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -19,12 +19,11 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
-import app.mycity.mycity.DataStore;
 import app.mycity.mycity.R;
-import app.mycity.mycity.fragments.registrationFragments.ConfirmEmailFragment;
 import app.mycity.mycity.fragments.registrationFragments.DataFragment;
-import app.mycity.mycity.fragments.registrationFragments.EmailFragment;
-import app.mycity.mycity.fragments.registrationFragments.PasswordFragment;
+import app.mycity.mycity.views.fragments.registrationFragments.ConfirmEmailFragment;
+import app.mycity.mycity.views.fragments.registrationFragments.EmailFragment;
+import app.mycity.mycity.views.fragments.registrationFragments.PasswordFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import okhttp3.FormBody;
@@ -32,8 +31,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
-public class RegistrationActivity extends AppCompatActivity implements DataStore {
-
+public class RegistrationActivity extends AppCompatActivity implements RegisterActivityDataStore {
 
     @BindView(R.id.registrationLabel)
     TextView label;
@@ -44,9 +42,11 @@ public class RegistrationActivity extends AppCompatActivity implements DataStore
     private String email;
     private String sex, code;
     private String password, confirm;
-    private  EmailFragment emailFragment;
-    private  ConfirmEmailFragment confirmEmailFragment;
+
     private FragmentManager fragmentManager;
+    private EmailFragment emailFragment;
+    private ConfirmEmailFragment confirmEmailFragment;
+    private PasswordFragment passwordFragment;
 
 
     @Override
@@ -89,13 +89,11 @@ public class RegistrationActivity extends AppCompatActivity implements DataStore
                 app.mycity.mycity.api.model.Response resp = response.body().getResponse();
                 Log.i("TAG", resp.toString());
                 Log.i("TAG", response.body().toString());
-
             }
 
             @Override
             public void onFailure(Call<FullResponse> call, Throwable t) {
                 Log.i("TAG", "fail");
-
             }
         });*/
     }
@@ -126,78 +124,14 @@ public class RegistrationActivity extends AppCompatActivity implements DataStore
 
     @Override
     public void nextConfirmEmailCodeStep() {
+        Log.d("TAG", "confirmEmailCodeStep");
 
         confirmEmailFragment = new ConfirmEmailFragment();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
-        transaction.replace(R.id.fragmentContainer, emailFragment);
+        transaction.replace(R.id.fragmentContainer, confirmEmailFragment);
         transaction.addToBackStack(null);
         transaction.commit();
-
-        registration();
-    }
-
-    private void registration() {
-
-        Log.d("TAG", "Registration");
-
-        OkHttpClient client = new OkHttpClient();
-
-        RequestBody body = new FormBody.Builder()
-                .add("first_name", firstName)
-                .add("last_name", secondName)
-                .add("bdate", birthday)
-                .add("email", email)
-                .add("sex", sex)
-                .build();
-
-        Request request = new Request.Builder().url("http://192.168.0.104/api/auth.signUp")
-                .post(body)
-                .build();
-
-        okhttp3.Response response = null;
-        client.newCall(request).enqueue(new okhttp3.Callback() {
-            @Override
-            public void onFailure(okhttp3.Call call, IOException e) {
-
-            }
-
-            @Override
-            public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
-                String responseString = response.body().string();
-                Log.i("TAG", responseString);
-                String responseClear = responseString.substring(1,responseString.length()-1);
-                Log.i("TAG", responseClear);
-
-                JSONObject jsonObject = null;
-                try {
-                    jsonObject = new JSONObject(responseString);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                Log.i("TAG", "jsonObj = " + String.valueOf(jsonObject!=null));
-
-                JSONObject innerObject = null;
-                try {
-                    innerObject = jsonObject.getJSONObject("response");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                Log.i("TAG", "jsonInnerObj = " + String.valueOf(jsonObject!=null));
-
-
-                String code;
-
-                try {
-                    code = innerObject.getString("user_id");
-                    Log.i("TAG", String.valueOf(code));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 
     @Override
@@ -255,37 +189,27 @@ public class RegistrationActivity extends AppCompatActivity implements DataStore
                         Log.i("TAG", "сущ");
                         emailFragment.emailExist();
                     } else {
-
-
                         Log.i("TAG", "empty");
-                        RegistrationActivity.this.nextConfirmEmailCodeStep();
-
+                        sendEmail();
+                        nextConfirmEmailCodeStep();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-
-
-
             }
         });
 
     }
 
-    @Override
-    public void checkEmailCode() {
+    private void sendEmail() {
+        Log.d("TAG", "Registration");
         OkHttpClient client = new OkHttpClient();
-
         RequestBody body = new FormBody.Builder()
                 .add("email", email)
-                .add("code", code)
                 .build();
-
-        Request request = new Request.Builder().url("http://192.168.0.104/api/auth.checkCode")
+        Request request = new Request.Builder().url("http://192.168.0.104/api/auth.reconfirm")
                 .post(body)
                 .build();
-
         okhttp3.Response response = null;
         client.newCall(request).enqueue(new okhttp3.Callback() {
             @Override
@@ -299,48 +223,85 @@ public class RegistrationActivity extends AppCompatActivity implements DataStore
                 Log.i("TAG", responseString);
                 String responseClear = responseString.substring(1,responseString.length()-1);
                 Log.i("TAG", responseClear);
+            }
+        });
+    }
 
+    @Override
+    public void checkEmailCodeAndRegistration() {
+
+        Log.d("TAG", "Registration");
+
+        OkHttpClient client = new OkHttpClient();
+
+        RequestBody body = new FormBody.Builder()
+                .add("first_name", firstName)
+                .add("last_name", secondName)
+                .add("code", code)
+                .add("bdate", birthday)
+                .add("email", email)
+                .add("sex", sex)
+                .build();
+
+        Request request = new Request.Builder().url("http://192.168.0.104/api/auth.signUp")
+                .post(body)
+                .build();
+
+        okhttp3.Response response = null;
+        client.newCall(request).enqueue(new okhttp3.Callback() {
+            @Override
+            public void onFailure(okhttp3.Call call, IOException e) {
+            }
+
+            @Override
+            public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
+                String responseString = response.body().string();
+                Log.i("TAG", responseString);
+                String responseClear = responseString.substring(1,responseString.length()-1);
+                Log.i("TAG", responseClear);
                 JSONObject jsonObject = null;
+                JSONObject innerResponseObject = null;
                 try {
                     jsonObject = new JSONObject(responseString);
+                    Log.i("TAG", "jsonObj = " + String.valueOf(jsonObject!=null));
+                    innerResponseObject = jsonObject.getJSONObject("response");
+                    Log.i("TAG", "jsonInnerRespObj = " + String.valueOf(innerResponseObject!=null));
+                    if(innerResponseObject!=null){
+                        Log.i("TAG", "RESPONSE");
+                        String success = innerResponseObject.getString("success");
+                        if(success.equals("1")){
+                            passwordFragment = new PasswordFragment();
+                            FragmentTransaction transaction = fragmentManager.beginTransaction();
+                            transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
+                            transaction.replace(R.id.fragmentContainer, passwordFragment);
+                            transaction.addToBackStack(null);
+                            transaction.commit();
+
+                        } else {
+                            confirmEmailFragment.codeIsWrong();
+                        }
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    Log.i("TAG", "JSON GET RESPONSE ERROR");
                 }
 
-                Log.i("TAG", "jsonObj = " + String.valueOf(jsonObject!=null));
-
-                JSONObject innerObject = null;
+                JSONObject innerErrorObject;
                 try {
-                    innerObject = jsonObject.getJSONObject("response");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                Log.i("TAG", "jsonInnerObj = " + String.valueOf(jsonObject!=null));
-
-
-                boolean code;
-
-                try {
-                    code = innerObject.getBoolean("exists");
-                    Log.i("TAG", String.valueOf(code));
-                    if (code){
-                        Log.i("TAG", "Right");
-                        PasswordFragment emailFragment = new PasswordFragment();
-                        FragmentTransaction transaction = fragmentManager.beginTransaction();
-                        transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
-                        transaction.replace(R.id.fragmentContainer, emailFragment);
-                        transaction.addToBackStack(null);
-                        transaction.commit();
-
-
-                    } else {
-                        Log.i("TAG", "Wrong");
-                        confirmEmailFragment.codeIsWrong();
+                    innerErrorObject = jsonObject.getJSONObject("error");
+                    if(innerErrorObject!=null){
+                        Log.i("TAG", "ERROR");
+                        String errorMassage = innerErrorObject.getString("error_msg");
+                        if(errorMassage.equals("account_error")){
+                            Log.i("TAG", "WRONG_CODE");
+                            confirmEmailFragment.codeIsWrong();
+                        }
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                Log.i("TAG", "jsonInnerObj = " + String.valueOf(jsonObject!=null));
+
             }
         });
     }
@@ -365,7 +326,6 @@ public class RegistrationActivity extends AppCompatActivity implements DataStore
         client.newCall(request).enqueue(new okhttp3.Callback() {
             @Override
             public void onFailure(okhttp3.Call call, IOException e) {
-
             }
 
             @Override
@@ -375,42 +335,55 @@ public class RegistrationActivity extends AppCompatActivity implements DataStore
                 String responseClear = responseString.substring(1,responseString.length()-1);
                 Log.i("TAG", responseClear);
 
-               /* JSONObject jsonObject = null;
+                JSONObject jsonObject = null;
+                JSONObject innerResponseObject = null;
                 try {
                     jsonObject = new JSONObject(responseString);
+                    Log.i("TAG", "jsonObj = " + String.valueOf(jsonObject!=null));
+                    innerResponseObject = jsonObject.getJSONObject("response");
+                    Log.i("TAG", "jsonInnerObj = " + String.valueOf(jsonObject!=null));
+
+                    String success;
+                    if(innerResponseObject != null){
+                        try {
+                            success = innerResponseObject.getString("success");
+                            if(success.equals("1")){
+                                Log.i("TAG", "All right");
+                                RegistrationActivity.this.finish();
+                            }
+                            Log.i("TAG", String.valueOf(success));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
                 } catch (JSONException e) {
+                    Log.i("TAG", "GET RESPONSE ERROR");
                     e.printStackTrace();
                 }
 
-                Log.i("TAG", "jsonObj = " + String.valueOf(jsonObject!=null));
-
-                JSONObject innerObject = null;
+                JSONObject innerErrorObject;
                 try {
-                    innerObject = jsonObject.getJSONObject("response");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                Log.i("TAG", "jsonInnerObj = " + String.valueOf(jsonObject!=null));
-
-
-                boolean code;
-
-                try {
-                    code = innerObject.getBoolean("exists");
-                    Log.i("TAG", String.valueOf(code));
-                    if (code){
-                        Log.i("TAG", "Right");
-
-
-
-                    } else {
-                        Log.i("TAG", "Wrong");
-
+                    innerErrorObject = jsonObject.getJSONObject("error");
+                    if(innerErrorObject!=null){
+                        Log.i("TAG", "ERROR");
+                        String errorMassage = innerErrorObject.getString("error_msg");
+                        if(errorMassage.equals("account_password_length")){
+                            Log.i("TAG", "WRONG_LENGTH");
+                            passwordFragment.wrongCodeLength();
+                        }
+                        if(errorMassage.equals("account_password_not_match")){
+                            Log.i("TAG", "NOT MATCH");
+                            passwordFragment.codeNotMatch();
+                        }
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                }*/
+                }
+
+
+
+
             }
         });
     }
