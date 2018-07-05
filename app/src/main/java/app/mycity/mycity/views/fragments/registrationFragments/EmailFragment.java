@@ -1,4 +1,4 @@
-package app.mycity.mycity.fragments.registrationFragments;
+package app.mycity.mycity.views.fragments.registrationFragments;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -6,13 +6,14 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import app.mycity.mycity.DataStore;
+import app.mycity.mycity.views.activities.RegisterActivityDataStore;
 import app.mycity.mycity.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -20,7 +21,7 @@ import butterknife.OnClick;
 
 public class EmailFragment extends Fragment {
 
-    DataStore dataStore;
+    RegisterActivityDataStore dataStore;
 
     @BindView(R.id.emailFragEmailEt)
     EditText email;
@@ -49,14 +50,21 @@ public class EmailFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        dataStore = (DataStore) context;
+        dataStore = (RegisterActivityDataStore) context;
     }
 
     @OnClick(R.id.passwordFragNext)
     public void confirmEmail(View view){
-        dataStore.setEmail(email.getText().toString());
-        progressBarContainer.setVisibility(View.VISIBLE);
-        dataStore.checkEmail();
+        Log.i("TAG", "Email click");
+
+        if(isValidEmailAddress(email.getText().toString())){
+            dataStore.setEmail(email.getText().toString());
+            progressBarContainer.setVisibility(View.VISIBLE);
+            dataStore.checkEmail();
+        } else {
+            info.setTextColor(Color.parseColor("#ff0000"));
+            info.setText("Email введен не верно");
+        }
     }
 
     public void emailExist() {
@@ -65,9 +73,31 @@ public class EmailFragment extends Fragment {
             public void run() {
                 progressBarContainer.setVisibility(View.GONE);
                 info.setTextColor(Color.parseColor("#ff0000"));
-                info.setText("Данный code уже занят, выберите другой или восстановите доступ");
+                info.setText("Данный email уже занят, выберите другой или восстановите доступ");
             }
         });
 
+    }
+
+    public boolean isWaitAnswer(){
+        return progressBarContainer.getVisibility() == View.VISIBLE;
+    }
+
+/*    public static boolean isValidEmailAddress(String email) {
+        boolean result = true;
+        try {
+            InternetAddress emailAddr = new InternetAddress(email);
+            emailAddr.validate();
+        } catch (AddressException ex) {
+            result = false;
+        }
+        return result;
+    }*/
+
+    public boolean isValidEmailAddress(String email) {
+        String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
+        java.util.regex.Matcher m = p.matcher(email);
+        return m.matches();
     }
 }

@@ -1,4 +1,4 @@
-package app.mycity.mycity.activities;
+package app.mycity.mycity.views.activities;
 
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -12,7 +12,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import app.mycity.mycity.Constants;
-import app.mycity.mycity.PersistantStorage;
+import app.mycity.mycity.SharedManager;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.ResponseAuth;
@@ -76,10 +76,10 @@ public class LoginActivity extends AppCompatActivity {
                     Log.i("TAG", "USER ID - " + String.valueOf(responseAuth.getUserId()));
                     Log.i("TAG", "TOKEN - " + responseAuth.getAccessToken());
 
-                    PersistantStorage.addProperty(Constants.KEY_MY_ID, responseAuth.getUserId());
-                    PersistantStorage.addProperty(Constants.KEY_ACCESS_TOKEN, responseAuth.getAccessToken());
-                    PersistantStorage.addProperty(Constants.KEY_REFRESH_TOKEN, responseAuth.getRefreshToken());
-                    PersistantStorage.addProperty(Constants.KEY_EXPIRED_AT, responseAuth.getExpiredAt());
+                    SharedManager.addProperty(Constants.KEY_MY_ID, responseAuth.getUserId());
+                    SharedManager.addProperty(Constants.KEY_ACCESS_TOKEN, responseAuth.getAccessToken());
+                    SharedManager.addProperty(Constants.KEY_REFRESH_TOKEN, responseAuth.getRefreshToken());
+                    SharedManager.addProperty(Constants.KEY_EXPIRED_AT, responseAuth.getExpiredAt());
 
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);

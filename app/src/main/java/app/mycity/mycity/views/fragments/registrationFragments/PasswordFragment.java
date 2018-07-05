@@ -1,24 +1,26 @@
-package app.mycity.mycity.fragments.registrationFragments;
+package app.mycity.mycity.views.fragments.registrationFragments;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import app.mycity.mycity.DataStore;
 import app.mycity.mycity.R;
+import app.mycity.mycity.views.activities.RegisterActivityDataStore;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class PasswordFragment extends Fragment {
 
-    DataStore dataStore;
+    RegisterActivityDataStore dataStore;
 
     @BindView(R.id.passwordFragConfirmPasswordEt)
     EditText confirmPassword;
@@ -28,6 +30,9 @@ public class PasswordFragment extends Fragment {
 
     @BindView(R.id.emailFragmentTextViewInfo)
     TextView info;
+
+    @BindView(R.id.passwordFragProgressBarContainer)
+    ConstraintLayout progressBarContainer;
 
     @Nullable
     @Override
@@ -46,12 +51,36 @@ public class PasswordFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        dataStore = (DataStore) context;
+        dataStore = (RegisterActivityDataStore) context;
     }
 
     @OnClick(R.id.passwordFragNext)
     public void setPassword(View view){
         dataStore.setPassword(password.getText().toString(), confirmPassword.getText().toString());
         dataStore.commitPassword();
+        progressBarContainer.setVisibility(View.VISIBLE);
+    }
+
+    public void wrongCodeLength(){
+        this.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                info.setTextColor(Color.parseColor("#ff0000"));
+                info.setText("Не верная длина пароля");
+                progressBarContainer.setVisibility(View.GONE);
+            }
+        });
+    }
+
+
+    public void codeNotMatch(){
+        this.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                info.setTextColor(Color.parseColor("#ff0000"));
+                info.setText("Пароли не соответствуют");
+                progressBarContainer.setVisibility(View.GONE);
+            }
+        });
     }
 }

@@ -1,4 +1,4 @@
-package app.mycity.mycity.fragments;
+package app.mycity.mycity.views.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -15,17 +15,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import app.mycity.mycity.Constants;
-import app.mycity.mycity.PersistantStorage;
 import app.mycity.mycity.R;
-import app.mycity.mycity.adapters.FriendsRecyclerAdapter;
+import app.mycity.mycity.SharedManager;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.User;
 import app.mycity.mycity.api.model.UsersContainer;
+import app.mycity.mycity.views.adapters.FriendsRecyclerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MyFriendsAllFragment extends Fragment {
+public class FriendsCommonListFragment extends Fragment {
 
 
     @BindView(R.id.myAllFriendsRecyclerAdapter)
@@ -39,6 +39,7 @@ public class MyFriendsAllFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_my_all_friends, container, false);
+        Log.d("TAG", "Create " + this.getClass().getSimpleName());
 
 
         ButterKnife.bind(this, view);
@@ -48,36 +49,34 @@ public class MyFriendsAllFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.d("TAG", "ViewCreated " + this.getClass().getSimpleName());
 
         userList = new ArrayList<>();
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         adapter = new FriendsRecyclerAdapter(userList);
         recyclerView.setAdapter(adapter);
 
-        getFriendsList();
+      //  getFriendsList();
 
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        Log.d("TAG", "Attach " + this.getClass().getSimpleName());
+
     }
 
     private void getFriendsList(){
 
-        ApiFactory.getApi().getUsersWithFields(PersistantStorage.getProperty(Constants.KEY_ACCESS_TOKEN), "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
+        Log.d("TAG", "Get friends List");
+        ApiFactory.getApi().getUsersOnlineWithFields(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<UsersContainer>> call, retrofit2.Response<ResponseContainer<UsersContainer>> response) {
                 UsersContainer users = response.body().getResponse();
-
-                for (User u:users.getFriends()
-                     ) {
-                    Log.d("TAG", "User link - " + u.getPhoto130());
-                }
-
                 if(users != null){
                     userList = users.getFriends();
-                    Log.d("TAG", "Users list size = " + userList.size());
+                    Log.d("TAG", "Users online loaded. List size = " + userList.size());
                     adapter.update(userList);
                 } else {
 
@@ -89,6 +88,48 @@ public class MyFriendsAllFragment extends Fragment {
 
             }
         });
+    }
+
+    public void onStart() {
+        super.onStart();
+        Log.d("TAG", "Start " + this.getClass().getSimpleName());
+
+    }
+
+    public void onResume() {
+        super.onResume();
+        Log.d("TAG", "Resume " + this.getClass().getSimpleName());
+
+    }
+
+    public void onPause() {
+        super.onPause();
+        Log.d("TAG", "Pause " + this.getClass().getSimpleName());
+
+    }
+
+    public void onStop() {
+        super.onStop();
+        Log.d("TAG", "Stop " + this.getClass().getSimpleName());
+
+    }
+
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d("TAG", "Destroy view " + this.getClass().getSimpleName());
+
+    }
+
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d("TAG", "Destroy " + this.getClass().getSimpleName());
+
+    }
+
+    public void onDetach() {
+        super.onDetach();
+        Log.d("TAG", "Detach " + this.getClass().getSimpleName());
+
     }
 
 }

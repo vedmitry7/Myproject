@@ -1,4 +1,4 @@
-package app.mycity.mycity.adapters;
+package app.mycity.mycity.views.adapters;
 
 import android.graphics.Color;
 import android.graphics.PorterDuff;

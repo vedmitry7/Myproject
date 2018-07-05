@@ -4,4 +4,5 @@
     <dimen name="padding16">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="settingsRowSize">56dp</dimen>
+    <dimen name="photo_item_padding">0dp</dimen>
 </resources>

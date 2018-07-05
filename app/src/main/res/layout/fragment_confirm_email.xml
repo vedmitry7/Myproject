@@ -58,14 +58,14 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/emailFragmentTextViewInfo"
+        android:id="@+id/confirmEmailFragmentTextViewInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:gravity="center"
         android:paddingLeft="@dimen/padding16"
         android:paddingRight="@dimen/padding16"
-        android:text="На вашу почту будет отправленно письмо с кодом подтверждения"
+        android:text=""
         app:layout_constraintBottom_toTopOf="@+id/passwordFragNext"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -111,12 +111,13 @@
         android:orientation="horizontal"
         android:paddingLeft="@dimen/padding16"
         android:paddingRight="@dimen/padding16"
-        app:layout_constraintBottom_toTopOf="@+id/dateFragmentNext"
+        app:layout_constraintBottom_toTopOf="@+id/dataFragmentNext"
         app:layout_constraintTop_toBottomOf="@+id/view3"
         tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="0dp">
 
         <RadioButton
+            android:checked="true"
             android:id="@+id/male"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

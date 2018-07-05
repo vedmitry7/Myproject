@@ -1,4 +1,4 @@
-package app.mycity.mycity.adapters;
+package app.mycity.mycity.views.adapters;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -10,8 +10,11 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.List;
 
+import app.mycity.mycity.EventBusMessages;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.model.User;
 import butterknife.BindView;
@@ -37,7 +40,6 @@ public class FriendsRecyclerAdapter extends RecyclerView.Adapter<FriendsRecycler
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Log.d("TAG", "on bind");
         String name = userList.get(position).getFirstName() + " " + userList.get(position).getLastName();
 
         holder.name.setText(name);
@@ -61,6 +63,13 @@ public class FriendsRecyclerAdapter extends RecyclerView.Adapter<FriendsRecycler
         ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("TAG", userList.get(getAdapterPosition()).getFirstName() + " open profile");
+                    EventBus.getDefault().post(new EventBusMessages.OpenUser(userList.get(getAdapterPosition()).getId()));
+                }
+            });
         }
     }
 

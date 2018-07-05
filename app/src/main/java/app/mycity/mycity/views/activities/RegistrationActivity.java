@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 import app.mycity.mycity.R;
+import app.mycity.mycity.api.OkHttpClientFactory;
 import app.mycity.mycity.fragments.registrationFragments.DataFragment;
 import app.mycity.mycity.views.fragments.registrationFragments.ConfirmEmailFragment;
 import app.mycity.mycity.views.fragments.registrationFragments.EmailFragment;
@@ -27,7 +28,6 @@ import app.mycity.mycity.views.fragments.registrationFragments.PasswordFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
@@ -47,6 +47,7 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
     private EmailFragment emailFragment;
     private ConfirmEmailFragment confirmEmailFragment;
     private PasswordFragment passwordFragment;
+
 
 
     @Override
@@ -81,21 +82,6 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
     @Override
     public void setEmail(String email) {
         this.email = email;
-
-
-       /* ApiFactory.getApi().registration(firstName, secondName, birthday, email, sex).enqueue(new Callback<FullResponse>() {
-            @Override
-            public void onResponse(Call<FullResponse> call, Response<FullResponse> response) {
-                app.mycity.mycity.api.model.Response resp = response.body().getResponse();
-                Log.i("TAG", resp.toString());
-                Log.i("TAG", response.body().toString());
-            }
-
-            @Override
-            public void onFailure(Call<FullResponse> call, Throwable t) {
-                Log.i("TAG", "fail");
-            }
-        });*/
     }
 
     @Override
@@ -137,7 +123,6 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
     @Override
     public void checkEmail() {
         Log.i("TAG", "checking.........");
-        OkHttpClient client = new OkHttpClient();
 
         RequestBody body = new FormBody.Builder()
                 .add("email", email)
@@ -148,7 +133,7 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
                 .build();
 
         okhttp3.Response response = null;
-        client.newCall(request).enqueue(new okhttp3.Callback() {
+        OkHttpClientFactory.getClient().newCall(request).enqueue(new okhttp3.Callback() {
             @Override
             public void onFailure(okhttp3.Call call, IOException e) {
 
@@ -203,7 +188,6 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
 
     private void sendEmail() {
         Log.d("TAG", "Registration");
-        OkHttpClient client = new OkHttpClient();
         RequestBody body = new FormBody.Builder()
                 .add("email", email)
                 .build();
@@ -211,7 +195,7 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
                 .post(body)
                 .build();
         okhttp3.Response response = null;
-        client.newCall(request).enqueue(new okhttp3.Callback() {
+        OkHttpClientFactory.getClient().newCall(request).enqueue(new okhttp3.Callback() {
             @Override
             public void onFailure(okhttp3.Call call, IOException e) {
 
@@ -232,8 +216,6 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
 
         Log.d("TAG", "Registration");
 
-        OkHttpClient client = new OkHttpClient();
-
         RequestBody body = new FormBody.Builder()
                 .add("first_name", firstName)
                 .add("last_name", secondName)
@@ -248,7 +230,7 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
                 .build();
 
         okhttp3.Response response = null;
-        client.newCall(request).enqueue(new okhttp3.Callback() {
+        OkHttpClientFactory.getClient().newCall(request).enqueue(new okhttp3.Callback() {
             @Override
             public void onFailure(okhttp3.Call call, IOException e) {
             }
@@ -308,7 +290,6 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
 
     @Override
     public void commitPassword() {
-        OkHttpClient client = new OkHttpClient();
 
         RequestBody body = new FormBody.Builder()
                 .add("email", email)
@@ -323,7 +304,7 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
                 .build();
 
         okhttp3.Response response = null;
-        client.newCall(request).enqueue(new okhttp3.Callback() {
+        OkHttpClientFactory.getClient().newCall(request).enqueue(new okhttp3.Callback() {
             @Override
             public void onFailure(okhttp3.Call call, IOException e) {
             }
@@ -380,10 +361,6 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-
-
-
             }
         });
     }

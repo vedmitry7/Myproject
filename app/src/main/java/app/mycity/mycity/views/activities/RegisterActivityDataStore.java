@@ -1,6 +1,6 @@
-package app.mycity.mycity;
+package app.mycity.mycity.views.activities;
 
-public interface DataStore {
+public interface RegisterActivityDataStore {
 
     void setPassword(String password, String confirm);
     void setEmail(String email);
@@ -9,6 +9,6 @@ public interface DataStore {
     void nextEmailStep();
     void nextConfirmEmailCodeStep();
     void checkEmail();
-    void checkEmailCode();
+    void checkEmailCodeAndRegistration();
     void commitPassword();
 }

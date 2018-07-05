@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.RegistrationActivity">
+    tools:context=".views.activities.RegistrationActivity">
 
 
     <android.support.constraint.ConstraintLayout
@@ -63,7 +63,6 @@
 
     </android.support.constraint.ConstraintLayout>
 
-
     <android.support.v7.widget.CardView
         android:elevation="6dp"
         android:id="@+id/fragmentContainer"
@@ -78,7 +77,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="MissingConstraints"></android.support.v7.widget.CardView>
+        tools:ignore="MissingConstraints">
+    </android.support.v7.widget.CardView>
+
+<!--    <fragment
+        android:name="app.mycity.mycity.views.fragments.registrationFragments.DataFragment"
+        android:layout_marginEnd="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="175dp"
+        android:id="@+id/fragmentContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>-->
 
 
 </android.support.constraint.ConstraintLayout>

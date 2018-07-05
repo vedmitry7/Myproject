@@ -1,8 +1,10 @@
 package app.mycity.mycity.fragments.registrationFragments;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,7 +19,7 @@ import android.widget.TextView;
 
 import java.util.Calendar;
 
-import app.mycity.mycity.DataStore;
+import app.mycity.mycity.views.activities.RegisterActivityDataStore;
 import app.mycity.mycity.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,7 +27,7 @@ import butterknife.OnClick;
 
 public class DataFragment extends Fragment {
 
-    DataStore dataStore;
+    RegisterActivityDataStore dataStore;
 
     @BindView(R.id.dataFragBirthdayTv)
     TextView birthday;
@@ -67,19 +69,50 @@ public class DataFragment extends Fragment {
                 }
             }
         });
+
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        dataStore = (DataStore) context;
+        dataStore = (RegisterActivityDataStore) context;
     }
 
     @OnClick(R.id.dataFragmentNext)
     public void next(View view){
-        dataStore.setInfo(firstName.getText().toString(), secondName.getText().toString(), birthday.getText().toString(), sex);
-        dataStore.nextEmailStep();
+
+        if(isValidLogin(firstName.getText().toString()) && isValidLogin(secondName.getText().toString())){
+            Log.i("TAG", "valid");
+        } else {
+            Log.i("TAG", "invalid");
+            showAlert("Имя и фамилия не должны быть менее двух символов");
+            return;
+        }
+
+        if(birthday.getText().toString().equals("Дата рождения")){
+            Log.i("TAG", "invalid birthday " + birthday.getText().toString());
+            showAlert("Заполните поле даты рождения");
+
+        } else {
+            dataStore.setInfo(firstName.getText().toString(), secondName.getText().toString(), birthday.getText().toString(), sex);
+            dataStore.nextEmailStep();
+        }
+
         Log.i("TAG", "next");
+    }
+
+    private void showAlert(String s) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage(s);
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     @OnClick(R.id.dataFragBirthdayIb)
@@ -112,5 +145,16 @@ public class DataFragment extends Fragment {
                 mMonth,
                 mDay)
                 .show();
+    }
+
+/*    public boolean isValidLogin(String s) {
+        return s.length() >= 2;
+    }*/
+
+    public boolean isValidLogin(String email) {
+        String ePattern = "^[а-яА-Я]{2,}|[a-zA-Z]{2,}$";
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
+        java.util.regex.Matcher m = p.matcher(email);
+        return m.matches();
     }
 }

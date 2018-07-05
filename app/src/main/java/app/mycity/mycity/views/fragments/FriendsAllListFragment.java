@@ -25,7 +25,7 @@ import app.mycity.mycity.api.model.UsersContainer;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class FriendsOnlineListFragment extends Fragment {
+public class FriendsAllListFragment extends Fragment {
 
 
     @BindView(R.id.myAllFriendsRecyclerAdapter)
@@ -36,15 +36,17 @@ public class FriendsOnlineListFragment extends Fragment {
 
     String id;
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_my_all_friends, container, false);
+
         Log.d("TAG", "Create " + this.getClass().getSimpleName());
-
-        if(getArguments() != null)
+        if(getArguments() != null){
             id = getArguments().getString("ID");
-
+            Log.d("TAG", "__________________________________________________________________________id = " + id);
+        }
         ButterKnife.bind(this, view);
         return view;
     }
@@ -52,20 +54,20 @@ public class FriendsOnlineListFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.d("TAG", "ViewCreated " + this.getClass().getSimpleName());
 
         userList = new ArrayList<>();
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         adapter = new FriendsRecyclerAdapter(userList);
         recyclerView.setAdapter(adapter);
+        Log.d("TAG", "ViewCreated " + this.getClass().getSimpleName());
 
-        if(id != null && !id.equals("")) {
+
+        if(id!= null && !id.equals("")){
             getFriendsListById();
         }
-        else{
+        else {
             getFriendsList();
         }
-
 
     }
 
@@ -73,19 +75,19 @@ public class FriendsOnlineListFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.d("TAG", "Attach " + this.getClass().getSimpleName());
-
     }
 
     private void getFriendsList(){
+        Log.d("TAG", "getFriendsList " + this.getClass().getSimpleName());
 
-        Log.d("TAG", "Get friends List");
-        ApiFactory.getApi().getUsersOnlineWithFields(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
+        ApiFactory.getApi().getUsersWithFields(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<UsersContainer>> call, retrofit2.Response<ResponseContainer<UsersContainer>> response) {
                 UsersContainer users = response.body().getResponse();
+
                 if(users != null){
                     userList = users.getFriends();
-                    Log.d("TAG", "Users online loaded. List size = " + userList.size());
+                    Log.d("TAG", "Users all loaded. List size = " + userList.size());
                     adapter.update(userList);
                 } else {
 
@@ -100,15 +102,16 @@ public class FriendsOnlineListFragment extends Fragment {
     }
 
     private void getFriendsListById(){
+        Log.d("TAG", "getFriendsListById " + this.getClass().getSimpleName());
 
-        Log.d("TAG", "Get friends List");
-        ApiFactory.getApi().getUsersOnlineById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), id, "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
+        ApiFactory.getApi().getUsersById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), id, "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<UsersContainer>> call, retrofit2.Response<ResponseContainer<UsersContainer>> response) {
                 UsersContainer users = response.body().getResponse();
+
                 if(users != null){
                     userList = users.getFriends();
-                    Log.d("TAG", "Users online loaded. List size = " + userList.size());
+                    Log.d("TAG", "Users all loaded. List size = " + userList.size());
                     adapter.update(userList);
                 } else {
 
@@ -121,6 +124,7 @@ public class FriendsOnlineListFragment extends Fragment {
             }
         });
     }
+
 
     public void onStart() {
         super.onStart();

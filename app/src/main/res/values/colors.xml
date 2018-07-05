@@ -7,4 +7,7 @@
     <color name="deliver_color">#999999</color>
     <color name="reg_dialog_text_color">#000000</color>
     <color name="black_30percent">#B3B3B3</color>
+    <color name="main_grey_color">#78909c</color>
+
+
 </resources>

@@ -2,11 +2,11 @@ package app.mycity.mycity.api;
 
 import com.google.gson.JsonObject;
 
-import app.mycity.mycity.api.model.ResponseUsers;
-import app.mycity.mycity.api.model.UsersContainer;
+import app.mycity.mycity.api.model.PhotoContainer;
 import app.mycity.mycity.api.model.ResponseAuth;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.User;
+import app.mycity.mycity.api.model.UsersContainer;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -23,10 +23,20 @@ public interface ApiInterface {
     Call<ResponseContainer<ResponseAuth>> authorize(@Field("email") String email,
                                                     @Field("password") String password);
 
+
+
+    // get users
+
     @FormUrlEncoded
     @POST("users.get")
     Call<ResponseContainer<User>> getUser(@Field("access_token") String accessToken,
                                           @Field("fields") String fields);
+
+    @FormUrlEncoded
+    @POST("users.get")
+    Call<ResponseContainer<User>> getUserById(@Field("access_token") String accessToken,
+                                              @Field("user_id") String id,
+                                              @Field("fields") String fields);
 
     @FormUrlEncoded
     @POST("friends.get")
@@ -35,16 +45,39 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("friends.get")
     Call<ResponseContainer<UsersContainer>> getUsersWithFields(@Field("access_token") String accessToken,
-                                                     @Field("fields") String fields);
+                                                               @Field("fields") String fields);
 
     @FormUrlEncoded
     @POST("friends.get")
-    Call<ResponseContainer<UsersContainer>> getUsers(@Field("access_token") String accessToken,
-                                                     @Field("user_id") String userId);
+    Call<ResponseContainer<UsersContainer>> getUsersById(@Field("access_token") String accessToken,
+                                                         @Field("user_id") String id,
+                                                         @Field("fields") String fields);
 
     @FormUrlEncoded
-    @POST("friends.get")
-    Call<ResponseUsers> getUsers2(@Field("access_token") String accessToken);
+    @POST("friends.getOnline")
+    Call<ResponseContainer<UsersContainer>> getUsersOnline(@Field("access_token") String accessToken);
+
+    @FormUrlEncoded
+    @POST("friends.getOnline")
+    Call<ResponseContainer<UsersContainer>> getUsersOnlineWithFields(@Field("access_token") String accessToken,
+                                                                     @Field("fields") String fields);
+
+    @FormUrlEncoded
+    @POST("friends.getOnline")
+    Call<ResponseContainer<UsersContainer>> getUsersOnlineById(@Field("access_token") String accessToken,
+                                                                     @Field("user_id") String id,
+                                                                     @Field("fields") String fields);
+
+    @FormUrlEncoded
+    @POST("photos.getAll")
+    Call<ResponseContainer<PhotoContainer>> getPhotosById(@Field("access_token") String accessToken,
+                                                          @Field("owner_id") String id,
+                                                          @Field("album_id") String albumId);
+
+    @FormUrlEncoded
+    @POST("users.search")
+    Call<ResponseContainer<UsersContainer>> getFriendsList(@Field("access_token") String accessToken,
+                                                           @Field("offset") int count);
 
 /*    @FormUrlEncoded
     @POST("auth.signUp")

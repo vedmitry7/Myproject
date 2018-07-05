@@ -1,30 +1,35 @@
-package app.mycity.mycity.adapters;
+package app.mycity.mycity.views.adapters;
 
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.util.Log;
 
-import app.mycity.mycity.fragments.MyFriendsAllFragment;
 import app.mycity.mycity.fragments.SimpleFragment;
+import app.mycity.mycity.views.fragments.FriendsAllListFragment;
+import app.mycity.mycity.views.fragments.FriendsOnlineListFragment;
 
 
-public class MyFriendsPagerAdapter extends FragmentPagerAdapter {
+public class MyFriendsPagerAdapter extends FragmentStatePagerAdapter {
 
     private FragmentManager fm;
-    TabLayout tabLayout;
+    private TabLayout tabLayout;
 
     public MyFriendsPagerAdapter(FragmentManager fm, TabLayout tabLayout) {
         super(fm);
+        Log.d("TAG", "Constructor " + this.getClass().getSimpleName());
     }
 
     @Override
     public Fragment getItem(int position) {
         switch (position){
             case 0:
-                return new MyFriendsAllFragment();
+                Log.d("TAG", "new MyFriendsAllFragment() " + this.getClass().getSimpleName());
+                return new FriendsAllListFragment();
             case 1:
-                return new SimpleFragment();
+                Log.d("TAG", "new MyFriendsOnlineFragment() " + this.getClass().getSimpleName());
+                return new FriendsOnlineListFragment();
             case 2:
                 return new SimpleFragment();
         }
@@ -36,6 +41,7 @@ public class MyFriendsPagerAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position) {
             case 0:
+                Log.d("TAG", "getPageTitle " + this.getClass().getSimpleName());
                 return "Все";
             case 1:
                 return "Online";
