@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:text="Фотография"
+            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:paddingBottom="5dp"/>
+
+
+        <Button
+            android:id="@+id/chooseAvatarFromGallery"
+            android:text="Выбрать из галереи"
+            android:background="@android:color/white"
+            android:layout_width="match_parent"
+            android:layout_height="48dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="center"
+            android:background="@color/black_10percent" />
+
+        <Button
+            android:id="@+id/makeAvatarPhoto"
+            android:text="Сделать фото"
+            android:background="@android:color/white"
+            android:layout_width="match_parent"
+            android:layout_height="48dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="center"
+            android:background="@color/black_10percent" />
+
+        <Button
+            android:id="@+id/deleteAvatar"
+            android:text="Удалить"
+            android:background="@android:color/white"
+            android:layout_width="match_parent"
+            android:layout_height="48dp" />
+    </LinearLayout>
+
+
+</android.support.constraint.ConstraintLayout>

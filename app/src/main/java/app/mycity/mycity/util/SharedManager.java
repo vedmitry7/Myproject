@@ -1,4 +1,4 @@
-package app.mycity.mycity;
+package app.mycity.mycity.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;

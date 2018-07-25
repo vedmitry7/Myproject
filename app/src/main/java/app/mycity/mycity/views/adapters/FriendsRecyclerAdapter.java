@@ -14,7 +14,7 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
-import app.mycity.mycity.EventBusMessages;
+import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.model.User;
 import butterknife.BindView;

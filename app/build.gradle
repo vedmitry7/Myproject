@@ -1,10 +1,12 @@
 apply plugin: 'com.android.application'
+apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 27
     defaultConfig {
+        vectorDrawables.useSupportLibrary = true
         applicationId "app.mycity.mycity"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
@@ -52,4 +54,17 @@ dependencies {
     //EventBus
     implementation 'org.greenrobot:eventbus:3.1.1'
 
+    //realm
+    implementation 'io.realm:android-adapters:2.1.1'
+
+    implementation 'com.karumi:dexter:5.0.0'
+
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.5.0'
+
+/*
+    implementation 'io.realm:realm-annotations:2.0.1'*/
+
+    implementation 'com.lovejjfg:circleimageview:0.0.1-beta'
+
+    implementation 'info.androidhive:imagefilters:1.0.7'
 }

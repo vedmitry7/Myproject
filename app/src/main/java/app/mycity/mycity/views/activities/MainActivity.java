@@ -3,24 +3,31 @@ package app.mycity.mycity.views.activities;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import app.mycity.mycity.EventBusMessages;
+import app.mycity.mycity.filter_desc_post.FilterImageActivity;
+import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.R;
-import app.mycity.mycity.fragments.settings.MainSettingsFragment;
+import app.mycity.mycity.util.Util;
+import app.mycity.mycity.views.fragments.DialogsFragment;
 import app.mycity.mycity.views.fragments.FriendsFragment;
 import app.mycity.mycity.views.fragments.LongListFragment;
 import app.mycity.mycity.views.fragments.SomeoneFriendsFragment;
 import app.mycity.mycity.views.fragments.profile.ProfileFragment;
 import app.mycity.mycity.views.fragments.profile.SomeoneProfileFragment;
+import app.mycity.mycity.views.fragments.settings.MainSettingsFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -33,6 +40,9 @@ public class MainActivity extends AppCompatActivity implements MainAct {
     @BindView(R.id.main_act_feed_button)    ImageView feedButton;
 
     @BindView(R.id.main_act_profile_button) ImageView profileButton;
+
+    @BindView(R.id.main_act_messages_container)         RelativeLayout messageButton;
+    @BindView(R.id.main_act_notification_container)     RelativeLayout notificattionButton;
 
     FragmentManager fragmentManager;
     ProfileFragment profileFragment;
@@ -48,6 +58,15 @@ public class MainActivity extends AppCompatActivity implements MainAct {
 
         fragmentManager = getFragmentManager();
 
+        Log.d("TAG21", "File - " + Environment.getExternalStorageDirectory()+ Util.getFileName());
+        Log.d("TAG21", "File - " + getCacheDir()+ Util.getFileName());
+
+    }
+
+    @OnClick(R.id.mainActAddBtn)
+    public void photo(View v){
+        Intent intent = new Intent(this, FilterImageActivity.class);
+        startActivity(intent);
     }
 
     @OnClick(R.id.main_act_top_button_container)
@@ -87,6 +106,18 @@ public class MainActivity extends AppCompatActivity implements MainAct {
         transaction.commit();
     }
 
+    @OnClick(R.id.main_act_messages_container)
+    public void message(View v){
+        Log.d("TAG", "messages");
+
+        DialogsFragment dialogsFragment = new DialogsFragment();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
+        transaction.replace(R.id.main_act_fragment_container, dialogsFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
     private void setIndicator(ImageView button){
         topButton.setColorFilter(getResources().getColor(R.color.colorDefaultButton));
         placesButton.setColorFilter(getResources().getColor(R.color.colorDefaultButton));
@@ -107,7 +138,6 @@ public class MainActivity extends AppCompatActivity implements MainAct {
                 transaction.addToBackStack(null);
                 transaction.commit();
                 break;
-
         }
     }
 

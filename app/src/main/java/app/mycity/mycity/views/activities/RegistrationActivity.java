@@ -239,7 +239,7 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
             public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
                 String responseString = response.body().string();
                 Log.i("TAG", responseString);
-                String responseClear = responseString.substring(1,responseString.length()-1);
+                String responseClear = responseString.substring(1, responseString.length()-1);
                 Log.i("TAG", responseClear);
                 JSONObject jsonObject = null;
                 JSONObject innerResponseObject = null;

@@ -16,7 +16,7 @@ import java.util.List;
 
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
-import app.mycity.mycity.SharedManager;
+import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.Dialog;
 import app.mycity.mycity.api.model.DialogsContainer;
@@ -67,6 +67,10 @@ public class DialogsFragment extends Fragment {
         ApiFactory.getApi().getDialogs(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), 0).enqueue(new Callback<ResponseContainer<DialogsContainer>>() {
             @Override
             public void onResponse(Call<ResponseContainer<DialogsContainer>> call, Response<ResponseContainer<DialogsContainer>> response) {
+
+                // !!!!!!!!!
+                // NullPointerException: Attempt to invoke virtual method 'java.lang.Object app.mycity.mycity.api.model.ResponseContainer.getResponse()' on a null object reference
+
                 DialogsContainer dialogs = response.body().getResponse();
 
                 if(dialogs != null){

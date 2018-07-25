@@ -1,6 +1,5 @@
 package app.mycity.mycity.views.fragments.profile;
 
-import android.Manifest;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Context;
@@ -20,15 +19,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.MultiplePermissionsReport;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -40,13 +33,15 @@ import java.util.List;
 
 import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
-import app.mycity.mycity.ExpandableLayout;
+import app.mycity.mycity.filter_desc_post.ExpandableLayout;
 import app.mycity.mycity.R;
-import app.mycity.mycity.SharedManager;
-import app.mycity.mycity.SpacesItemDecoration;
+import app.mycity.mycity.api.model.Likes;
+import app.mycity.mycity.api.model.Post;
+import app.mycity.mycity.api.model.ResponseWall;
+import app.mycity.mycity.util.SharedManager;
+import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.Photo;
-import app.mycity.mycity.api.model.PhotoContainer;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponseSavePhoto;
 import app.mycity.mycity.api.model.ResponseUploadServer;
@@ -54,12 +49,10 @@ import app.mycity.mycity.api.model.ResponseUploading;
 import app.mycity.mycity.api.model.User;
 import app.mycity.mycity.api.model.UsersContainer;
 import app.mycity.mycity.views.activities.MainAct;
-import app.mycity.mycity.views.activities.MainActivity;
 import app.mycity.mycity.views.adapters.CheckinRecyclerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -98,6 +91,7 @@ public class ProfileFragment extends Fragment {
     CheckinRecyclerAdapter adapter;
 
     List<Photo> photoList;
+    List<Likes> likeList;
 
     MainAct activity;
 
@@ -105,11 +99,8 @@ public class ProfileFragment extends Fragment {
 
     RecyclerView.LayoutManager mLayoutManager;
 
-
     File file;
     Uri fileUri;
-
-
 
     @Nullable
     @Override
@@ -128,15 +119,17 @@ public class ProfileFragment extends Fragment {
         imageView.setShadow(App.dpToPx(getActivity(),10));
 
         mLayoutManager = new GridLayoutManager(this.getActivity(), 3);
-        recyclerView.addItemDecoration(new SpacesItemDecoration(3, App.dpToPx(getActivity(), 4), false));
+        recyclerView.addItemDecoration(new ImagesSpacesItemDecoration(3, App.dpToPx(getActivity(), 4), false));
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setNestedScrollingEnabled(false);
-        photoList = new ArrayList<>();
 
-        adapter = new CheckinRecyclerAdapter( photoList);
+        photoList = new ArrayList<>();
+        likeList = new ArrayList<>();
+
+        adapter = new CheckinRecyclerAdapter( photoList, likeList);
         recyclerView.setAdapter(adapter);
 
-        spaceDecoration = new SpacesItemDecoration(3, App.dpToPx(getActivity(), 4), false);
+        spaceDecoration = new ImagesSpacesItemDecoration(3, App.dpToPx(getActivity(), 4), false);
     }
 
     @OnClick(R.id.expandable_layout)
@@ -242,26 +235,38 @@ public class ProfileFragment extends Fragment {
     }
 
     private void getCheckins(){
-        ApiFactory.getApi().getPhotosById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),SharedManager.getProperty(Constants.KEY_MY_ID), "2").enqueue(new Callback<ResponseContainer<PhotoContainer>>() {
+
+        ApiFactory.getApi().getWall(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN)).enqueue(new Callback<ResponseContainer<ResponseWall>>() {
+            @Override
+            public void onResponse(Call<ResponseContainer<ResponseWall>> call, Response<ResponseContainer<ResponseWall>> response) {
+                Log.d("TAG21", "resp = " + response.body().getResponse().getCount());
+                Log.d("TAG21", "resp = " + response.body().getResponse().getItems().get(0).getAttachments().get(0).getPhotoOrig());
+
+                for (Post p:response.body().getResponse().getItems()
+                     ) {
+                    photoList.add(p.getAttachments().get(0));
+                    likeList.add(p.getLikes());
+                }
+                adapter.notifyDataSetChanged();
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseContainer<ResponseWall>> call, Throwable t) {
+                Log.d("TAG21", "fail get wall");
+            }
+        });
+
+
+        /*      ApiFactory.getApi().getPhotosById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),SharedManager.getProperty(Constants.KEY_MY_ID), "4").enqueue(new Callback<ResponseContainer<PhotoContainer>>() {
             @Override
             public void onResponse(Call<ResponseContainer<PhotoContainer>> call, Response<ResponseContainer<PhotoContainer>> response) {
                 PhotoContainer photos = response.body().getResponse();
+                Log.d("TAG21", "ph count = " + photos.getCount());
 
                 if(photos != null){
-                    photoList.add(photos.getPhotos().get(0));
-                    photoList.add(photos.getPhotos().get(0));
-                    photoList.add(photos.getPhotos().get(0));
-                    photoList.add(photos.getPhotos().get(0));
-                    photoList.add(photos.getPhotos().get(0));         photoList.add(photos.getPhotos().get(0));
-                    photoList.add(photos.getPhotos().get(0));
-                    photoList.add(photos.getPhotos().get(0));
-                    photoList.add(photos.getPhotos().get(0));
-                    photoList.add(photos.getPhotos().get(0));         photoList.add(photos.getPhotos().get(0));
-                    photoList.add(photos.getPhotos().get(0));
-                    photoList.add(photos.getPhotos().get(0));
-                    photoList.add(photos.getPhotos().get(0));
-                    photoList.add(photos.getPhotos().get(0));
-                    Log.d("TAG", "photos size = " + photoList.size());
+                    photoList.addAll(photos.getPhotos());
+                    Log.d("TAG21", "photos size = " + photoList.size());
                     adapter.update(photoList);
                 }
             }
@@ -270,7 +275,7 @@ public class ProfileFragment extends Fragment {
             public void onFailure(Call<ResponseContainer<PhotoContainer>> call, Throwable t) {
 
             }
-        });
+        });*/
     }
 
 

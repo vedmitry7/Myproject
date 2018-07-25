@@ -19,9 +19,12 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
+import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
-import app.mycity.mycity.SharedManager;
+import app.mycity.mycity.api.model.Likes;
+import app.mycity.mycity.util.SharedManager;
+import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.Photo;
 import app.mycity.mycity.api.model.PhotoContainer;
@@ -64,6 +67,9 @@ public class SomeoneProfileFragment extends Fragment {
     CheckinRecyclerAdapter adapter;
 
     List<Photo> photoList;
+    List<Likes> likeList;
+
+
 
     String id;
     MainAct activity;
@@ -71,7 +77,7 @@ public class SomeoneProfileFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        View view = inflater.inflate(R.layout.new_profile_fragment_scrolling, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
@@ -88,10 +94,11 @@ public class SomeoneProfileFragment extends Fragment {
         getCheckins();
 
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this.getActivity(), 3);
+        recyclerView.addItemDecoration(new ImagesSpacesItemDecoration(3, App.dpToPx(getActivity(), 4), false));
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setNestedScrollingEnabled(false);
         photoList = new ArrayList<>();
-        adapter = new CheckinRecyclerAdapter(photoList);
+        adapter = new CheckinRecyclerAdapter(photoList, likeList);
         recyclerView.setAdapter(adapter);
     }
 

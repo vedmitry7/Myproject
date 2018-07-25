@@ -1,4 +1,4 @@
-package app.mycity.mycity.fragments.settings;
+package app.mycity.mycity.views.fragments.settings;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -24,6 +24,8 @@ public class MainSettingsFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+
+
         super.onViewCreated(view, savedInstanceState);
     }
 

@@ -16,7 +16,7 @@ import java.util.List;
 
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
-import app.mycity.mycity.SharedManager;
+import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.User;

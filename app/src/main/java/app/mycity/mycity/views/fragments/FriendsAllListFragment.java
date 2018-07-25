@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import app.mycity.mycity.Constants;
-import app.mycity.mycity.SharedManager;
+import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.R;
 import app.mycity.mycity.views.adapters.FriendsRecyclerAdapter;
 import app.mycity.mycity.api.ApiFactory;

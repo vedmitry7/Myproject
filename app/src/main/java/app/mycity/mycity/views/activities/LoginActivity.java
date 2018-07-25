@@ -12,7 +12,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import app.mycity.mycity.Constants;
-import app.mycity.mycity.SharedManager;
+import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.ResponseAuth;
