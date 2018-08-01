@@ -45,6 +45,8 @@ public class FriendsOnlineListFragment extends Fragment {
         if(getArguments() != null)
             id = getArguments().getString("ID");
 
+        Log.i("TAG3","All Online create");
+
         ButterKnife.bind(this, view);
         return view;
     }
@@ -131,12 +133,15 @@ public class FriendsOnlineListFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.d("TAG", "Resume " + this.getClass().getSimpleName());
+        Log.i("TAG21","Friends ALL ONLINE FRIENDS  resume");
+        Log.i("TAG3","All Online resume");
 
     }
 
     public void onPause() {
         super.onPause();
         Log.d("TAG", "Pause " + this.getClass().getSimpleName());
+        Log.i("TAG3","All Online pause");
 
     }
 
@@ -155,6 +160,7 @@ public class FriendsOnlineListFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         Log.d("TAG", "Destroy " + this.getClass().getSimpleName());
+        Log.i("TAG3","All Online destroy");
 
     }
 

@@ -4,7 +4,11 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -35,6 +39,8 @@ public class LoginActivity extends AppCompatActivity {
     @BindView(R.id.loginActPasswordEt)
     EditText password;
 
+    int selection = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +58,27 @@ public class LoginActivity extends AppCompatActivity {
     public void onClick(View v){
         Intent intent = new Intent(this, RegistrationActivity.class);
         startActivity(intent);
+    }
+
+    @OnClick(R.id.showPasswordBtn)
+    public void showPassword(View v){
+        v.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                switch(event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        selection = password.getSelectionStart();
+                        password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        password.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                        password.setSelection(selection);
+                        return true;
+                }
+                return false;
+            }
+        });
     }
 
     @OnClick(R.id.loginActForgetPasswordButtonTv)
@@ -115,7 +142,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.i("TAG", "FAILURE - " + e.getLocalizedMessage());
-                Log.i("TAG", "FAILURE - " + e.getMessage());
+                Log.i("TAG", "FAILURE - " + e.getPostId());
                 Log.i("TAG", "FAILURE - " + e.getCause());
 
                 if(e instanceof ConnectException){

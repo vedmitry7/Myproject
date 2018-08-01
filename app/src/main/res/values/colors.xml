@@ -7,8 +7,10 @@
     <color name="colorDefaultButton">#b0c1c9</color>
     <color name="deliver_color">#999999</color>
     <color name="reg_dialog_text_color">#000000</color>
+    <color name="black_67percent">#545454</color>
     <color name="black_30percent">#B3B3B3</color>
     <color name="black_10percent">#E5E5E5</color>
+    <color name="grey600">#757575</color>
     <color name="main_grey_color">#78909c</color>
     <color name="filter_label_normal">#8A8889</color>
 

@@ -1,10 +1,10 @@
 package app.mycity.mycity.views.fragments;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -25,7 +25,6 @@ public class SomeoneFriendsFragment extends Fragment {
     ViewPager viewPager;
     @BindView(R.id.myFriendsTabLayout)
     TabLayout tabLayout;
-
 
     String id;
 
@@ -51,7 +50,6 @@ public class SomeoneFriendsFragment extends Fragment {
         //viewPager.addOnPageChangeListener(pagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
-
     }
 
     @Override
@@ -71,6 +69,7 @@ public class SomeoneFriendsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.d("TAG", "Resume " + this.getClass().getSimpleName());
+        Log.i("TAG21","Friends by Id  resume");
 
     }
 

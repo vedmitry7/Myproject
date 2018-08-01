@@ -14,6 +14,10 @@ public class ResponseWall {
     @Expose
     private List<Post> items = null;
 
+    @SerializedName("profiles")
+    @Expose
+    private List<Profile> profiles = null;
+
     public Integer getCount() {
         return count;
     }
@@ -24,6 +28,14 @@ public class ResponseWall {
 
     public List<Post> getItems() {
         return items;
+    }
+
+    public List<Profile> getProfiles() {
+        return profiles;
+    }
+
+    public void setProfiles(List<Profile> profiles) {
+        this.profiles = profiles;
     }
 
     public void setItems(List<Post> items) {

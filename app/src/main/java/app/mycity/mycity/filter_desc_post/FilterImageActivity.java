@@ -11,6 +11,7 @@ import android.provider.MediaStore;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -33,11 +34,13 @@ import com.zomato.photofilters.imageprocessors.subfilters.ContrastSubFilter;
 import com.zomato.photofilters.imageprocessors.subfilters.SaturationSubfilter;
 
 import java.io.File;
+import java.net.URI;
 import java.util.List;
 
 import app.mycity.mycity.R;
 import app.mycity.mycity.util.BitmapUtils;
 import app.mycity.mycity.util.Util;
+import app.mycity.mycity.views.activities.MainActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -253,64 +256,31 @@ public class FilterImageActivity extends AppCompatActivity implements FiltersLis
         Log.d("TAG21", file.getAbsolutePath());
         Log.d("TAG21", file.getAbsolutePath());
         fileUri = Uri.fromFile(file);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+
+
+
+        Uri imageUri = FileProvider.getUriForFile(
+                this,
+                "app.mycity.mycity.provider", //(use your app signature + ".provider" )
+                file);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
         startActivityForResult(intent, REQUEST_CODE);
+
     }
 
-    /*
-     * saves image to camera gallery
-     * */
     private void saveImageToGallery() {
 
         outFilteredImage = superOriginalImage.copy(Bitmap.Config.ARGB_8888, true);
-
         if(selectedFilter!=null)
             selectedFilter.processFilter(outFilteredImage);
-
         outFinalImage = outFilteredImage.copy(Bitmap.Config.ARGB_8888, true);
-
         final Bitmap bitmap = outFilteredImage.copy(Bitmap.Config.ARGB_8888, true);
-
         if(editFilter!=null)
         outFinalImage = editFilter.processFilter(bitmap);
 
-        Dexter.withActivity(this).withPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                .withListener(new MultiplePermissionsListener() {
-                    @Override
-                    public void onPermissionsChecked(MultiplePermissionsReport report) {
-                        if (report.areAllPermissionsGranted()) {
-
-                            saveImagePath = Util.getExternalFileName();
-                            BitmapUtils.storeImage(outFinalImage, saveImagePath);
-                            startDescriptionActivity(saveImagePath);
-
-                            if (!TextUtils.isEmpty(path)) {
-                                Snackbar snackbar = Snackbar
-                                        .make(coordinatorLayout, "Image saved to gallery!", Snackbar.LENGTH_LONG)
-                                        .setAction("OPEN", new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View view) {
-                                                openImage(path);
-                                            }
-                                        });
-
-                                snackbar.show();
-                            } else {
-                                Snackbar snackbar = Snackbar
-                                        .make(coordinatorLayout, "Unable to save image!", Snackbar.LENGTH_LONG);
-
-                                snackbar.show();
-                            }
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Permissions are not granted!", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-
-                    @Override
-                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-                        token.continuePermissionRequest();
-                    }
-                }).check();
+        saveImagePath = Util.getExternalFileName();
+        BitmapUtils.storeImage(outFinalImage, saveImagePath);
+        startDescriptionActivity(saveImagePath);
     }
 
     // opening image in default image viewer app
@@ -349,6 +319,10 @@ public class FilterImageActivity extends AppCompatActivity implements FiltersLis
         }
 
         if (resultCode == RESULT_OK && requestCode == REQUEST_ACTIVITY_DESCRIPTION) {
+            finish();
+        }
+
+        if(resultCode == RESULT_CANCELED && path.equals("") ){
             finish();
         }
     }

@@ -1,10 +1,10 @@
 package app.mycity.mycity.views.fragments.profile;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -23,6 +23,7 @@ import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.model.Likes;
+import app.mycity.mycity.api.model.Post;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
 import app.mycity.mycity.api.ApiFactory;
@@ -68,6 +69,7 @@ public class SomeoneProfileFragment extends Fragment {
 
     List<Photo> photoList;
     List<Likes> likeList;
+    List<Post> postList;
 
 
 
@@ -98,8 +100,11 @@ public class SomeoneProfileFragment extends Fragment {
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setNestedScrollingEnabled(false);
         photoList = new ArrayList<>();
-        adapter = new CheckinRecyclerAdapter(photoList, likeList);
+        adapter = new CheckinRecyclerAdapter(postList);
         recyclerView.setAdapter(adapter);
+        Log.i("TAG21","Someone - stack count - " + getActivity().getFragmentManager().getBackStackEntryCount());
+        Log.i("TAG3","SomeOne Profile created");
+
     }
 
     @Override
@@ -116,6 +121,7 @@ public class SomeoneProfileFragment extends Fragment {
 
 
     private void getInfo(){
+        Log.i("TAG21", "Someone getInfo");
         if(id.equals("") || id == null){
             Log.i("TAG", "ID doesn't exist!");
             return;
@@ -181,20 +187,22 @@ public class SomeoneProfileFragment extends Fragment {
 
     @OnClick(R.id.profileFragFriendsButton)
     public void friends(View v){
-        Log.d("TAG", "FRIENDS");
+        Log.d("TAG", "GET FRIENDS BY ID!!!!!!!!!!  " + id);
         activity.startFriendsById(id);
     }
 
     private void getCheckins(){
+        Log.d("TAG21", "SOMEONE PROFILE GET CHECKINS");
         ApiFactory.getApi().getPhotosById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), id, "2").enqueue(new Callback<ResponseContainer<PhotoContainer>>() {
             @Override
             public void onResponse(Call<ResponseContainer<PhotoContainer>> call, Response<ResponseContainer<PhotoContainer>> response) {
+
                 PhotoContainer photos = response.body().getResponse();
 
                 if(photos != null){
                     photoList = photos.getPhotos();
-                    Log.d("TAG", "photos size = " + photoList.size());
-                    adapter.update(photoList);
+                    Log.d("TAG21", "photos size = " + photoList.size());
+                   // adapter.update(photoList);
                 }
             }
 
@@ -203,5 +211,18 @@ public class SomeoneProfileFragment extends Fragment {
 
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.i("TAG21", "Profile Someone Fragment resume");
+        Log.i("TAG3","SomeOne Profile created");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.i("TAG3","SomeOne Profile destroy");
     }
 }

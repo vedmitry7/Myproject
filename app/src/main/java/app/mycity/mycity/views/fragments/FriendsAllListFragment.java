@@ -47,6 +47,7 @@ public class FriendsAllListFragment extends Fragment {
             id = getArguments().getString("ID");
             Log.d("TAG", "__________________________________________________________________________id = " + id);
         }
+        Log.i("TAG3","All list created");
         ButterKnife.bind(this, view);
         return view;
     }
@@ -75,6 +76,7 @@ public class FriendsAllListFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.d("TAG", "Attach " + this.getClass().getSimpleName());
+        Log.i("TAG3","All list attach");
     }
 
     private void getFriendsList(){
@@ -107,6 +109,8 @@ public class FriendsAllListFragment extends Fragment {
         ApiFactory.getApi().getUsersById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), id, "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<UsersContainer>> call, retrofit2.Response<ResponseContainer<UsersContainer>> response) {
+
+
                 UsersContainer users = response.body().getResponse();
 
                 if(users != null){
@@ -135,12 +139,15 @@ public class FriendsAllListFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.d("TAG", "Resume " + this.getClass().getSimpleName());
+        Log.i("TAG3","All list resume");
 
     }
 
     public void onPause() {
         super.onPause();
         Log.d("TAG", "Pause " + this.getClass().getSimpleName());
+        Log.i("TAG21","Friends ALL FRIENDS  resume");
+        Log.i("TAG3","All list pause");
 
     }
 
@@ -159,12 +166,14 @@ public class FriendsAllListFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         Log.d("TAG", "Destroy " + this.getClass().getSimpleName());
+        Log.i("TAG3","All list destroy");
 
     }
 
     public void onDetach() {
         super.onDetach();
         Log.d("TAG", "Detach " + this.getClass().getSimpleName());
+        Log.i("TAG3","All list detach");
 
     }
 

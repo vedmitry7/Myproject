@@ -19,6 +19,7 @@ public class MyFriendsPagerAdapter extends FragmentStatePagerAdapter {
     public MyFriendsPagerAdapter(FragmentManager fm, TabLayout tabLayout) {
         super(fm);
         Log.d("TAG", "Constructor " + this.getClass().getSimpleName());
+        Log.i("TAG3","new Friends Pager created");
     }
 
     @Override

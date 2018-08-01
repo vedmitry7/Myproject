@@ -22,35 +22,47 @@
             android:fitsSystemWindows="true"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
-        <activity android:name=".views.activities.MainActivity" />
+        <activity
+            android:name=".views.activities.MainActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".views.activities.ChatActivity"
-            android:windowSoftInputMode="adjustPan"></activity>
-        <activity android:name=".views.activities.LoadImageActivity">
-
-        </activity>
-
-
-
+            android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".views.activities.LoadImageActivity" />
         <activity
             android:name=".filter_desc_post.FilterImageActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar.Fullscreen">
+            android:theme="@style/AppTheme.NoActionBar.Fullscreen" />
+        <activity
+            android:name=".filter_desc_post.DescriptionActivity"
+            android:theme="@style/AppTheme.NoActionBar.Fullscreen" />
+        <activity
+            android:name=".views.activities.FullViewActivity"
+            android:theme="@style/AppTheme.NoActionBar.Fullscreen"
+            android:windowSoftInputMode="stateHidden|adjustUnspecified"></activity>
 
-        </activity>
-        <activity android:name=".filter_desc_post.DescriptionActivity"
-            android:theme="@style/AppTheme.NoActionBar.Fullscreen">
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="app.mycity.mycity.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
 
-        </activity>
+            <!-- ressource file to create -->
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"></meta-data>
+        </provider>
 
+        <activity
+            android:name=".views.activities.CommentActivity"
+            android:label="@string/title_activity_comment"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

@@ -20,5 +20,6 @@
     <string name="filter_normal">Normal</string>
     <string name="action_save">SAVE</string>
     <string name="action_open">Заново</string>
+    <string name="title_activity_comment">Комментарии</string>
 
 </resources>

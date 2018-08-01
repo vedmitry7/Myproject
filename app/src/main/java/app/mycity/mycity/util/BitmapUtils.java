@@ -197,7 +197,7 @@ public class BitmapUtils {
         File pictureFile = new File(path);
         if (pictureFile == null) {
             Log.d(TAG,
-                    "Error creating media file, check storage permissions: ");// e.getMessage());
+                    "Error creating media file, check storage permissions: ");// e.getPostId());
             return;
         }
         try {

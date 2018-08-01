@@ -34,7 +34,7 @@ public class FriendsRecyclerAdapter extends RecyclerView.Adapter<FriendsRecycler
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.friends_row, parent, false);
-
+        Log.d("TAG", "rec created");
         return new ViewHolder(view);
     }
 
@@ -45,6 +45,10 @@ public class FriendsRecyclerAdapter extends RecyclerView.Adapter<FriendsRecycler
         holder.name.setText(name);
 
         Picasso.get().load(userList.get(position).getPhoto780()).into(holder.image);
+
+        Log.d("TAG21", "Bind FRIEND " + position);
+        Log.i("TAG3","bind");
+
     }
 
     @Override
@@ -75,7 +79,8 @@ public class FriendsRecyclerAdapter extends RecyclerView.Adapter<FriendsRecycler
 
     public void update(List<User> users){
         userList = users;
+        Log.d("TAG", "update rec - rec list = " + userList.size());
+        Log.i("TAG3","All list recycler update");
         notifyDataSetChanged();
-        Log.d("TAG", "update rec");
     }
 }

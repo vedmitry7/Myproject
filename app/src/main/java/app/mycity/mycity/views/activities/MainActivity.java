@@ -1,27 +1,40 @@
 package app.mycity.mycity.views.activities;
 
+import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
+
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.List;
+
 import app.mycity.mycity.filter_desc_post.FilterImageActivity;
+import app.mycity.mycity.util.BitmapUtils;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.R;
 import app.mycity.mycity.util.Util;
+import app.mycity.mycity.views.fragments.CommentsFragment;
 import app.mycity.mycity.views.fragments.DialogsFragment;
+import app.mycity.mycity.views.fragments.FeedFragment;
 import app.mycity.mycity.views.fragments.FriendsFragment;
 import app.mycity.mycity.views.fragments.LongListFragment;
 import app.mycity.mycity.views.fragments.SomeoneFriendsFragment;
@@ -31,6 +44,7 @@ import app.mycity.mycity.views.fragments.settings.MainSettingsFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.realm.Realm;
 
 public class MainActivity extends AppCompatActivity implements MainAct {
 
@@ -44,8 +58,10 @@ public class MainActivity extends AppCompatActivity implements MainAct {
     @BindView(R.id.main_act_messages_container)         RelativeLayout messageButton;
     @BindView(R.id.main_act_notification_container)     RelativeLayout notificattionButton;
 
-    FragmentManager fragmentManager;
+    android.support.v4.app.FragmentManager fragmentManager;
+
     ProfileFragment profileFragment;
+    private LongListFragment myFriendsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,17 +72,42 @@ public class MainActivity extends AppCompatActivity implements MainAct {
 
         setIndicator(profileButton);
 
-        fragmentManager = getFragmentManager();
+        fragmentManager = getSupportFragmentManager();
 
-        Log.d("TAG21", "File - " + Environment.getExternalStorageDirectory()+ Util.getFileName());
-        Log.d("TAG21", "File - " + getCacheDir()+ Util.getFileName());
+
+     /*   profileFragment = new ProfileFragment();
+        myFriendsFragment = new LongListFragment();
+
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.add(R.id.main_act_fragment_container, profileFragment);
+        transaction.add(R.id.main_act_fragment_container, myFriendsFragment);
+
+        transaction.show(profileFragment).commit();*/
+
+
 
     }
 
     @OnClick(R.id.mainActAddBtn)
     public void photo(View v){
-        Intent intent = new Intent(this, FilterImageActivity.class);
-        startActivity(intent);
+        Dexter.withActivity(this).withPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                        if (report.areAllPermissionsGranted()) {
+                            Intent intent = new Intent(MainActivity.this, FilterImageActivity.class);
+                            startActivity(intent);
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Permissions are not granted!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                        token.continuePermissionRequest();
+                    }
+                }).check();
+
     }
 
     @OnClick(R.id.main_act_top_button_container)
@@ -82,28 +123,52 @@ public class MainActivity extends AppCompatActivity implements MainAct {
     @OnClick(R.id.main_act_search_button_container)
     public void search(View v){
         setIndicator(searchButton);
-    }
-
-    @OnClick(R.id.main_act_feed_button_container)
-    public void feed(View v){
-        setIndicator(feedButton);
         LongListFragment myFriendsFragment = new LongListFragment();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
         transaction.replace(R.id.main_act_fragment_container, myFriendsFragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }
 
+    @OnClick(R.id.main_act_feed_button_container)
+    public void feed(View v){
+        setIndicator(feedButton);
+        FeedFragment feedFragment = new FeedFragment();
+        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
+        transaction.replace(R.id.main_act_fragment_container, feedFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+
     @OnClick(R.id.main_act_profile_button_container)
     public void profile(View v){
         profileFragment = new ProfileFragment();
 
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
-        transaction.replace(R.id.main_act_fragment_container, profileFragment);
-        transaction.addToBackStack(null);
+        transaction.add(R.id.main_act_fragment_container, profileFragment);
+        transaction.addToBackStack("myProfile");
         transaction.commit();
+
+        clearFragmentStack();
+    }
+    void clearFragmentStack(){
+        FragmentManager fm = getFragmentManager(); // or 'getSupportFragmentManager();'
+        int count = fm.getBackStackEntryCount();
+        for(int i = 0; i < count; ++i) {
+            fm.popBackStack();
+        }
+    }
+
+    private void clearStack(){
+        int count = fragmentManager.getBackStackEntryCount();
+        while(count > 0){
+            fragmentManager.popBackStack();
+            count--;
+        }
     }
 
     @OnClick(R.id.main_act_messages_container)
@@ -111,8 +176,8 @@ public class MainActivity extends AppCompatActivity implements MainAct {
         Log.d("TAG", "messages");
 
         DialogsFragment dialogsFragment = new DialogsFragment();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
+        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
+      //  transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
         transaction.replace(R.id.main_act_fragment_container, dialogsFragment);
         transaction.addToBackStack(null);
         transaction.commit();
@@ -128,12 +193,12 @@ public class MainActivity extends AppCompatActivity implements MainAct {
 
     @Override
     public void startSettings(int i) {
-        Fragment settingsFragment = null;
+
         switch (i){
             case 0 :
-                settingsFragment = new MainSettingsFragment();
-                FragmentTransaction transaction = fragmentManager.beginTransaction();
-                transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
+                MainSettingsFragment settingsFragment = new MainSettingsFragment();
+                android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
+           //     transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
                 transaction.replace(R.id.main_act_fragment_container, settingsFragment);
                 transaction.addToBackStack(null);
                 transaction.commit();
@@ -144,10 +209,9 @@ public class MainActivity extends AppCompatActivity implements MainAct {
     @Override
     public void startFriends() {
         FriendsFragment myFriendsFragment = new FriendsFragment();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
-        transaction.replace(R.id.main_act_fragment_container, myFriendsFragment);
-        transaction.addToBackStack(null);
+        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.add(R.id.main_act_fragment_container, myFriendsFragment);
+        transaction.addToBackStack("friends");
         transaction.commit();
     }
 
@@ -157,26 +221,43 @@ public class MainActivity extends AppCompatActivity implements MainAct {
         Bundle bundle = new Bundle();
         bundle.putString("ID", id);
         someoneFriendsFragment.setArguments(bundle);
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
+        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
+   //     transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
         transaction.replace(R.id.main_act_fragment_container, someoneFriendsFragment);
-        transaction.addToBackStack(null);
+        transaction.addToBackStack("idFriends");
         transaction.commit();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(EventBusMessages.OpenUser event){
-        // your implementation
-
         SomeoneProfileFragment profileFragment = new SomeoneProfileFragment();
         Bundle bundle = new Bundle();
         bundle.putString("ID", event.getMessage());
         profileFragment.setArguments(bundle);
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
+        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
+        //    transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
         transaction.replace(R.id.main_act_fragment_container, profileFragment);
-        transaction.addToBackStack(null);
+        transaction.addToBackStack("someoneProfile");
         transaction.commit();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(EventBusMessages.OpenComments event){
+        /*CommentsFragment commentsFragment = new CommentsFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("postId", event.getPostId());
+        bundle.putString("ownerId", event.getOwnerId());
+        commentsFragment.setArguments(bundle);
+        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
+        //    transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
+        transaction.replace(R.id.main_act_fragment_container, commentsFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();*/
+
+        Intent intent = new Intent(this, CommentActivity.class);
+        intent.putExtra("postId", event.getPostId());
+        intent.putExtra("ownerId", event.getOwnerId());
+        startActivity(intent);
     }
 
 
@@ -192,9 +273,36 @@ public class MainActivity extends AppCompatActivity implements MainAct {
         EventBus.getDefault().unregister(this);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void closefragment() {
+        getFragmentManager().beginTransaction().remove(getVisibleFragment()).commit();
+    }
+
+    public Fragment getActiveFragment() {
+        if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+            return null;
+        }
+        String tag = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName();
+        return getFragmentManager().findFragmentByTag(tag);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public Fragment getVisibleFragment(){
+        FragmentManager fragmentManager = getFragmentManager();
+        List<Fragment> fragments = fragmentManager.getFragments();
+        if(fragments != null){
+            for(Fragment fragment : fragments){
+                if(fragment != null && fragment.isVisible())
+                    return fragment;
+            }
+        }
+        return null;
+    }
+
     @Override
     public void onBackPressed() {
         Log.d("TAG", "BaCk");
+       // closefragment();
         super.onBackPressed();
     }
 }

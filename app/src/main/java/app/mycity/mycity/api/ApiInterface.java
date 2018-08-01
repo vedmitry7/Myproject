@@ -3,6 +3,9 @@ package app.mycity.mycity.api;
 import com.google.gson.JsonObject;
 
 import app.mycity.mycity.api.model.DialogsContainer;
+import app.mycity.mycity.api.model.ResponseAddComment;
+import app.mycity.mycity.api.model.ResponseComments;
+import app.mycity.mycity.api.model.ResponseLike;
 import app.mycity.mycity.api.model.PhotoContainer;
 import app.mycity.mycity.api.model.ResponseAuth;
 import app.mycity.mycity.api.model.ResponseContainer;
@@ -173,5 +176,49 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("wall.get")
     Call<ResponseContainer<ResponseWall>> getWall(@Field("access_token") String token);
+
+
+    @FormUrlEncoded
+    @POST("likes.add")
+    Call<ResponseContainer<ResponseLike>> like(@Field("access_token") String token,
+                                               @Field("type") String type,
+                                               @Field("item_id") String itemId,
+                                               @Field("owner_id") String ownerId);
+
+    @FormUrlEncoded
+    @POST("likes.delete")
+    Call<ResponseContainer<ResponseLike>> unlike(@Field("access_token") String token,
+                                               @Field("type") String type,
+                                               @Field("item_id") String itemId,
+                                               @Field("owner_id") String ownerId);
+
+    @FormUrlEncoded
+    @POST("feed.get")
+    Call<ResponseContainer<ResponseWall>> getFeed(@Field("access_token") String token,
+                                                 @Field("extended") String type,
+                                                 @Field("offset") int offset,
+                                                 @Field("fields") String fields);
+
+
+    @FormUrlEncoded
+    @POST("wall.getComments")
+    Call<ResponseContainer<ResponseComments>> getComment(@Field("access_token") String token,
+                                                         @Field("sort") String sort,
+                                                         @Field("post_id") String postId,
+                                                         @Field("owner_id") String ownerId,
+                                                         @Field("offset") int offset,
+                                                         @Field("extended") String extended,
+                                                         @Field("count") int count,
+                                                         @Field("fields") String fields);
+
+    //return comment id
+    @FormUrlEncoded
+    @POST("wall.createComment")
+    Call<ResponseContainer<ResponseAddComment>> addComment(@Field("access_token") String token,
+                                                           @Field("post_id") String postId,
+                                                           @Field("owner_id") String ownerId,
+                                                           @Field("text") String text);
+
+
 
 }

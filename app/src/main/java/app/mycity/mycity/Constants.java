@@ -7,4 +7,5 @@ public class Constants {
     public static final String KEY_ACCESS_TOKEN = "access_token";
     public static final String KEY_REFRESH_TOKEN = "refresh_token";
     public static final String KEY_EXPIRED_AT = "expired_at";
+    public static final String KEY_PHOTO_130 = "key_photo_130";
 }

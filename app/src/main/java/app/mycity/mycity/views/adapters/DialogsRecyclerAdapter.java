@@ -18,6 +18,7 @@ import java.util.List;
 
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.model.Dialog;
+import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.activities.ChatActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,15 +48,21 @@ public class DialogsRecyclerAdapter extends RecyclerView.Adapter<DialogsRecycler
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         String name = dialogList.get(position).getTitle();
-        DateFormat format = new SimpleDateFormat("dd.MM.yy:HH:mm");
 
      /*   try {
             holder.time.setText((CharSequence) format.parse(dialogList.get(position).getDate().toString()));
         } catch (ParseException e) {
             e.printStackTrace();
         }*/
+
         holder.name.setText(name);
         holder.lastMessage.setText(dialogList.get(position).getText());
+
+        if(dialogList.get(position).getDate()!=null){
+            holder.time.setText(Util.getDatePretty(dialogList.get(position).getDate()));
+        } else {
+            holder.time.setText("null");
+        }
 
         Picasso.get().load(dialogList.get(position).getPhoto130()).into(holder.image);
     }
@@ -74,7 +81,7 @@ public class DialogsRecyclerAdapter extends RecyclerView.Adapter<DialogsRecycler
         CircleImageView image;
 
         @BindView(R.id.dialog_row_time)
-                TextView time;
+        TextView time;
 
         @BindView(R.id.dialog_row_message)
         TextView lastMessage;
