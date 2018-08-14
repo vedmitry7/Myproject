@@ -9,6 +9,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -16,6 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Calendar;
 
 import app.mycity.mycity.Constants;
@@ -67,8 +71,19 @@ public class ChatActivity extends AppCompatActivity {
 
     RealmResults<Message> results;
 
-    long userId = 11013;
+    long userId = 1;
     public static String imageUrl;
+
+    private Socket mSocket;
+
+    private Emitter.Listener listener = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            String history = "" + args[0];
+            Log.d("TAG21", "History - " + args[0]);
+            chatResponse2(history);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +93,36 @@ public class ChatActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         mRealm = Realm.getDefaultInstance();
+
+
+        {
+            try {
+                mSocket = IO.socket("http://192.168.0.104:8000");
+            } catch (URISyntaxException e) {}
+        }
+
+        mSocket.connect();
+
+
+        JSONObject obj = new JSONObject();
+
+        long l = 15342461596308L;
+        try {
+            obj.put("hash", SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN));
+            if(SharedManager.getProperty("ts")!=null){
+                obj.put("ts", Long.parseLong(SharedManager.getProperty("ts")));
+                Log.d("TAG21", "TS AUTH - " + SharedManager.getProperty("ts"));
+            }
+            else{
+                obj.put("ts", l);
+                Log.d("TAG21", "TS AUTH old - " + l);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        mSocket.emit("auth", obj);
+
+        mSocket.on("history", listener);
 
         userId = getIntent().getLongExtra("user_id", 0);
         imageUrl = getIntent().getStringExtra("image");
@@ -128,7 +173,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        getChats();
+      //  getChats();
     }
 
     @OnClick(R.id.chatBackButtonContainer)
@@ -153,8 +198,12 @@ public class ChatActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         mRealm.close();
+        mSocket.disconnect();
+        mSocket.close();
+        listener = null;
+        Log.d("TAG21", "Realm close");
+        super.onDestroy();
     }
 
     public long getNextKey() {
@@ -206,6 +255,8 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+
+
     /*    Log.d("TAG21", "sending...");
         RequestBody body = new FormBody.Builder()
                 .add("access_token", SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN))
@@ -255,6 +306,7 @@ public class ChatActivity extends AppCompatActivity {
                 .build();*/
 
         if(SharedManager.getProperty("ts")==null){
+            long l = 15342461596308L;
             SharedManager.addProperty("ts", "15313140976873");
         }
 
@@ -285,103 +337,117 @@ public class ChatActivity extends AppCompatActivity {
                  Log.i("TAG21","RESPONSE!!! " + ((endTime - startTime)/1000));
                // String responseClear = responseString.substring(1,responseString.length()-1);
                // Log.i("TAG21", responseClear);
+                chatResponse(responseString);
+            }
+        };
 
-                JSONObject jsonObject = null;
-                JSONObject innerResponseObject = null;
-                JSONArray jsonArray = null;
-
-                try {
-                    jsonObject = new JSONObject(responseString);
-                    Log.i("TAG21", "jsonObj = " + String.valueOf(jsonObject!=null));
-                    innerResponseObject = jsonObject.getJSONObject("response");
-                    Log.i("TAG21", "jsonInnerRespObj = " + String.valueOf(innerResponseObject!=null));
-
-                    jsonArray = innerResponseObject.getJSONArray("history");
-                    Log.i("TAG21", "jsonArray = " + String.valueOf(jsonArray!=null));
-                    Log.i("TAG21", "Size - " + String.valueOf(jsonArray.length()));
-
-                    String ts = innerResponseObject.getString("ts");
-                    Log.i("TAG21", "ts - " + ts);
-                    SharedManager.addProperty("ts", ts);
+        newRequest();
+    }
 
 
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONArray array = jsonArray.getJSONArray(i);
 
-                        String info = null;
-                        switch (array.getInt(0)){
-                            case 1: info = "new message   ";break;
-                            case 2: info = "was read      ";break;
-                            case 5: info = "dialog update "; break;
-                            case 6: info = "read dialog   "; break;
-                        }
-                        Log.i("TAG21", info + array.length() + ": " + array.toString());
-                        int type = array.getInt(0);
-                        final int messageId = array.getInt(4);
-                        final long userId = array.getLong(2);
-                        final long time = array.getLong(1);
+// {"response":{"history":[[1,1534238337,4,0,74,{"text":"коуо","from_id":4,"date":1534238337},0],[5,1534238337,4,0,74,"коуо",0]],"ts":15342383373867}}
 
-                        switch (type){
-                            case 1:
-                                Log.i("TAG21", "new mes");
-                                //How to get text
+//             {"history":[{"0":1,"1":1534238429,"2":4,"3":0,"4":"77","5":{"text":"ггг","from_id":4,"date":1534238429},"6":0},{"0":5,"1":1534238429,"2":4,"3":0,"4":"77","5":"ггг","6":0}],"ts":15342384292720}
 
-                                break;
-                            case 2:
-                                Log.i("TAG21", "was read");
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Message message = mRealm
-                                                .where(Message.class).equalTo("id", messageId).findFirst();
-                                        mRealm.beginTransaction();
-                                        if(message != null){
-                                         message.setWasRead(true);
-                                        }
-                                        mRealm.commitTransaction();
-                                        updateList();
-                                    }
-                                });
+  //  {"history":[[1,1534241198,4,0,"94",{"text":"овоао","from_id":4,"date":1534241198},0],[5,1534241198,4,0,"94","овоао",0]],"ts":15342411988851}
+    void chatResponse(String responseString){
+        JSONObject jsonObject = null;
+        JSONObject innerResponseObject = null;
+        JSONArray jsonArray = null;
 
-                                break;
-                            case 5:
-                                Log.i("TAG21", "Add message to Realm");
-                                //new message
-                                final String text = array.getString(5);
-                                final int out = array.getInt(6);
+        try {
+            jsonObject = new JSONObject(responseString);
+            Log.i("TAG21", "jsonObj = " + String.valueOf(jsonObject!=null));
+            innerResponseObject = jsonObject.getJSONObject("response");
+            Log.i("TAG21", "jsonInnerRespObj = " + String.valueOf(innerResponseObject!=null));
 
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Message message = mRealm
-                                                .where(Message.class).equalTo("id", messageId).findFirst();
-                                        mRealm.beginTransaction();
-                                        if(message == null){
-                                            message = mRealm.createObject(Message.class, messageId);
-                                            //message.setId(messageId);
-                                            message.setUser(userId);
-                                            message.setTime(time);
-                                            message.setText(text);
-                                            message.setOut(out);
-                                            message.setWasRead(false);
-                                        } else {
-                                            message.setTime(time);
-                                        }
-                                        mRealm.commitTransaction();
-                                        updateList();
-                                    }
-                                });
+            jsonArray = innerResponseObject.getJSONArray("history");
+            Log.i("TAG21", "jsonArray = " + String.valueOf(jsonArray!=null));
+            Log.i("TAG21", "Size - " + String.valueOf(jsonArray.length()));
 
-                                break;
-                        }
-                    }
-                    //newRequest();
+            String ts = innerResponseObject.getString("ts");
+            Log.i("TAG21", "ts - " + ts);
+            SharedManager.addProperty("ts", ts);
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    Log.i("TAG21", "JSON GET RESPONSE ERROR");
-               //     newRequest();
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONArray array = jsonArray.getJSONArray(i);
+
+                String info = null;
+                switch (array.getInt(0)){
+                    case 1: info = "new message   ";break;
+                    case 2: info = "was read      ";break;
+                    case 5: info = "dialog update "; break;
+                    case 6: info = "read dialog   "; break;
                 }
+                Log.i("TAG21", info + array.length() + ": " + array.toString());
+                int type = array.getInt(0);
+                final int messageId = array.getInt(4);
+                final long userId = array.getLong(2);
+                final long time = array.getLong(1);
+
+                switch (type){
+                    case 1:
+                        Log.i("TAG21", "new mes");
+                        //How to get text
+
+                        break;
+                    case 2:
+                        Log.i("TAG21", "was read");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Message message = mRealm
+                                        .where(Message.class).equalTo("id", messageId).findFirst();
+                                mRealm.beginTransaction();
+                                if(message != null){
+                                    message.setWasRead(true);
+                                }
+                                mRealm.commitTransaction();
+                                updateList();
+                            }
+                        });
+
+                        break;
+                    case 5:
+                        Log.i("TAG21", "Add message to Realm");
+                        //new message
+                        final String text = array.getString(5);
+                        final int out = array.getInt(6);
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Message message = mRealm
+                                        .where(Message.class).equalTo("id", messageId).findFirst();
+                                mRealm.beginTransaction();
+                                if(message == null){
+                                    message = mRealm.createObject(Message.class, messageId);
+                                    //message.setId(messageId);
+                                    message.setUser(userId);
+                                    message.setTime(time);
+                                    message.setText(text);
+                                    message.setOut(out);
+                                    message.setWasRead(false);
+                                } else {
+                                    message.setTime(time);
+                                }
+                                mRealm.commitTransaction();
+                                updateList();
+                            }
+                        });
+
+                        break;
+                }
+            }
+            //newRequest();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.i("TAG21", "JSON GET RESPONSE ERROR");
+            //     newRequest();
+        }
 
                /* JSONObject innerErrorObject;
                 try {
@@ -389,10 +455,116 @@ public class ChatActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }*/
-            }
-        };
 
-        newRequest();
+    }
+
+    void chatResponse2(String responseString){
+        JSONObject jsonObject = null;
+        JSONObject innerResponseObject = null;
+        JSONArray jsonArray = null;
+
+        try {
+            jsonObject = new JSONObject(responseString);
+            Log.i("TAG21", "jsonObj = " + String.valueOf(jsonObject!=null));
+
+            jsonArray = jsonObject.getJSONArray("history");
+            Log.i("TAG21", "jsonArray = " + String.valueOf(jsonArray!=null));
+            Log.i("TAG21", "Size - " + String.valueOf(jsonArray.length()));
+
+            String ts = jsonObject.getString("ts");
+            Log.i("TAG21", "ts - " + ts);
+            SharedManager.addProperty("ts", ts);
+
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONArray array = jsonArray.getJSONArray(i);
+
+                String info = null;
+                switch (array.getInt(0)){
+                    case 1: info = "new message   ";break;
+                    case 2: info = "was read      ";break;
+                    case 5: info = "dialog update "; break;
+                    case 6: info = "read dialog   "; break;
+                }
+                Log.i("TAG21", info + array.length() + ": " + array.toString());
+                int type = array.getInt(0);
+                final int messageId = array.getInt(4);
+                final long userId = array.getLong(2);
+                final long time = array.getLong(1);
+
+                switch (type){
+                    case 1:
+                        Log.i("TAG21", "new mes");
+                        //How to get text
+
+                        break;
+                    case 2:
+                        Log.i("TAG21", "was read");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Message message = mRealm
+                                        .where(Message.class).equalTo("id", messageId).findFirst();
+                                mRealm.beginTransaction();
+                                if(message != null){
+                                    message.setWasRead(true);
+                                }
+                                mRealm.commitTransaction();
+                                updateList();
+                            }
+                        });
+
+                        break;
+                    case 5:
+                        Log.i("TAG21", "Add message to Realm");
+                        //new message
+                        final String text = array.getString(5);
+                        final int out = array.getInt(6);
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(mRealm.isClosed()){
+                                    Log.i("TAG21", "Realm closed. Call another");
+                                    mRealm = Realm.getDefaultInstance();
+                                }
+                                Message message = mRealm
+                                        .where(Message.class).equalTo("id", messageId).findFirst();
+                                mRealm.beginTransaction();
+                                if(message == null){
+                                    message = mRealm.createObject(Message.class, messageId);
+                                    //message.setId(messageId);
+                                    message.setUser(userId);
+                                    message.setTime(time);
+                                    message.setText(text);
+                                    message.setOut(out);
+                                    message.setWasRead(false);
+                                } else {
+                                    message.setTime(time);
+                                }
+                                mRealm.commitTransaction();
+                                updateList();
+                            }
+                        });
+
+                        break;
+                }
+            }
+            //newRequest();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.i("TAG21", "JSON GET RESPONSE ERROR");
+            //     newRequest();
+        }
+
+               /* JSONObject innerErrorObject;
+                try {
+                    innerErrorObject = jsonObject.getJSONObject("error");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }*/
+
     }
 
     private void newRequest() {
