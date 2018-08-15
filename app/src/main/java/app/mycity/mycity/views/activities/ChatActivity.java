@@ -199,6 +199,7 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         mRealm.close();
+        mSocket.off("history");
         mSocket.disconnect();
         mSocket.close();
         listener = null;
