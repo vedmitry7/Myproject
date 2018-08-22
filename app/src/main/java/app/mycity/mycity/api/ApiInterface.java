@@ -5,12 +5,15 @@ import com.google.gson.JsonObject;
 import app.mycity.mycity.api.model.DialogsContainer;
 import app.mycity.mycity.api.model.ResponseAddComment;
 import app.mycity.mycity.api.model.ResponseComments;
+import app.mycity.mycity.api.model.ResponseDeleteComment;
 import app.mycity.mycity.api.model.ResponseLike;
 import app.mycity.mycity.api.model.PhotoContainer;
 import app.mycity.mycity.api.model.ResponseAuth;
 import app.mycity.mycity.api.model.ResponseContainer;
+import app.mycity.mycity.api.model.ResponseMarkAsRead;
 import app.mycity.mycity.api.model.ResponsePostPhoto;
 import app.mycity.mycity.api.model.ResponseSavePhoto;
+import app.mycity.mycity.api.model.ResponseSocketServer;
 import app.mycity.mycity.api.model.ResponseUploadServer;
 import app.mycity.mycity.api.model.ResponseUploading;
 import app.mycity.mycity.api.model.ResponseWall;
@@ -83,6 +86,11 @@ public interface ApiInterface {
                                                                @Field("fields") String fields);
 
     @FormUrlEncoded
+    @POST("friends.add")
+    Call<ResponseContainer<UsersContainer>> addToFriends(@Field("access_token") String accessToken,
+                                                         @Field("user_id") String id);
+
+    @FormUrlEncoded
     @POST("photos.getAll")
     Call<ResponseContainer<PhotoContainer>> getPhotosById(@Field("access_token") String accessToken,
                                                           @Field("owner_id") String id,
@@ -107,6 +115,17 @@ public interface ApiInterface {
                                                              @Field("peer_id") long user_id,
                                                              @Field("chat_id") long chat_id,
                                                              @Field("text") String text);
+
+
+    @FormUrlEncoded
+    @POST("messages.markAsRead")
+    Call<ResponseContainer<ResponseMarkAsRead>> markAsRead(@Field("access_token") String accessToken,
+                                                           @Field("peer_id") long user_id);
+
+    @FormUrlEncoded
+    @POST("messages.markAsRead")
+    Call<ResponseContainer<SendMessageResponse>> markAsReadMessages(@Field("access_token") String accessToken,
+                                                            @Field("message_ids") long message_ids);
 
 /*    @FormUrlEncoded
     @POST("auth.signUp")
@@ -175,7 +194,13 @@ public interface ApiInterface {
 
     @FormUrlEncoded
     @POST("wall.get")
+    Call<ResponseContainer<ResponseWall>> getWallById(@Field("access_token") String token,
+                                                  @Field("owner_id") String ownerId);
+
+    @FormUrlEncoded
+    @POST("wall.get")
     Call<ResponseContainer<ResponseWall>> getWall(@Field("access_token") String token);
+
 
 
     @FormUrlEncoded
@@ -219,6 +244,13 @@ public interface ApiInterface {
                                                            @Field("owner_id") String ownerId,
                                                            @Field("text") String text);
 
+    @FormUrlEncoded
+    @POST("wall.deleteComment")
+    Call<ResponseContainer<ResponseDeleteComment>> deleteComment(@Field("access_token") String token,
+                                                                 @Field("comment_id") String postId,
+                                                                 @Field("owner_id") String ownerId);
 
+    @GET("getSocketServer")
+    Call<ResponseContainer<ResponseSocketServer>> getSocketServer(@Field("access_token") String token);
 
 }
