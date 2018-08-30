@@ -6,16 +6,16 @@ import com.google.gson.annotations.SerializedName;
 public class Comment {
     @SerializedName("id")
     @Expose
-    private Integer id;
+    private String id;
     @SerializedName("owner_id")
     @Expose
-    private Integer ownerId;
+    private String ownerId;
     @SerializedName("post_id")
     @Expose
-    private Integer postId;
+    private String postId;
     @SerializedName("from_id")
     @Expose
-    private Integer fromId;
+    private String fromId;
     @SerializedName("text")
     @Expose
     private String text;
@@ -26,35 +26,35 @@ public class Comment {
     @Expose
     private Likes likes;
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public Integer getOwnerId() {
+    public String getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(Integer ownerId) {
+    public void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
     }
 
-    public Integer getPostId() {
+    public String getPostId() {
         return postId;
     }
 
-    public void setPostId(Integer postId) {
+    public void setPostId(String postId) {
         this.postId = postId;
     }
 
-    public Integer getFromId() {
+    public String getFromId() {
         return fromId;
     }
 
-    public void setFromId(Integer fromId) {
+    public void setFromId(String fromId) {
         this.fromId = fromId;
     }
 

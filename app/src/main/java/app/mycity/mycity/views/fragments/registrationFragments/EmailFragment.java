@@ -60,6 +60,7 @@ public class EmailFragment extends Fragment {
         if(isValidEmailAddress(email.getText().toString())){
             dataStore.setEmail(email.getText().toString());
             progressBarContainer.setVisibility(View.VISIBLE);
+            dataStore.setEmail(email.getText().toString());
             dataStore.checkEmail();
         } else {
             info.setTextColor(Color.parseColor("#ff0000"));
@@ -67,13 +68,13 @@ public class EmailFragment extends Fragment {
         }
     }
 
-    public void emailExist() {
+    public void emailExist(final String msg) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 progressBarContainer.setVisibility(View.GONE);
                 info.setTextColor(Color.parseColor("#ff0000"));
-                info.setText("Данный email уже занят, выберите другой или восстановите доступ");
+                info.setText(msg);
             }
         });
 

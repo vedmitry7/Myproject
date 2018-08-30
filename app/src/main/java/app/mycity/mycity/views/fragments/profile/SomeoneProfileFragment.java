@@ -1,30 +1,56 @@
 package app.mycity.mycity.views.fragments.profile;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.model.Likes;
 import app.mycity.mycity.api.model.Post;
+import app.mycity.mycity.api.model.ResponseLike;
+import app.mycity.mycity.api.model.ResponseSavePhoto;
+import app.mycity.mycity.api.model.ResponseUploadServer;
+import app.mycity.mycity.api.model.ResponseUploading;
+import app.mycity.mycity.api.model.ResponseWall;
+import app.mycity.mycity.filter_desc_post.ExpandableLayout;
+import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
+import app.mycity.mycity.views.activities.FullViewActivity;
 import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.Photo;
@@ -37,16 +63,15 @@ import app.mycity.mycity.views.adapters.CheckinRecyclerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class SomeoneProfileFragment extends Fragment {
+public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerAdapter.ImageClickListener {
 
     @BindView(R.id.profileFragRoundImage)
-    CircleImageView imageView;
+    de.hdodenhof.circleimageview.CircleImageView imageView;
 
     @BindView(R.id.profileFragProgressBarContainer)
     ConstraintLayout progressBar;
@@ -59,27 +84,58 @@ public class SomeoneProfileFragment extends Fragment {
     @BindView(R.id.profileFragFriendsTv)
     TextView friendsCount;
 
+    @BindView(R.id.checkinCount)
+    TextView checkinCount;
+
     @BindView(R.id.profileFragCurrentPointContainer)
     RelativeLayout currentPoint;
 
     @BindView(R.id.someOneProfileFragRecyclerView)
     RecyclerView recyclerView;
 
+    @BindView(R.id.expandable_layout)
+    ExpandableLayout expandableLayout;
+
+    @BindView(R.id.profilePlaceHolder)
+    ConstraintLayout placeHolder;
+
     CheckinRecyclerAdapter adapter;
 
-    List<Photo> photoList;
-    List<Likes> likeList;
     List<Post> postList;
 
-
-
-    String id;
     MainAct activity;
+
+    private RecyclerView.ItemDecoration spaceDecoration;
+
+    RecyclerView.LayoutManager mLayoutManager;
+
+    File file;
+    Uri fileUri;
+
+    ProgressDialog progressDialog;
+
+    boolean friendLoad, checkinLoad, infoLoad;
+
+    String userId;
+
+    public void showContent() {
+
+        if (friendLoad && checkinLoad && infoLoad) {
+            placeHolder.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // keep the fragment and all its data across screen rotation
+        //setRetainInstance(true);
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.new_profile_fragment_scrolling, container, false);
+        View view = inflater.inflate(R.layout.someone_profile_fragment, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
@@ -87,25 +143,86 @@ public class SomeoneProfileFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        id = getArguments().getString("ID");
+        placeHolder.setVisibility(View.VISIBLE);
 
+        userId = getArguments().getString("ID");
+        Log.i("TAG21", "USER ID " + userId);
+
+
+        //      imageView.setShadow(App.dpToPx(getActivity(),10));
+
+        mLayoutManager = new GridLayoutManager(this.getActivity(), 3);
+        recyclerView.addItemDecoration(new ImagesSpacesItemDecoration(3, App.dpToPx(getActivity(), 4), false));
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setNestedScrollingEnabled(false);
+
+        postList = new ArrayList<>();
+
+        adapter = new CheckinRecyclerAdapter(postList);
+        adapter.setImageClickListener(this);
+        recyclerView.setAdapter(adapter);
+
+        spaceDecoration = new ImagesSpacesItemDecoration(3, App.dpToPx(getActivity(), 4), false);
 
 
         getInfo();
         getFriendsCount();
         getCheckins();
 
-        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this.getActivity(), 3);
-        recyclerView.addItemDecoration(new ImagesSpacesItemDecoration(3, App.dpToPx(getActivity(), 4), false));
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setNestedScrollingEnabled(false);
-        photoList = new ArrayList<>();
-        adapter = new CheckinRecyclerAdapter(postList);
-        recyclerView.setAdapter(adapter);
-        Log.i("TAG21","Someone - stack count - " + getActivity().getFragmentManager().getBackStackEntryCount());
-        Log.i("TAG3","SomeOne Profile created");
 
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+            }
+        }, 100);
+
+
+        Log.i("TAG21", "My profile - stack count - " + getActivity().getFragmentManager().getBackStackEntryCount());
+        Log.i("TAG3", "Profile created");
     }
+
+
+    @OnClick(R.id.expandable_layout)
+    public void onClick(View v) {
+        Log.i("TAG", "toggle ...");
+        expandableLayout.toggleExpansion();
+
+        TextView textView = v.findViewById(R.id.labelPersonalInfo);
+
+        if (expandableLayout.isExpanded()) {
+            textView.setText("Личная информация");
+        } else {
+            textView.setText("Скрыть");
+        }
+    }
+
+    @OnClick(R.id.profileFragListRecyclerLayout)
+    public void listView(View v) {
+        Log.i("TAG", "list view");
+        mLayoutManager = new LinearLayoutManager(this.getActivity());
+        recyclerView.setLayoutManager(mLayoutManager);
+        if (recyclerView.getItemDecorationCount() == 1)
+            recyclerView.removeItemDecorationAt(0);
+
+        adapter.setLayout(CheckinRecyclerAdapter.LINEAR_LAYOUT);
+        recyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+    }
+
+    @OnClick(R.id.profileFragGridRecyclerLayout)
+    public void gridView(View v) {
+        Log.i("TAG", "grid view");
+        mLayoutManager = new GridLayoutManager(this.getActivity(), 3);
+        if (recyclerView.getItemDecorationCount() == 0) {
+            recyclerView.addItemDecoration(spaceDecoration);
+        }
+        recyclerView.setLayoutManager(mLayoutManager);
+
+        adapter.setLayout(CheckinRecyclerAdapter.GRID_LAYOUT);
+        recyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+    }
+
 
     @Override
     public void onAttach(Context context) {
@@ -115,31 +232,30 @@ public class SomeoneProfileFragment extends Fragment {
 
 
     @OnClick(R.id.profileFragBackButtonContainer)
-    public void back(View v){
+    public void back(View v) {
         getActivity().onBackPressed();
     }
 
 
-    private void getInfo(){
-        Log.i("TAG21", "Someone getInfo");
-        if(id.equals("") || id == null){
-            Log.i("TAG", "ID doesn't exist!");
-            return;
-        }
-
-        ApiFactory.getApi().getUserById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), id,  "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<User>>() {
+    private void getInfo() {
+        Log.i("TAG21", "Get Info");
+        ApiFactory.getApi().getUserById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId, "photo_780,photo_130").enqueue(new retrofit2.Callback<ResponseContainer<User>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<User>> call, retrofit2.Response<ResponseContainer<User>> response) {
                 User user = response.body().getResponse();
-                if(user != null){
-                    Log.i("TAG", user.getFirstName());
-                    Log.i("TAG", user.getLastName());
-                    Log.i("TAG", user.getPhoto780());
+                if (user != null) {
+                    Log.i("TAG21", user.getFirstName());
+                    Log.i("TAG21", user.getLastName());
+                    Log.i("TAG21", user.getPhoto780());
 
-                    progressBar.setVisibility(View.GONE);
                     name.setText(user.getFirstName() + " " + user.getLastName());
-                    currentPoint.setVisibility(View.GONE);
+
+                    infoLoad = true;
+                    showContent();
                     Picasso.get().load(user.getPhoto780()).into(imageView);
+                    if (progressDialog != null) {
+                        progressDialog.hide();
+                    }
                 } else {
 
                 }
@@ -152,22 +268,23 @@ public class SomeoneProfileFragment extends Fragment {
         });
     }
 
-    private void getFriendsCount(){
-        if(id.equals("") || id == null) {
-            Log.i("TAG", "ID doesn't exist!");
-            return;
-        }
+    private void getFriendsCount() {
 
-        ApiFactory.getApi().getUsersById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), id, "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
+        ApiFactory.getApi().getUsersById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId, "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<UsersContainer>> call, retrofit2.Response<ResponseContainer<UsersContainer>> response) {
                 UsersContainer users = response.body().getResponse();
 
-                if(users != null){
+                if (users != null) {
                     friendsCount.setText(String.valueOf(users.getFriends().size()));
                 } else {
 
                 }
+
+                friendLoad = true;
+
+                showContent();
+
             }
 
             @Override
@@ -177,32 +294,44 @@ public class SomeoneProfileFragment extends Fragment {
         });
     }
 
+    private void getCheckins() {
 
-    @OnClick(R.id.profileFragSettingButtonContainer)
-    public void settings(View v){
-        Log.d("TAG", "SETTINGS");
-        activity.startSettings(0);
+        ApiFactory.getApi().getWallById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId).enqueue(new Callback<ResponseContainer<ResponseWall>>() {
+            @Override
+            public void onResponse(Call<ResponseContainer<ResponseWall>> call, Response<ResponseContainer<ResponseWall>> response) {
+                Log.d("TAG21", "resp = " + response.body().getResponse().getCount());
 
-    }
+                postList.addAll(response.body().getResponse().getItems());
 
-    @OnClick(R.id.profileFragFriendsButton)
-    public void friends(View v){
-        Log.d("TAG", "GET FRIENDS BY ID!!!!!!!!!!  " + id);
-        activity.startFriendsById(id);
-    }
+                checkinCount.setText(String.valueOf(response.body().getResponse().getCount()));
 
-    private void getCheckins(){
-        Log.d("TAG21", "SOMEONE PROFILE GET CHECKINS");
-        ApiFactory.getApi().getPhotosById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), id, "2").enqueue(new Callback<ResponseContainer<PhotoContainer>>() {
+           /*     for (Post p:response.body().getResponse().getItems()
+                     ) {
+                    photoList.add(p.getAttachments().get(0));
+                    likeList.add(p.getLikes());
+                }*/
+                adapter.notifyDataSetChanged();
+                checkinLoad = true;
+                showContent();
+            }
+
+            @Override
+            public void onFailure(Call<ResponseContainer<ResponseWall>> call, Throwable t) {
+                Log.d("TAG21", "fail get wall");
+            }
+        });
+
+
+        /*      ApiFactory.getApi().getPhotosById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),SharedManager.getProperty(Constants.KEY_MY_ID), "4").enqueue(new Callback<ResponseContainer<PhotoContainer>>() {
             @Override
             public void onResponse(Call<ResponseContainer<PhotoContainer>> call, Response<ResponseContainer<PhotoContainer>> response) {
-
                 PhotoContainer photos = response.body().getResponse();
+                Log.d("TAG21", "ph count = " + photos.getCount());
 
                 if(photos != null){
-                    photoList = photos.getPhotos();
+                    photoList.addAll(photos.getPhotos());
                     Log.d("TAG21", "photos size = " + photoList.size());
-                   // adapter.update(photoList);
+                    adapter.update(photoList);
                 }
             }
 
@@ -210,19 +339,125 @@ public class SomeoneProfileFragment extends Fragment {
             public void onFailure(Call<ResponseContainer<PhotoContainer>> call, Throwable t) {
 
             }
+        });*/
+    }
+
+
+    @OnClick(R.id.someoneFragChat)
+    public void settings(View v) {
+        Log.d("TAG", "Chat ");
+       // activity.startSettings(0);
+    }
+
+    @OnClick(R.id.someoneFragAdd)
+    public void addToFriends(View v) {
+        Log.d("TAG", "Add friends ");
+
+        ApiFactory.getApi().addToFriends(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId).enqueue(new Callback<ResponseContainer<UsersContainer>>() {
+            @Override
+            public void onResponse(Call<ResponseContainer<UsersContainer>> call, Response<ResponseContainer<UsersContainer>> response) {
+                Log.d("TAG21", "Add friends RESP");
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseContainer<UsersContainer>> call, Throwable t) {
+                Log.d("TAG21", "Add friends FAIL");
+            }
         });
+
+        // activity.startSettings(0);
+    }
+
+    @OnClick(R.id.profileFragFriendsButton)
+    public void friends(View v) {
+        Log.d("TAG", "FRIENDS");
+        activity.startFriendsById(userId);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Log.i("TAG21", "Profile Someone Fragment resume");
-        Log.i("TAG3","SomeOne Profile created");
+        Log.i("TAG21", "Profile Fragment resume");
+        Log.i("TAG3", "Profile resume");
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(final EventBusMessages.LikePost event) {
+        Log.d("TAG21", "Like " + event.getItemId());
+
+        if (postList.get(event.getAdapterPosition()).getLikes().getUserLikes() == 1) {
+            Log.d("TAG21", "unlike");
+            ApiFactory.getApi().unlike(
+                    SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),
+                    "post",
+                    postList.get(event.getAdapterPosition()).getId().toString(),
+                    postList.get(event.getAdapterPosition()).getOwnerId().toString()
+            ).enqueue(new Callback<ResponseContainer<ResponseLike>>() {
+                @Override
+                public void onResponse(Call<ResponseContainer<ResponseLike>> call, Response<ResponseContainer<ResponseLike>> response) {
+                    Log.i("TAG21", "resp like - " + response.body().getResponse().getLikes());
+                    if (response != null && response.body() != null) {
+                        postList.get(event.getAdapterPosition()).getLikes().setCount(response.body().getResponse().getLikes());
+                        postList.get(event.getAdapterPosition()).getLikes().setUserLikes(0);
+                        adapter.notifyItemChanged(event.getAdapterPosition());
+                    }
+
+                }
+
+                @Override
+                public void onFailure(Call<ResponseContainer<ResponseLike>> call, Throwable t) {
+                    Log.i("TAG21", "fail");
+                }
+            });
+        }
+
+        if (postList.get(event.getAdapterPosition()).getLikes().getUserLikes() == 0) {
+            Log.d("TAG21", "Like");
+            ApiFactory.getApi().like(
+                    SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),
+                    "post",
+                    postList.get(event.getAdapterPosition()).getId().toString(),
+                    postList.get(event.getAdapterPosition()).getOwnerId().toString()
+            ).enqueue(new Callback<ResponseContainer<ResponseLike>>() {
+                @Override
+                public void onResponse(Call<ResponseContainer<ResponseLike>> call, Response<ResponseContainer<ResponseLike>> response) {
+                    Log.i("TAG21", "resp like - " + response.body().getResponse().getLikes());
+                    if (response != null && response.body() != null) {
+                        postList.get(event.getAdapterPosition()).getLikes().setCount(response.body().getResponse().getLikes());
+                        postList.get(event.getAdapterPosition()).getLikes().setUserLikes(1);
+                        adapter.notifyItemChanged(event.getAdapterPosition());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseContainer<ResponseLike>> call, Throwable t) {
+                    Log.i("TAG21", "fail");
+                }
+            });
+        }
+
+
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.i("TAG3","SomeOne Profile destroy");
+    public void onClick(int position) {
+        Intent intent = new Intent(getActivity(), FullViewActivity.class);
+        intent.putExtra("path", postList.get(position).getAttachments().get(0).getPhotoOrig());
+        intent.putExtra("postId", postList.get(position).getId().toString());
+        intent.putExtra("ownerId", postList.get(position).getOwnerId());
+        getActivity().startActivity(intent);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
     }
 }

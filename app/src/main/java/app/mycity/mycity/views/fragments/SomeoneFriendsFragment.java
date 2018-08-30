@@ -44,7 +44,7 @@ public class SomeoneFriendsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         Log.d("TAG", "ViewCreated " + this.getClass().getSimpleName());
 
-        SomeoneFriendsPagerAdapter pagerAdapter = new SomeoneFriendsPagerAdapter(fragmentManager, tabLayout, id );
+        SomeoneFriendsPagerAdapter pagerAdapter = new SomeoneFriendsPagerAdapter(getChildFragmentManager(), tabLayout, id );
         viewPager.setAdapter(pagerAdapter);
         viewPager.setOffscreenPageLimit(3);
         //viewPager.addOnPageChangeListener(pagerAdapter);

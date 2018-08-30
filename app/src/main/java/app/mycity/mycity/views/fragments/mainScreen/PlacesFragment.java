@@ -1,4 +1,4 @@
-package app.mycity.mycity.fragments.mainScreen;
+
 
 import android.content.Context;
 import android.os.Bundle;

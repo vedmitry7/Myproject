@@ -38,21 +38,33 @@ public class PlacesCheckinFragment extends android.support.v4.app.Fragment {
 
     LinearLayoutManager mLayoutManager;
 
-    @BindView(R.id.placeRecyclerAdapter)
+    @BindView(R.id.placesFragmentCheckinRecyclerView)
     RecyclerView recyclerView;
 
     List<Post> postList;
     PlacesCheckinRecyclerAdapter adapter;
     Map profiles = new HashMap<Long, Profile>();
 
+
+    String placeId;
+
     boolean isLoading;
     int totalCount;
 
+    public static PlacesCheckinFragment createInstance(String placeId) {
+        PlacesCheckinFragment fragment = new PlacesCheckinFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("placeId", placeId);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_places_checkin, container, false);
+
+        placeId = getArguments().getString("placeId");
 
         ButterKnife.bind(this, view);
         return view;
@@ -64,7 +76,7 @@ public class PlacesCheckinFragment extends android.support.v4.app.Fragment {
         mLayoutManager = new GridLayoutManager(this.getActivity(), 3);
         recyclerView.addItemDecoration(new ImagesSpacesItemDecoration(3, App.dpToPx(getActivity(), 4), false));
         recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setNestedScrollingEnabled(false);
+      //  recyclerView.setNestedScrollingEnabled(false);
 
         postList = new ArrayList<>();
 
@@ -98,12 +110,12 @@ public class PlacesCheckinFragment extends android.support.v4.app.Fragment {
     }
 
     private void loadMedia(int offset) {
-        ApiFactory.getApi().getGroupWallById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "1", "checkin", "1").enqueue(new Callback<ResponseContainer<ResponseWall>>() {
+        ApiFactory.getApi().getGroupWallById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), placeId, "checkin", "1").enqueue(new Callback<ResponseContainer<ResponseWall>>() {
             @Override
             public void onResponse(Call<ResponseContainer<ResponseWall>> call, Response<ResponseContainer<ResponseWall>> response) {
 
 
-                if(response!=null && response.body().getResponse()!=null){
+                if(response.body().getResponse()!=null){
                     Log.d("TAG21", "RESPONSE FEED OK");
 
                     totalCount = response.body().getResponse().getCount();

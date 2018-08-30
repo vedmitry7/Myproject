@@ -172,7 +172,7 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
                     Log.i("TAG", String.valueOf(code));
                     if (code){
                         Log.i("TAG", "сущ");
-                        emailFragment.emailExist();
+                        emailFragment.emailExist("Данный email уже занят, выберите другой или восстановите доступ");
                     } else {
                         Log.i("TAG", "empty");
                         sendEmail();

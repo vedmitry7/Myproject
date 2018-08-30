@@ -11,11 +11,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
+import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.Dialog;
@@ -63,6 +68,18 @@ public class DialogsFragment extends Fragment {
         loadDialogs();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
     private void loadDialogs() {
         ApiFactory.getApi().getDialogs(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), 0).enqueue(new Callback<ResponseContainer<DialogsContainer>>() {
             @Override
@@ -85,6 +102,19 @@ public class DialogsFragment extends Fragment {
 
             }
         });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(EventBusMessages.UpdateDialog event){
+        Log.d("TAG21", "Update dialog");
+        for (Dialog dialog: dialogList
+             ) {
+            if(dialog.getId()==event.getId()){
+                dialog.setText(event.getMessage());
+            }
+        }
+
+        adapter.notifyDataSetChanged();
     }
 
     @Override

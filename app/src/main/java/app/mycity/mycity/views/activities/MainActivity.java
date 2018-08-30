@@ -3,7 +3,6 @@ package app.mycity.mycity.views.activities;
 import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -26,17 +25,24 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import app.mycity.mycity.filter_desc_post.FilterImageActivity;
-import app.mycity.mycity.util.BitmapUtils;
-import app.mycity.mycity.util.EventBusMessages;
+import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
-import app.mycity.mycity.util.Util;
-import app.mycity.mycity.views.fragments.CommentsFragment;
+import app.mycity.mycity.TestService;
+import app.mycity.mycity.api.ApiFactory;
+import app.mycity.mycity.api.model.ResponseContainer;
+import app.mycity.mycity.api.model.ResponseSocketServer;
+import app.mycity.mycity.filter_desc_post.FilterImageActivity;
+import app.mycity.mycity.util.EventBusMessages;
+import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.fragments.DialogsFragment;
 import app.mycity.mycity.views.fragments.FeedFragment;
 import app.mycity.mycity.views.fragments.FriendsFragment;
 import app.mycity.mycity.views.fragments.LongListFragment;
+import app.mycity.mycity.views.fragments.PlaceFragment;
+import app.mycity.mycity.views.fragments.PlacesFragment;
 import app.mycity.mycity.views.fragments.SomeoneFriendsFragment;
 import app.mycity.mycity.views.fragments.profile.ProfileFragment;
 import app.mycity.mycity.views.fragments.profile.SomeoneProfileFragment;
@@ -45,6 +51,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements MainAct {
 
@@ -61,12 +71,22 @@ public class MainActivity extends AppCompatActivity implements MainAct {
     android.support.v4.app.FragmentManager fragmentManager;
 
     ProfileFragment profileFragment;
-    private LongListFragment myFriendsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        updateTimestemp();
+
+        new Timer().schedule(new TimerTask() {
+           @Override
+           public void run() {
+               Intent serviceIntent = new Intent(MainActivity.this, TestService.class);
+               startService(serviceIntent);
+
+           }
+       }, 500);
 
         ButterKnife.bind(this);
 
@@ -86,6 +106,37 @@ public class MainActivity extends AppCompatActivity implements MainAct {
 
 
 
+//     initRealm();
+
+    }
+
+    private void updateTimestemp() {
+        ApiFactory.getApi().getSocketServer(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN)).enqueue(new Callback<ResponseContainer<ResponseSocketServer>>() {
+            @Override
+            public void onResponse(Call<ResponseContainer<ResponseSocketServer>> call, Response<ResponseContainer<ResponseSocketServer>> response) {
+                if(response.body()!=null){
+                    SharedManager.addProperty("ts", response.body().getResponse().getTs());
+                    Log.d("TAG21", "update TS - " + response.body().getResponse().getTs());
+                    Toast.makeText(MainActivity.this, response.body().getResponse().getTs(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseContainer<ResponseSocketServer>> call, Throwable t) {
+
+            }
+        });
+    }
+
+
+    public void initRealm() {
+        Realm.init(this);
+        RealmConfiguration config = new RealmConfiguration.Builder()
+                .name("chat.realm_" + SharedManager.getProperty(Constants.KEY_LOGIN))
+                .schemaVersion(1)
+                .deleteRealmIfMigrationNeeded()
+                .build();
+        Realm.setDefaultConfiguration(config);
     }
 
     @OnClick(R.id.mainActAddBtn)
@@ -118,7 +169,14 @@ public class MainActivity extends AppCompatActivity implements MainAct {
     @OnClick(R.id.main_act_places_button_container)
     public void places(View v){
         setIndicator(placesButton);
+        PlacesFragment placesFragment = new PlacesFragment();
+        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
+        transaction.add(R.id.main_act_fragment_container, placesFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
+
 
     @OnClick(R.id.main_act_search_button_container)
     public void search(View v){
@@ -210,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements MainAct {
     public void startFriends() {
         FriendsFragment myFriendsFragment = new FriendsFragment();
         android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.add(R.id.main_act_fragment_container, myFriendsFragment);
+        transaction.replace(R.id.main_act_fragment_container, myFriendsFragment);
         transaction.addToBackStack("friends");
         transaction.commit();
     }
@@ -258,6 +316,22 @@ public class MainActivity extends AppCompatActivity implements MainAct {
         intent.putExtra("postId", event.getPostId());
         intent.putExtra("ownerId", event.getOwnerId());
         startActivity(intent);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void openPlace(EventBusMessages.OpenPlace event){
+        PlaceFragment placeFragment = new PlaceFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("placeId", event.getId());
+        bundle.putString("photo780", event.getPhoto780());
+        bundle.putString("name", event.getName());
+        placeFragment.setArguments(bundle);
+        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
+        //    transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
+        transaction.replace(R.id.main_act_fragment_container, placeFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+
     }
 
 

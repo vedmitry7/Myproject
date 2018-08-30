@@ -88,6 +88,9 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
     @BindView(R.id.profileFragFriendsTv)
     TextView friendsCount;
 
+    @BindView(R.id.checkinCount)
+    TextView checkinCount;
+
     @BindView(R.id.profileFragCurrentPointContainer)
     RelativeLayout currentPoint;
 
@@ -255,6 +258,8 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
                     if(progressDialog!=null){
                         progressDialog.hide();
                     }
+                    SharedManager.addProperty(Constants.KEY_MY_FULL_NAME, user.getFirstName() + " " + user.getLastName());
+
                 } else {
 
                 }
@@ -301,6 +306,9 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
                 Log.d("TAG21", "resp = " + response.body().getResponse().getCount());
 
                 postList.addAll(response.body().getResponse().getItems());
+
+                checkinCount.setText(String.valueOf(response.body().getResponse().getCount()));
+
 
            /*     for (Post p:response.body().getResponse().getItems()
                      ) {
@@ -509,8 +517,12 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
 
     @Override
     public void onClick(int position) {
+        Log.i("TAG21", "post id " + postList.get(position).getId());
+        Log.i("TAG21", "owner id " + postList.get(position).getOwnerId());
         Intent intent = new Intent(getActivity(), FullViewActivity.class);
         intent.putExtra("path", postList.get(position).getAttachments().get(0).getPhotoOrig());
+        intent.putExtra("postId", postList.get(position).getId().toString());
+        intent.putExtra("ownerId", postList.get(position).getOwnerId());
         getActivity().startActivity(intent);
     }
 

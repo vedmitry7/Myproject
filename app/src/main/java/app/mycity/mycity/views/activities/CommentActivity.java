@@ -1,6 +1,7 @@
 package app.mycity.mycity.views.activities;
 
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -8,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.squareup.picasso.Picasso;
 
@@ -16,6 +18,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,10 +27,12 @@ import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.Comment;
+import app.mycity.mycity.api.model.Likes;
 import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.api.model.ResponseAddComment;
 import app.mycity.mycity.api.model.ResponseComments;
 import app.mycity.mycity.api.model.ResponseContainer;
+import app.mycity.mycity.api.model.ResponseDeleteComment;
 import app.mycity.mycity.api.model.ResponseLike;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
@@ -40,7 +45,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CommentActivity extends AppCompatActivity {
+public class CommentActivity extends AppCompatActivity implements CommentsRecyclerAdapter.CommnentClickListener {
 
 
     @BindView(R.id.commentsFragmentRecyclerView)
@@ -57,12 +62,20 @@ public class CommentActivity extends AppCompatActivity {
     List<Comment> commentList;
     Map profiles = new HashMap<Long, Profile>();
 
+    @BindView(R.id.commentsPlaceHolder)
+    ConstraintLayout placeHolder;
+
+
+    @BindView(R.id.addCommentProgress)
+    ProgressBar progressBar;
+
     boolean isLoading;
 
     int totalCount;
 
     String postId = "46";
     String ownerId = "45";
+    private String commentText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +84,12 @@ public class CommentActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               CommentActivity.super.onBackPressed();
+            }
+        });
 
         postId = getIntent().getStringExtra("postId");
         ownerId = getIntent().getStringExtra("ownerId");
@@ -82,6 +101,8 @@ public class CommentActivity extends AppCompatActivity {
 
         adapter = new CommentsRecyclerAdapter(commentList, profiles);
 
+        adapter.setCommentClickListener(this);
+
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 
 
@@ -90,14 +111,15 @@ public class CommentActivity extends AppCompatActivity {
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 int totalItemCount = layoutManager.getItemCount();
-                int lastVisibleItems = layoutManager.findLastVisibleItemPosition();
+                int lastVisibleItems = layoutManager.findLastVisibleItemPosition()+1;
+                Log.d("TAG21", "last visible " + lastVisibleItems + "       total " + totalItemCount);
 
                 if (!isLoading) {
                     if ( lastVisibleItems >= totalItemCount -10 ) {
                         Log.d("TAG21", "ЗАГРУЗКА ДАННЫХ " + commentList.size());
                         isLoading = true;
                         // load if we don't load all
-                        if(totalCount >= commentList.size()){
+                        if(totalCount > commentList.size()){
                             Log.d("TAG21", "load comments ");
                             loadComments(commentList.size());
                         }
@@ -124,7 +146,7 @@ public class CommentActivity extends AppCompatActivity {
     }
 
 
-    private void loadComments(int offset) {
+    private void loadComments(final int offset) {
 
         ApiFactory.getApi().getComment(
                 SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),
@@ -141,22 +163,32 @@ public class CommentActivity extends AppCompatActivity {
 
                 if(response!=null&&response.body().getResponse()!=null){
                     Log.d("TAG21", response.body().getResponse().getItems().size() + " Comment size");
-
-                    commentList = response.body().getResponse().getItems();
+                    isLoading = false;
+                    totalCount = response.body().getResponse().getCount();
+                    commentList.addAll(response.body().getResponse().getItems());
+                    Log.d("TAG21", commentList.size() + " Comments size, count = " + totalCount);
 
                     if(response.body().getResponse().getProfiles()!=null){
                         for (Profile p: response.body().getResponse().getProfiles()
                                 ) {
                             profiles.put(p.getId(), p);
                             Log.d("TAG21", "ADD ONE " + p.getFirstName() + " " + p.getLastName());
+                            Log.d("TAG21", "ADD ONE " + p.toString());
+
                         }
                     }
                     adapter.update(commentList, profiles);
-                    recyclerView.scrollToPosition(0);
+                    if(commentList.size()==0){
+                        placeHolder.setVisibility(View.VISIBLE);
+                    } else {
+                        placeHolder.setVisibility(View.GONE);
+                    }
+
+                    if(offset==0){
+                        recyclerView.scrollToPosition(0);
+                    }
                 }
-
             }
-
             @Override
             public void onFailure(Call<ResponseContainer<ResponseComments>> call, Throwable t) {
 
@@ -166,10 +198,34 @@ public class CommentActivity extends AppCompatActivity {
 
     @OnClick(R.id.addComment)
     public void addComment(View v){
-        ApiFactory.getApi().addComment(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), postId, ownerId, editText.getText().toString()).enqueue(new Callback<ResponseContainer<ResponseAddComment>>() {
+        progressBar.setVisibility(View.VISIBLE);
+        commentText = editText.getText().toString();
+        editText.setText("");
+        ApiFactory.getApi().addComment(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), postId, ownerId, commentText).enqueue(new Callback<ResponseContainer<ResponseAddComment>>() {
             @Override
             public void onResponse(Call<ResponseContainer<ResponseAddComment>> call, Response<ResponseContainer<ResponseAddComment>> response) {
                 Log.d("TAG21", "add comrent response " );
+
+                if(response!=null&&response.body().getResponse()!=null){
+                    Log.d("TAG21", "comment ID - " + response.body().getResponse().getCommentId() );
+
+                    Comment comment = new Comment();
+                    comment.setText(commentText);
+                    comment.setOwnerId(SharedManager.getProperty(Constants.KEY_MY_ID));
+                    comment.setDate((int) (Calendar.getInstance().getTimeInMillis()/1000));
+                    comment.setId(response.body().getResponse().getCommentId());
+                    comment.setFromId(SharedManager.getProperty(Constants.KEY_MY_ID));
+                    comment.setPostId(postId);
+                    Likes likes = new Likes();
+                    likes.setUserLikes(0);
+                    likes.setCount(0);
+                    comment.setLikes(likes);
+                    progressBar.setVisibility(View.GONE);
+                    commentList.add(0, comment);
+                    adapter.notifyDataSetChanged();
+
+                    placeHolder.setVisibility(View.GONE);
+                }
 
             }
 
@@ -179,7 +235,6 @@ public class CommentActivity extends AppCompatActivity {
             }
         });
     }
-
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(final EventBusMessages.LikeComment event) {
@@ -239,6 +294,28 @@ public class CommentActivity extends AppCompatActivity {
     }
 
     @Override
+    public void deleteComment(final int position) {
+        Log.d("TAG21", "delete comments in act");
+        ApiFactory.getApi().deleteComment(
+                SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),
+                commentList.get(position).getId(),
+                ownerId).enqueue(new Callback<ResponseContainer<ResponseDeleteComment>>() {
+            @Override
+            public void onResponse(Call<ResponseContainer<ResponseDeleteComment>> call, Response<ResponseContainer<ResponseDeleteComment>> response) {
+
+                if(response!=null&&response.body().getResponse() != null && response.body().getResponse().getSuccess())
+                commentList.remove(position);
+                adapter.notifyItemRemoved(position);
+            }
+
+            @Override
+            public void onFailure(Call<ResponseContainer<ResponseDeleteComment>> call, Throwable t) {
+
+            }
+        });
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
@@ -249,5 +326,4 @@ public class CommentActivity extends AppCompatActivity {
         super.onStop();
         EventBus.getDefault().unregister(this);
     }
-
 }

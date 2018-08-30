@@ -18,6 +18,7 @@ import java.util.List;
 
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.model.Dialog;
+import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.activities.ChatActivity;
 import butterknife.BindView;
@@ -64,6 +65,25 @@ public class DialogsRecyclerAdapter extends RecyclerView.Adapter<DialogsRecycler
             holder.time.setText("null");
         }
 
+        if(SharedManager.getProperty("unread_" + dialogList.get(position).getId())==null){
+            Log.d("TAG21", name + " UNREAD NUUUUUUUULL");
+        } else {
+            if(SharedManager.getProperty("unread_" + dialogList.get(position).getId()).equals("0")){
+                Log.d("TAG21", name + " UNREAD ZERO");
+            }
+        }
+
+
+
+        if(SharedManager.getProperty("unread_" + dialogList.get(position).getId())!=null && !SharedManager.getProperty("unread_" + dialogList.get(position).getId()).equals("0")){
+            holder.unreadCound.setVisibility(View.VISIBLE);
+            holder.unreadCound.setText(SharedManager.getProperty("unread_" + dialogList.get(position).getId()));
+            Log.d("TAG21", name + " COUNT " + SharedManager.getProperty("unread_" + dialogList.get(position).getId()));
+        }
+        else {
+            holder.unreadCound.setVisibility(View.GONE);
+        }
+
         Picasso.get().load(dialogList.get(position).getPhoto130()).into(holder.image);
     }
 
@@ -76,6 +96,9 @@ public class DialogsRecyclerAdapter extends RecyclerView.Adapter<DialogsRecycler
 
         @BindView(R.id.dialog_row_name)
         TextView name;
+
+        @BindView(R.id.unreadCount)
+        TextView unreadCound;
 
         @BindView(R.id.dialogsRowImage)
         CircleImageView image;

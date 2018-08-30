@@ -7,7 +7,8 @@ import java.util.Date;
 public class test {
 
     public static void main(String[] args) {
-        System.out.println(getDate(1532436719));
+    //    System.out.println(getDate(1532436719));
+        System.out.println("TIME - " + Calendar.getInstance().getTimeInMillis());
 
     }
 

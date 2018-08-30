@@ -8,4 +8,6 @@ public class Constants {
     public static final String KEY_REFRESH_TOKEN = "refresh_token";
     public static final String KEY_EXPIRED_AT = "expired_at";
     public static final String KEY_PHOTO_130 = "key_photo_130";
+    public static final String KEY_MY_FULL_NAME = "key_my_full_name";
+    public static final String KEY_LOGIN = "key_login";
 }

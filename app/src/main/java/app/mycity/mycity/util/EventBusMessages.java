@@ -80,4 +80,61 @@ public class EventBusMessages {
             return postId;
         }
     }
+
+    public static class Message {
+        private final String history;
+
+        public Message(String history) {
+            this.history = history;
+        }
+
+        public String getHistory() {
+            return history;
+        }
+    }
+
+    public static class UpdateChat{
+    }
+
+    public static class UpdateDialog {
+        private String message;
+        private long id;
+
+        public UpdateDialog(long id, String message) {
+            this.message = message;
+            this.id = id;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public long getId() {
+            return id;
+        }
+    }
+
+    public static class OpenPlace {
+        private String id;
+        private String photo780;
+        private String name;
+
+        public String getId() {
+            return id;
+        }
+
+        public String getPhoto780() {
+            return photo780;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public OpenPlace(String id, String photo780, String name) {
+         this.id = id;
+         this.photo780 = photo780;
+         this.name = name;
+        }
+    }
 }

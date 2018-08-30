@@ -11,10 +11,10 @@ public class Post {
     private Integer id;
     @SerializedName("from_id")
     @Expose
-    private Integer fromId;
+    private String fromId;
     @SerializedName("owner_id")
     @Expose
-    private Integer ownerId;
+    private String ownerId;
     @SerializedName("group_id")
     @Expose
     private Integer groupId;
@@ -51,19 +51,19 @@ public class Post {
         this.id = id;
     }
 
-    public Integer getFromId() {
+    public String getFromId() {
         return fromId;
     }
 
-    public void setFromId(Integer fromId) {
+    public void setFromId(String fromId) {
         this.fromId = fromId;
     }
 
-    public Integer getOwnerId() {
+    public String getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(Integer ownerId) {
+    public void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
     }
 

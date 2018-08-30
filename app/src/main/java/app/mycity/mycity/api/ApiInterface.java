@@ -11,6 +11,7 @@ import app.mycity.mycity.api.model.PhotoContainer;
 import app.mycity.mycity.api.model.ResponseAuth;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponseMarkAsRead;
+import app.mycity.mycity.api.model.ResponsePlaces;
 import app.mycity.mycity.api.model.ResponsePostPhoto;
 import app.mycity.mycity.api.model.ResponseSavePhoto;
 import app.mycity.mycity.api.model.ResponseSocketServer;
@@ -199,6 +200,13 @@ public interface ApiInterface {
 
     @FormUrlEncoded
     @POST("wall.get")
+    Call<ResponseContainer<ResponseWall>> getGroupWallById(@Field("access_token") String token,
+                                                      @Field("place_id") String placeId,
+                                                      @Field("filter") String filters,
+                                                      @Field("extended") String extended);
+
+    @FormUrlEncoded
+    @POST("wall.get")
     Call<ResponseContainer<ResponseWall>> getWall(@Field("access_token") String token);
 
 
@@ -250,7 +258,17 @@ public interface ApiInterface {
                                                                  @Field("comment_id") String postId,
                                                                  @Field("owner_id") String ownerId);
 
-    @GET("getSocketServer")
+    @FormUrlEncoded
+    @POST("messages.getSocketServer")
     Call<ResponseContainer<ResponseSocketServer>> getSocketServer(@Field("access_token") String token);
+
+    @FormUrlEncoded
+    @POST("groups.getAll")
+    Call<ResponseContainer<ResponsePlaces>> getPlaces(@Field("access_token") String token,
+                                                      @Field("offset") int offset,
+                                                      @Field("city_id ") int cityId);
+
+
+
 
 }

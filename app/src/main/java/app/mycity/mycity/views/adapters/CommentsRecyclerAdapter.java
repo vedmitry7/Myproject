@@ -21,11 +21,13 @@ import org.greenrobot.eventbus.EventBus;
 import java.util.List;
 import java.util.Map;
 
+import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.model.Comment;
 import app.mycity.mycity.api.model.Post;
 import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.util.EventBusMessages;
+import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -37,14 +39,14 @@ public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecycl
 
     int layout;
     Context context;
-    ImageClickListener imageClickListener;
+    CommnentClickListener commnentClickListener;
 
-    public interface ImageClickListener{
-        void onClick(int position);
+    public interface CommnentClickListener{
+        void deleteComment(int position);
     }
 
-    public void setImageClickListener(ImageClickListener imageClickListener){
-        this.imageClickListener = imageClickListener;
+    public void setCommentClickListener(CommnentClickListener commnentClickListener){
+        this.commnentClickListener = commnentClickListener;
     }
 
     public CommentsRecyclerAdapter(List<Comment> commentList, Map profiles) {
@@ -69,16 +71,27 @@ public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecycl
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Picasso.get().load(commentList.get(position).getText()).into(holder.ownerImage);
+      //  Picasso.get().load(commentList.get(position).getText()).into(holder.ownerImage);
 
         if(profiles.containsKey(commentList.get(position).getFromId())){
             Profile profile = (Profile) profiles.get(commentList.get(position).getFromId());
-            Log.d("TAG", "profile - " + profile.getFirstName() + " " + profile.getLastName());
+            Log.d("TAG21", "profile - " + profile.getFirstName() + " " + profile.getLastName());
             Picasso.get()
                     .load(profile.getPhoto130())
                     .into(holder.ownerImage);
             holder.name.setText(profile.getFirstName()+ " " + profile.getLastName());
+        } else {
+            Log.d("TAG21", "not in profiles");
+            if(commentList.get(position).getFromId()== SharedManager.getProperty(Constants.KEY_MY_ID)){
+                Log.d("TAG21", "add own picture");
+                Picasso.get()
+                        .load(SharedManager.getProperty(Constants.KEY_PHOTO_130))
+                        .into(holder.ownerImage);
+                holder.name.setText(SharedManager.getProperty(Constants.KEY_MY_FULL_NAME));
+            }
         }
+
+
 
         holder.time.setText(Util.getDatePretty(commentList.get(position).getDate()));
 
@@ -150,6 +163,28 @@ public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecycl
                 public void onClick(View v) {
                     PopupMenu popupMenu = new PopupMenu(context, v);
                     popupMenu.inflate(R.menu.popupmenu);
+                    MenuItem delete = popupMenu.getMenu().findItem(R.id.deleteComment);
+                    MenuItem complain = popupMenu.getMenu().findItem(R.id.complainComment);
+                    Log.d("TAG21", "click delete " + commentList.get(getAdapterPosition()).getFromId());
+                    Log.d("TAG21", "click delete " + SharedManager.getProperty(Constants.KEY_MY_ID));
+
+                    if(commentList.get(getAdapterPosition()).getFromId().equals(SharedManager.getProperty(Constants.KEY_MY_ID))){
+                        delete.setVisible(true);
+                    } else {
+                        complain.setVisible(true);
+                    }
+
+                    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            switch (item.getItemId()){
+                                case R.id.deleteComment:
+                                    commnentClickListener.deleteComment(getAdapterPosition());
+                                    break;
+                            }
+                            return true;
+                        }
+                    });
                     popupMenu.show();
                 }
             });
@@ -159,7 +194,7 @@ public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecycl
 
     public void update(List<Comment> comments, Map profiles){
         commentList = comments;
-        this.profiles = profiles;
+        this.profiles.putAll(profiles);
         notifyDataSetChanged();
         Log.d("TAG21", "update Photo recycler p - " + profiles.size());
     }

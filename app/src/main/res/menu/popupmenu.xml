@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="Пожаловаться">
+    <item android:title="Пожаловаться"
+        android:visible="false"
+        android:id="@+id/complainComment">
     </item>
 
-    <item android:title="Гладкий криминал">
+    <item android:title="Удалить"
+        android:visible="false"
+        android:id="@+id/deleteComment">
     </item>
 
 </menu>

@@ -54,7 +54,7 @@ public class FriendsFragment extends Fragment {
 
     public void onStart() {
         super.onStart();
-        MyFriendsPagerAdapter pagerAdapter = new MyFriendsPagerAdapter(fragmentManager, tabLayout );
+        MyFriendsPagerAdapter pagerAdapter = new MyFriendsPagerAdapter(getChildFragmentManager(), tabLayout );
         viewPager.setAdapter(pagerAdapter);
 //       viewPager.setOffscreenPageLimit(3);
         //viewPager.addOnPageChangeListener(pagerAdapter);

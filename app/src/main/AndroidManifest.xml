@@ -18,6 +18,9 @@
             android:name=".views.activities.RegistrationActivity"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".views.activities.ForgotPasswordActivity"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".views.activities.LoginActivity"
             android:fitsSystemWindows="true"
             android:screenOrientation="portrait"
@@ -30,8 +33,10 @@
         </activity>
         <activity
             android:name=".views.activities.MainActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
+            android:launchMode="singleTop"
             android:name=".views.activities.ChatActivity"
             android:windowSoftInputMode="adjustPan" />
         <activity android:name=".views.activities.LoadImageActivity" />
@@ -45,7 +50,7 @@
         <activity
             android:name=".views.activities.FullViewActivity"
             android:theme="@style/AppTheme.NoActionBar.Fullscreen"
-            android:windowSoftInputMode="stateHidden|adjustUnspecified"></activity>
+            android:windowSoftInputMode="stateHidden|adjustUnspecified" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -56,13 +61,24 @@
             <!-- ressource file to create -->
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"></meta-data>
+                android:resource="@xml/file_paths" />
         </provider>
 
         <activity
             android:name=".views.activities.CommentActivity"
             android:label="@string/title_activity_comment"
-            android:theme="@style/AppTheme"></activity>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="stateHidden" />
+        <activity android:name=".SocketTestActivity"></activity>
+
+        <service
+            android:name=".TestService"
+            android:enabled="true"
+            android:exported="true"
+            android:stopWithTask="false">
+
+        </service>
     </application>
 
 </manifest>

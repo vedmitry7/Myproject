@@ -1,8 +1,10 @@
 package app.mycity.mycity.views.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.text.method.HideReturnsTransformationMethod;
@@ -14,6 +16,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.util.SharedManager;
@@ -26,6 +29,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class LoginActivity extends AppCompatActivity {
+
+    public static final int CODE_FORGOT_PASSWORD = 27;
+    public static final int CODE_REGISTRATION = 26;
 
     @BindView(R.id.loginActRegistrationButtonTv)
     TextView textView;
@@ -83,13 +89,32 @@ public class LoginActivity extends AppCompatActivity {
 
     @OnClick(R.id.loginActForgetPasswordButtonTv)
     public void forgetPassword(View view) {
+        Intent intent = new Intent(this, ForgotPasswordActivity.class);
+        startActivityForResult(intent, CODE_FORGOT_PASSWORD);
     }
 
 
     @OnClick(R.id.loginActEnterButton)
     public void enter(View v) {
 
-        ApiFactory.getApi().authorize(login.getText().toString(), password.getText().toString()).enqueue(new retrofit2.Callback<ResponseContainer<ResponseAuth>>() {
+        String loginText = login.getText().toString();
+        String passwordText = password.getText().toString();
+
+        if(v.getId()==R.id.kolia){
+            loginText = "nicker08@inbox.ru";
+            passwordText = "12345678";
+        }
+
+        if(v.getId()==R.id.misha){
+            loginText = "Winchester_1995@mail.ru";
+            passwordText = "12345678";
+        }
+
+
+        final String finalLoginText = loginText;
+
+
+        ApiFactory.getApi().authorize(loginText, passwordText).enqueue(new retrofit2.Callback<ResponseContainer<ResponseAuth>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<ResponseAuth>> call, retrofit2.Response<ResponseContainer<ResponseAuth>> response) {
 /**
@@ -107,12 +132,14 @@ public class LoginActivity extends AppCompatActivity {
                     SharedManager.addProperty(Constants.KEY_ACCESS_TOKEN, responseAuth.getAccessToken());
                     SharedManager.addProperty(Constants.KEY_REFRESH_TOKEN, responseAuth.getRefreshToken());
                     SharedManager.addProperty(Constants.KEY_EXPIRED_AT, responseAuth.getExpiredAt());
+                    SharedManager.addProperty(Constants.KEY_LOGIN, finalLoginText);
 
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
                     LoginActivity.this.finish();
 
                 } else {
+                    Toast.makeText(LoginActivity.this, "response wrong", Toast.LENGTH_SHORT).show();
                     Log.i("TAG", "error");
 
                     // some error
@@ -122,6 +149,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(retrofit2.Call<ResponseContainer<ResponseAuth>> call, Throwable t) {
+                Toast.makeText(LoginActivity.this, "failure " + t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -205,5 +233,28 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });*/
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if(requestCode == CODE_FORGOT_PASSWORD){
+            if(resultCode == RESULT_OK){
+                final AlertDialog.Builder alert = new AlertDialog.Builder(
+                        this);
+                alert.setMessage("Пароль успешно изменен");
+                alert.setPositiveButton("Ok",
+                        new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog,
+                                                int which) {
+                                dialog.cancel();
+                            }
+                        });
+                alert.show();
+            }
+        }
     }
 }

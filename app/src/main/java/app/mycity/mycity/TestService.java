@@ -26,16 +26,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
-
 import app.mycity.mycity.api.model.Message;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.activities.ChatActivity;
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 public class TestService extends Service {
-
-
 
     private Socket mSocket;
 
@@ -52,14 +50,26 @@ public class TestService extends Service {
         return null;
     }
 
+
+ /*       public void initRealm() {
+        Realm.init(this);
+        RealmConfiguration config = new RealmConfiguration.Builder()
+                .name("chat.realm_" + SharedManager.getProperty(Constants.KEY_LOGIN))
+                .schemaVersion(1)
+                .deleteRealmIfMigrationNeeded()
+                .build();
+        Realm.setDefaultConfiguration(config);
+    }*/
+
     @Override
     public void onCreate() {
         Log.i("Test", "Service: onCreate");
 
+      //  initRealm();
         mRealm = Realm.getDefaultInstance();
         initSocket();
 
-    /*    new Timer().schedule(new TimerTask() {
+/*        new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
                 Log.i("Test", "Service: work - " + second++ + " is app foreground - " + ((App) getApplicationContext()).isAppForeground());
@@ -80,10 +90,13 @@ public class TestService extends Service {
         mSocket.off("history");
 
         JSONObject obj = new JSONObject();
-        long l = 15342461596308L;
+        long l = 15350138831666L;
         //  SharedManager.addProperty("ts", String.valueOf(l));
         try {
             obj.put("hash", SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN));
+            if(SharedManager.getProperty("ts")==null){
+                    SharedManager.addProperty("ts", String.valueOf(l));
+            }
             if(SharedManager.getProperty("ts")!=null){
                 obj.put("ts", Long.parseLong(SharedManager.getProperty("ts")));
                 Log.d("TAG21", "TS AUTH - " + SharedManager.getProperty("ts"));
@@ -150,6 +163,8 @@ public class TestService extends Service {
 
                 Message message;
 
+                //History - {"ts":15345123848696,"history":[[2,1534512384,3,0,1242]]}
+
                 switch (type){
                     case 1:
                         Log.i("TAG21", "new mes");
@@ -195,6 +210,7 @@ public class TestService extends Service {
                             message.setTime(time);
                         }
                         mRealm.commitTransaction();
+                        unreadCount(String.valueOf(userId));
                         if(!((App) getApplicationContext()).isAppForeground()){
                             Log.i("TAG21", "isNotForeground");
                             if(out == 0){
@@ -206,6 +222,7 @@ public class TestService extends Service {
                             Log.i("TAG21", "isForeground");
                             EventBus.getDefault().post(new EventBusMessages.UpdateChat());
                         }
+                        EventBus.getDefault().post(new EventBusMessages.UpdateDialog(userId, text));
 
                         break;
                 }
@@ -269,6 +286,18 @@ public class TestService extends Service {
         notificationManager.notify(23, builder.build());
     }
 
+
+    private void unreadCount(String userId){
+        int num;
+        if(SharedManager.getProperty("unread_"+ userId)!=null){
+            num = Integer.parseInt(SharedManager.getProperty("unread_"+ userId));
+        } else {
+            SharedManager.addProperty("unread_" + userId, "0");
+            num = 0;
+        }
+        SharedManager.addProperty("unread_" + userId, String.valueOf(++num));
+    }
+
     private void generateNotification(String text, String userId) {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
@@ -282,18 +311,10 @@ public class TestService extends Service {
 
         resultIntent.putExtra("user_id", Long.parseLong(userId));
 
-        int num;
-        if(SharedManager.getProperty("unread_"+ userId)!=null){
-            num = Integer.parseInt(SharedManager.getProperty("unread_"+ userId));
-        } else {
-            SharedManager.addProperty("unread_" + userId, "0");
-            num = 0;
-        }
         mBuilder.setAutoCancel(true);
 
-        mBuilder.setContentText(text).setNumber(++num);
+        mBuilder.setContentText(text).setNumber(Integer.parseInt(SharedManager.getProperty("unread_" + userId)));
 
-        SharedManager.addProperty("unread_" + userId, String.valueOf(num));
 
 // The stack builder object will contain an artificial back stack for the
 // started Activity.
