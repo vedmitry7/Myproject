@@ -154,6 +154,7 @@ public class TestService extends Service {
                     case 2: info = "was read      ";break;
                     case 5: info = "dialog update "; break;
                     case 6: info = "read dialog   "; break;
+                    case 7: info = "какаято хуйня   "; break;
                 }
                 Log.i("TAG21", info + array.length() + ": " + array.toString());
                 int type = array.getInt(0);
@@ -181,9 +182,7 @@ public class TestService extends Service {
                         }
                         mRealm.commitTransaction();
                         EventBus.getDefault().post(new EventBusMessages.UpdateChat());
-
                         break;
-
                     case 5:
                         Log.i("TAG21", "Add message to Realm");
                         //new message
