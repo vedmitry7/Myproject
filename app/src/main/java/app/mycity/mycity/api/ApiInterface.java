@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 
 import app.mycity.mycity.api.model.DialogsContainer;
 import app.mycity.mycity.api.model.ResponseAddComment;
+import app.mycity.mycity.api.model.ResponseAlbums;
 import app.mycity.mycity.api.model.ResponseComments;
 import app.mycity.mycity.api.model.ResponseDeleteComment;
 import app.mycity.mycity.api.model.ResponseLike;
@@ -92,12 +93,6 @@ public interface ApiInterface {
                                                          @Field("user_id") String id);
 
     @FormUrlEncoded
-    @POST("photos.getAll")
-    Call<ResponseContainer<PhotoContainer>> getPhotosById(@Field("access_token") String accessToken,
-                                                          @Field("owner_id") String id,
-                                                          @Field("album_id") String albumId);
-
-    @FormUrlEncoded
     @POST("users.search")
     Call<ResponseContainer<UsersContainer>> getFriendsList(@Field("access_token") String accessToken,
                                                            @Field("offset") int count);
@@ -181,6 +176,19 @@ public interface ApiInterface {
     @POST("photos.saveUserPhoto")
     Call<ResponseContainer<ResponseSavePhoto>> savePhoto2(@Part("access_token") RequestBody action,
                                                           @Part MultipartBody.Part filePart);
+
+
+    @FormUrlEncoded
+    @POST("photos.getAlbums")
+    Call<ResponseContainer<ResponseAlbums>> getGroupAlbums(@Field("access_token") String accessToken,
+                                                          @Field("group_id") String groupId,
+                                                          @Field("offset") int offset);
+
+    @FormUrlEncoded
+    @POST("photos.getAll")
+    Call<ResponseContainer<PhotoContainer>> getAlbums(@Field("access_token") String accessToken,
+                                                          @Field("owner_id") String id,
+                                                          @Field("album_id") String albumId);
 
 
     @Multipart
