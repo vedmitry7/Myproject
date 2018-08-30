@@ -1,4 +1,4 @@
-package app.mycity.mycity.views.fragments;
+package app.mycity.mycity.views.fragments.places;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -20,7 +20,12 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import app.mycity.mycity.R;
+import app.mycity.mycity.api.model.Place;
 import app.mycity.mycity.views.adapters.PlacePagerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -44,6 +49,7 @@ public class PlaceFragment extends android.support.v4.app.Fragment {
     View delivery;
     @BindView(R.id.toolbarContent)
     LinearLayout toolbar;
+    private Place place;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Nullable
@@ -52,7 +58,7 @@ public class PlaceFragment extends android.support.v4.app.Fragment {
         View view = inflater.inflate(R.layout.place_fragment, container, false);
 
         ButterKnife.bind(this, view);
-
+        Log.d("TAG21", "onCreateView");
 
         ImageView imageView = view.findViewById(R.id.place_image);
         //imageView.setImageResource(R.drawable.teapizdec);
@@ -96,16 +102,46 @@ public class PlaceFragment extends android.support.v4.app.Fragment {
             }
         });
 
+        return view;
+    }
 
-        PlacePagerAdapter adapter = new PlacePagerAdapter(getChildFragmentManager(), placeId);
+
+    void createPagerAdapter(){
+        PlacePagerAdapter adapter = new PlacePagerAdapter(getChildFragmentManager(), place);
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
-        return view;
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    // UI updates must run on MainThread
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onEvent(Place place) {
+        this.place = place;
+        Log.d("TAG21", "PLACE - " + place.getName());
+
+        if(this.place != null) {
+           // EventBus.getDefault().removeStickyEvent(place);
+        }
+        createPagerAdapter();
+
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.d("TAG21", "onCreateView");
     }
 
     @Override

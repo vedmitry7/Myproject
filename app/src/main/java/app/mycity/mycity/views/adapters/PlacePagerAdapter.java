@@ -3,27 +3,26 @@ package app.mycity.mycity.views.adapters;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.util.Log;
 
-import app.mycity.mycity.views.fragments.PlaceInfoFragment;
-import app.mycity.mycity.views.fragments.PlacesCheckinFragment;
+import app.mycity.mycity.api.model.Place;
+import app.mycity.mycity.views.fragments.places.PlaceInfoFragment;
+import app.mycity.mycity.views.fragments.places.PlacesCheckinFragment;
 import app.mycity.mycity.views.fragments.SimpleFragment;
 
 public class PlacePagerAdapter extends FragmentStatePagerAdapter {
 
+    Place place;
 
-    String placeId;
-
-    public PlacePagerAdapter(FragmentManager fm, String placeId) {
+    public PlacePagerAdapter(FragmentManager fm, Place place) {
         super(fm);
-        this.placeId = placeId;
+        this.place = place;
     }
 
     @Override
     public Fragment getItem(int position) {
         switch (position){
             case 0:
-                return PlacesCheckinFragment.createInstance(placeId);
+                return PlacesCheckinFragment.createInstance(String.valueOf(place.getId()));
             case 1:
                 return new PlaceInfoFragment();
             case 2:

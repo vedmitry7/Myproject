@@ -1,4 +1,4 @@
-package app.mycity.mycity.views.fragments;
+package app.mycity.mycity.views.fragments.places;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -25,7 +25,6 @@ import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponseWall;
 import app.mycity.mycity.util.SharedManager;
-import app.mycity.mycity.views.adapters.CheckinRecyclerAdapter;
 import app.mycity.mycity.views.adapters.PlacesCheckinRecyclerAdapter;
 import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
 import butterknife.BindView;

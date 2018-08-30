@@ -1,4 +1,4 @@
-package app.mycity.mycity.views.fragments;
+package app.mycity.mycity.views.fragments.places;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -61,6 +61,7 @@ public class PlacesFragment extends android.support.v4.app.Fragment {
     boolean isLoading;
 
     int totalCount;
+
 
     @Nullable
     @Override
@@ -129,19 +130,6 @@ public class PlacesFragment extends android.support.v4.app.Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-    }
-
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        // EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onStop() {
-        // EventBus.getDefault().unregister(this);
-        super.onStop();
     }
 
 }

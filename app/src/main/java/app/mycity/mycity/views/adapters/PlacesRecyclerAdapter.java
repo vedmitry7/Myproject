@@ -79,6 +79,7 @@ public class PlacesRecyclerAdapter extends RecyclerView.Adapter<PlacesRecyclerAd
                             String.valueOf(placeList.get(getAdapterPosition()).getId()),
                             placeList.get(getAdapterPosition()).getPhoto780(),
                             placeList.get(getAdapterPosition()).getName()));
+                    EventBus.getDefault().postSticky(placeList.get(getAdapterPosition()));
                 }
             });
         }

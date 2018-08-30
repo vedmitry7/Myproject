@@ -11,7 +11,7 @@ import android.support.v4.view.ViewPager;
 import app.mycity.mycity.fragments.mainScreen.FeedFragment;
 import app.mycity.mycity.fragments.mainScreen.SearchFragment;
 import app.mycity.mycity.fragments.mainScreen.TopFragment;
-import app.mycity.mycity.views.fragments.PlacesFragment;
+import app.mycity.mycity.views.fragments.places.PlacesFragment;
 import app.mycity.mycity.views.fragments.SimpleFragment;
 
 public class PagerAdapter extends FragmentPagerAdapter implements ViewPager.OnPageChangeListener {
