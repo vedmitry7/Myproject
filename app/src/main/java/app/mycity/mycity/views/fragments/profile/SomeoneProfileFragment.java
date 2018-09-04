@@ -63,12 +63,13 @@ import app.mycity.mycity.views.adapters.CheckinRecyclerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import fr.arnaudguyon.tabstacker.TabStacker;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerAdapter.ImageClickListener {
+public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerAdapter.ImageClickListener, TabStacker.TabStackInterface {
 
     @BindView(R.id.profileFragRoundImage)
     de.hdodenhof.circleimageview.CircleImageView imageView;
@@ -459,5 +460,25 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
     public void onStop() {
         EventBus.getDefault().unregister(this);
         super.onStop();
+    }
+
+    @Override
+    public void onTabFragmentPresented(TabStacker.PresentReason presentReason) {
+
+    }
+
+    @Override
+    public void onTabFragmentDismissed(TabStacker.DismissReason dismissReason) {
+
+    }
+
+    @Override
+    public View onSaveTabFragmentInstance(Bundle bundle) {
+        return null;
+    }
+
+    @Override
+    public void onRestoreTabFragmentInstance(Bundle bundle) {
+
     }
 }

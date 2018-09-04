@@ -7,9 +7,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.Log;
 
-import app.mycity.mycity.views.fragments.FriendsAllListFragment;
-import app.mycity.mycity.views.fragments.FriendsCommonListFragment;
-import app.mycity.mycity.views.fragments.FriendsOnlineListFragment;
+import app.mycity.mycity.views.fragments.friends.FriendsAllListFragment;
+import app.mycity.mycity.views.fragments.friends.FriendsCommonListFragment;
+import app.mycity.mycity.views.fragments.friends.FriendsOnlineListFragment;
 
 
 public class SomeoneFriendsPagerAdapter extends FragmentStatePagerAdapter {

@@ -137,4 +137,30 @@ public class EventBusMessages {
          this.name = name;
         }
     }
+
+    public static class LoadAlbum{
+        long albumId;
+        int adapterPosition;
+
+        public LoadAlbum(long albumId, int adapterPosition) {
+            this.albumId = albumId;
+            this.adapterPosition = adapterPosition;
+        }
+
+        public long getAlbumId() {
+            return albumId;
+        }
+
+        public void setAlbumId(long albumId) {
+            this.albumId = albumId;
+        }
+
+        public int getAdapterPosition() {
+            return adapterPosition;
+        }
+
+        public void setAdapterPosition(int adapterPosition) {
+            this.adapterPosition = adapterPosition;
+        }
+    }
 }

@@ -1,4 +1,4 @@
-package app.mycity.mycity.views.fragments;
+package app.mycity.mycity.views.fragments.friends;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -25,7 +25,7 @@ import app.mycity.mycity.api.model.UsersContainer;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class FriendsAllListFragment extends Fragment {
+public class FriendsOnlineListFragment extends Fragment {
 
 
     @BindView(R.id.myAllFriendsRecyclerAdapter)
@@ -36,18 +36,17 @@ public class FriendsAllListFragment extends Fragment {
 
     String id;
 
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_my_all_friends, container, false);
-
         Log.d("TAG", "Create " + this.getClass().getSimpleName());
-        if(getArguments() != null){
+
+        if(getArguments() != null)
             id = getArguments().getString("ID");
-            Log.d("TAG", "__________________________________________________________________________id = " + id);
-        }
-        Log.i("TAG3","All list created");
+
+        Log.i("TAG3","All Online create");
+
         ButterKnife.bind(this, view);
         return view;
     }
@@ -55,20 +54,20 @@ public class FriendsAllListFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.d("TAG", "ViewCreated " + this.getClass().getSimpleName());
 
         userList = new ArrayList<>();
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         adapter = new FriendsRecyclerAdapter(userList);
         recyclerView.setAdapter(adapter);
-        Log.d("TAG", "ViewCreated " + this.getClass().getSimpleName());
 
-
-        if(id!= null && !id.equals("")){
+        if(id != null && !id.equals("")) {
             getFriendsListById();
         }
-        else {
+        else{
             getFriendsList();
         }
+
 
     }
 
@@ -76,20 +75,19 @@ public class FriendsAllListFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.d("TAG", "Attach " + this.getClass().getSimpleName());
-        Log.i("TAG3","All list attach");
+
     }
 
     private void getFriendsList(){
-        Log.d("TAG", "getFriendsList " + this.getClass().getSimpleName());
 
-        ApiFactory.getApi().getUsersWithFields(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
+        Log.d("TAG", "Get friends List");
+        ApiFactory.getApi().getUsersOnlineWithFields(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<UsersContainer>> call, retrofit2.Response<ResponseContainer<UsersContainer>> response) {
                 UsersContainer users = response.body().getResponse();
-
                 if(users != null){
                     userList = users.getFriends();
-                    Log.d("TAG", "Users all loaded. List size = " + userList.size());
+                    Log.d("TAG", "Users online loaded. List size = " + userList.size());
                     adapter.update(userList);
                 } else {
 
@@ -104,18 +102,15 @@ public class FriendsAllListFragment extends Fragment {
     }
 
     private void getFriendsListById(){
-        Log.d("TAG", "getFriendsListById " + this.getClass().getSimpleName());
 
-        ApiFactory.getApi().getUsersById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), id, "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
+        Log.d("TAG", "Get friends List");
+        ApiFactory.getApi().getUsersOnlineById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), id, "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<UsersContainer>> call, retrofit2.Response<ResponseContainer<UsersContainer>> response) {
-
-
                 UsersContainer users = response.body().getResponse();
-
                 if(users != null){
                     userList = users.getFriends();
-                    Log.d("TAG", "Users all loaded. List size = " + userList.size());
+                    Log.d("TAG", "Users online loaded. List size = " + userList.size());
                     adapter.update(userList);
                 } else {
 
@@ -129,7 +124,6 @@ public class FriendsAllListFragment extends Fragment {
         });
     }
 
-
     public void onStart() {
         super.onStart();
         Log.d("TAG", "Start " + this.getClass().getSimpleName());
@@ -139,15 +133,15 @@ public class FriendsAllListFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.d("TAG", "Resume " + this.getClass().getSimpleName());
-        Log.i("TAG3","All list resume");
+        Log.i("TAG21","Friends ALL ONLINE FRIENDS  resume");
+        Log.i("TAG3","All Online resume");
 
     }
 
     public void onPause() {
         super.onPause();
         Log.d("TAG", "Pause " + this.getClass().getSimpleName());
-        Log.i("TAG21","Friends ALL FRIENDS  resume");
-        Log.i("TAG3","All list pause");
+        Log.i("TAG3","All Online pause");
 
     }
 
@@ -166,14 +160,13 @@ public class FriendsAllListFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         Log.d("TAG", "Destroy " + this.getClass().getSimpleName());
-        Log.i("TAG3","All list destroy");
+        Log.i("TAG3","All Online destroy");
 
     }
 
     public void onDetach() {
         super.onDetach();
         Log.d("TAG", "Detach " + this.getClass().getSimpleName());
-        Log.i("TAG3","All list detach");
 
     }
 

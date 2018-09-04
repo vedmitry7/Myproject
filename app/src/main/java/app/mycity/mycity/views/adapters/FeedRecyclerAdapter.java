@@ -161,6 +161,13 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
                             postList.get(getAdapterPosition()).getOwnerId().toString()));
                 }
             });
+
+            name.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EventBus.getDefault().post(new EventBusMessages.OpenUser(postList.get(getAdapterPosition()).getOwnerId()));
+                }
+            });
         }
 
     }

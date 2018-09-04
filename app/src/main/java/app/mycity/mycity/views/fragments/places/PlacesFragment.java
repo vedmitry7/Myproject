@@ -3,6 +3,7 @@ package app.mycity.mycity.views.fragments.places;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -41,6 +42,7 @@ import app.mycity.mycity.views.adapters.PlacesRecyclerAdapter;
 import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import fr.arnaudguyon.tabstacker.TabStacker;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -48,7 +50,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class PlacesFragment extends android.support.v4.app.Fragment {
+public class PlacesFragment extends Fragment implements TabStacker.TabStackInterface {
 
 
     @BindView(R.id.placesFragmentRecyclerView)
@@ -132,4 +134,23 @@ public class PlacesFragment extends android.support.v4.app.Fragment {
         super.onAttach(context);
     }
 
+    @Override
+    public void onTabFragmentPresented(TabStacker.PresentReason presentReason) {
+
+    }
+
+    @Override
+    public void onTabFragmentDismissed(TabStacker.DismissReason dismissReason) {
+
+    }
+
+    @Override
+    public View onSaveTabFragmentInstance(Bundle bundle) {
+        return null;
+    }
+
+    @Override
+    public void onRestoreTabFragmentInstance(Bundle bundle) {
+
+    }
 }

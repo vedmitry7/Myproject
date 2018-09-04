@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.PointerIcon;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -14,31 +13,20 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import org.greenrobot.eventbus.EventBus;
-
 import java.util.List;
 
 import app.mycity.mycity.R;
-import app.mycity.mycity.api.model.Likes;
 import app.mycity.mycity.api.model.Photo;
 import app.mycity.mycity.api.model.Post;
-import app.mycity.mycity.util.EventBusMessages;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class PlacesCheckinRecyclerAdapter extends RecyclerView.Adapter<PlacesCheckinRecyclerAdapter.ViewHolder> {
+public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdapter.ViewHolder> {
 
-    List<Post> postList;
+    List<Photo> photoList;
 
-    int layout;
-    Context context;
-
-    public PlacesCheckinRecyclerAdapter(List<Post> postList) {
-        this.postList = postList;
-    }
-
-    public void setLayout(int layout){
-        this.layout = layout;
+    public AlbumRecyclerAdapter(List<Photo> postList) {
+        this.photoList = postList;
     }
 
     @NonNull
@@ -51,30 +39,19 @@ public class PlacesCheckinRecyclerAdapter extends RecyclerView.Adapter<PlacesChe
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Picasso.get()
-                .load(postList.get(position).getAttachments().get(0).getPhoto780())
+                .load(photoList.get(position).getPhotoOrig())
                 .into(holder.photo);
     }
 
     @Override
     public int getItemCount() {
-        return postList.size();
+        return photoList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.photoRowImageView)
         ImageView photo;
 
-        @Nullable
-        @BindView(R.id.placeLabel)
-        TextView place;
-
-        @Nullable
-        @BindView(R.id.likeIcon)
-        ImageView likeIcon;
-
-        @Nullable
-        @BindView(R.id.likesCount)
-        TextView likesCount;
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -82,9 +59,9 @@ public class PlacesCheckinRecyclerAdapter extends RecyclerView.Adapter<PlacesChe
 
     }
 
-    public void update(List<Post> posts){
-        postList = posts;
+    public void update(List<Photo> photos){
+        photoList = photos;
         notifyDataSetChanged();
-        Log.d("TAG21", "update Photo recycler " + postList);
+        Log.d("TAG21", "update Photo recycler " + photoList);
     }
 }

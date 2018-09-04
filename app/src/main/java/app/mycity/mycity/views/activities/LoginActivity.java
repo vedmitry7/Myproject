@@ -134,7 +134,7 @@ public class LoginActivity extends AppCompatActivity {
                     SharedManager.addProperty(Constants.KEY_EXPIRED_AT, responseAuth.getExpiredAt());
                     SharedManager.addProperty(Constants.KEY_LOGIN, finalLoginText);
 
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, MainActivity2.class);
                     startActivity(intent);
                     LoginActivity.this.finish();
 

@@ -1,4 +1,4 @@
-package app.mycity.mycity.views.fragments;
+package app.mycity.mycity.views.fragments.friends;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -14,11 +14,13 @@ import android.view.ViewGroup;
 
 import app.mycity.mycity.R;
 import app.mycity.mycity.views.activities.MainActivity;
-import app.mycity.mycity.views.adapters.MyFriendsPagerAdapter;
+import app.mycity.mycity.views.activities.MainActivity2;
+import app.mycity.mycity.views.adapters.SomeoneFriendsPagerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import fr.arnaudguyon.tabstacker.TabStacker;
 
-public class FriendsFragment extends Fragment {
+public class SomeoneFriendsFragment extends Fragment implements TabStacker.TabStackInterface {
 
 
     @BindView(R.id.myFriendsViewPager)
@@ -26,11 +28,15 @@ public class FriendsFragment extends Fragment {
     @BindView(R.id.myFriendsTabLayout)
     TabLayout tabLayout;
 
+    String id;
+
     FragmentManager fragmentManager;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_my_friends, container, false);
+        Log.d("TAG", "Create " + this.getClass().getSimpleName());
+        id = getArguments().getString("ID");
         ButterKnife.bind(this, view);
         return view;
     }
@@ -38,27 +44,26 @@ public class FriendsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.d("TAG", "ViewCreated " + this.getClass().getSimpleName());
 
-        // Log.i("TAG21","Friends stack count - " + getActivity().getFragmentManager().getBackStackEntryCount());
-        Log.i("TAG21","Friends Fragment - " + getActivity().getFragmentManager().getBackStackEntryCount());
-        Log.i("TAG3","Friends fragment");
+        SomeoneFriendsPagerAdapter pagerAdapter = new SomeoneFriendsPagerAdapter(getChildFragmentManager(), tabLayout, id );
+        viewPager.setAdapter(pagerAdapter);
+        viewPager.setOffscreenPageLimit(3);
+        //viewPager.addOnPageChangeListener(pagerAdapter);
+        tabLayout.setupWithViewPager(viewPager);
+
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         Log.d("TAG", "Attach " + this.getClass().getSimpleName());
-        fragmentManager = ((MainActivity) context).getSupportFragmentManager();
+      //  fragmentManager = ((MainActivity2) context).getSupportFragmentManager();
 
     }
 
     public void onStart() {
         super.onStart();
-        MyFriendsPagerAdapter pagerAdapter = new MyFriendsPagerAdapter(getChildFragmentManager(), tabLayout );
-        viewPager.setAdapter(pagerAdapter);
-//       viewPager.setOffscreenPageLimit(3);
-        //viewPager.addOnPageChangeListener(pagerAdapter);
-        tabLayout.setupWithViewPager(viewPager);
         Log.d("TAG", "Start " + this.getClass().getSimpleName());
 
     }
@@ -66,34 +71,58 @@ public class FriendsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.d("TAG", "Resume " + this.getClass().getSimpleName());
-        Log.i("TAG21","Friends Fragment resume - " + getActivity().getFragmentManager().getBackStackEntryCount());
-        Log.i("TAG3","Friends fragment resume");
+        Log.i("TAG21","Friends by Id  resume");
+
     }
 
     public void onPause() {
         super.onPause();
         Log.d("TAG", "Pause " + this.getClass().getSimpleName());
-        Log.i("TAG3","Friends fragment pause");
+
     }
 
     public void onStop() {
         super.onStop();
         Log.d("TAG", "Stop " + this.getClass().getSimpleName());
+
     }
 
     public void onDestroyView() {
         super.onDestroyView();
         Log.d("TAG", "Destroy view " + this.getClass().getSimpleName());
+
     }
 
     public void onDestroy() {
         super.onDestroy();
         Log.d("TAG", "Destroy " + this.getClass().getSimpleName());
-        Log.i("TAG3","Friends fragment destroy");
+
     }
 
     public void onDetach() {
         super.onDetach();
         Log.d("TAG", "Detach " + this.getClass().getSimpleName());
+
+    }
+
+
+    @Override
+    public void onTabFragmentPresented(TabStacker.PresentReason presentReason) {
+
+    }
+
+    @Override
+    public void onTabFragmentDismissed(TabStacker.DismissReason dismissReason) {
+
+    }
+
+    @Override
+    public View onSaveTabFragmentInstance(Bundle bundle) {
+        return null;
+    }
+
+    @Override
+    public void onRestoreTabFragmentInstance(Bundle bundle) {
+
     }
 }

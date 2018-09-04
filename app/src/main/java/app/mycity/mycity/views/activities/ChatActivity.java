@@ -93,8 +93,6 @@ public class ChatActivity extends AppCompatActivity {
 
     long lastMyMessageId;
 
-
-
     private Emitter.Listener listener = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
@@ -257,8 +255,11 @@ public class ChatActivity extends AppCompatActivity {
                 recyclerView.scrollToPosition(results.size()-1);
                 Toast.makeText(this, "Scroll down", Toast.LENGTH_SHORT).show();
             } else {
-                recyclerView.scrollToPosition(lastVisibleItems);
-                newMessageIndicator.setVisibility(View.VISIBLE);
+                //if message not our
+                if(results.get(results.size()-1).getOut()!=1){
+                    recyclerView.scrollToPosition(lastVisibleItems);
+                    newMessageIndicator.setVisibility(View.VISIBLE);
+                }
             }
         }
 

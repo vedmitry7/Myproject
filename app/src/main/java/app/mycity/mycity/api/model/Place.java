@@ -16,6 +16,9 @@ public class Place {
     @SerializedName("photo_70")
     @Expose
     private String photo70;
+    @SerializedName("photo_130")
+    @Expose
+    private String photo130;
     @SerializedName("photo_780")
     @Expose
     private String photo780;
@@ -46,21 +49,6 @@ public class Place {
     @SerializedName("count_members")
     @Expose
     private Integer countMembers;
-    @SerializedName("cover_id")
-    @Expose
-    private Integer coverId;
-    @SerializedName("cover_50")
-    @Expose
-    private String cover50;
-    @SerializedName("cover_70")
-    @Expose
-    private String cover70;
-    @SerializedName("cover_780")
-    @Expose
-    private String cover780;
-    @SerializedName("cover_orig")
-    @Expose
-    private String coverOrig;
     @SerializedName("country_id")
     @Expose
     private Integer countryId;
@@ -82,6 +70,12 @@ public class Place {
     @SerializedName("instagram")
     @Expose
     private String instagram;
+    @SerializedName("latitude")
+    @Expose
+    private Double latitude;
+    @SerializedName("longitude")
+    @Expose
+    private Double longitude;
     @SerializedName("date_create")
     @Expose
     private Integer dateCreate;
@@ -128,6 +122,14 @@ public class Place {
 
     public void setPhoto70(String photo70) {
         this.photo70 = photo70;
+    }
+
+    public String getPhoto130() {
+        return photo130;
+    }
+
+    public void setPhoto130(String photo130) {
+        this.photo130 = photo130;
     }
 
     public String getPhoto780() {
@@ -210,46 +212,6 @@ public class Place {
         this.countMembers = countMembers;
     }
 
-    public Integer getCoverId() {
-        return coverId;
-    }
-
-    public void setCoverId(Integer coverId) {
-        this.coverId = coverId;
-    }
-
-    public String getCover50() {
-        return cover50;
-    }
-
-    public void setCover50(String cover50) {
-        this.cover50 = cover50;
-    }
-
-    public String getCover70() {
-        return cover70;
-    }
-
-    public void setCover70(String cover70) {
-        this.cover70 = cover70;
-    }
-
-    public String getCover780() {
-        return cover780;
-    }
-
-    public void setCover780(String cover780) {
-        this.cover780 = cover780;
-    }
-
-    public String getCoverOrig() {
-        return coverOrig;
-    }
-
-    public void setCoverOrig(String coverOrig) {
-        this.coverOrig = coverOrig;
-    }
-
     public Integer getCountryId() {
         return countryId;
     }
@@ -304,6 +266,22 @@ public class Place {
 
     public void setInstagram(String instagram) {
         this.instagram = instagram;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 
     public Integer getDateCreate() {

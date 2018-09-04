@@ -45,7 +45,8 @@ public class Util {
 
     public static String getDate(long time) {
         Date date = new Date(time*1000L); // *1000 is to convert seconds to milliseconds
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm"); // the format of your date
+       // SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm"); // the format of your date
+       SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy"); // the format of your date
         //sdf.setTimeZone(TimeZone.getTimeZone("GMT-2"));
 
         return sdf.format(date);

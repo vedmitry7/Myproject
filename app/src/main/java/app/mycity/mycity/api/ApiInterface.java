@@ -43,7 +43,6 @@ public interface ApiInterface {
     Call<ResponseContainer<ResponseAuth>> authorize(@Field("email") String email,
                                                     @Field("password") String password);
 
-
     // get users
 
     @FormUrlEncoded
@@ -186,8 +185,8 @@ public interface ApiInterface {
 
     @FormUrlEncoded
     @POST("photos.getAll")
-    Call<ResponseContainer<PhotoContainer>> getAlbums(@Field("access_token") String accessToken,
-                                                          @Field("owner_id") String id,
+    Call<ResponseContainer<PhotoContainer>> getAlbum(@Field("access_token") String accessToken,
+                                                          @Field("group_id") String groupId,
                                                           @Field("album_id") String albumId);
 
 

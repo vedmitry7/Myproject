@@ -1,5 +1,6 @@
 package app.mycity.mycity.views.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,6 +9,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +28,9 @@ import app.mycity.mycity.api.model.PhotoContainer;
 import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.api.model.ResponseAlbums;
 import app.mycity.mycity.api.model.ResponseContainer;
+import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
+import app.mycity.mycity.views.activities.CommentActivity;
 import app.mycity.mycity.views.adapters.AlbumsRecyclerViewAdapter;
 import app.mycity.mycity.views.adapters.MyRecyclerViewAdapter;
 import butterknife.BindView;
@@ -41,6 +48,7 @@ public class PhotoAlbumsFragment extends android.support.v4.app.Fragment {
     List<Albume> albumsList;
 
     Map albums =  new HashMap<Long, List<Photo>>();
+    //Map albums =  new HashMap<Long, List<Photo>>();
 
 
     AlbumsRecyclerViewAdapter adapter;
@@ -71,6 +79,7 @@ public class PhotoAlbumsFragment extends android.support.v4.app.Fragment {
     }
 
     private void loadAlbums() {
+
         ApiFactory.getApi().getGroupAlbums(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "1", 0)
                 .enqueue(new Callback<ResponseContainer<ResponseAlbums>>() {
             @Override
@@ -82,28 +91,8 @@ public class PhotoAlbumsFragment extends android.support.v4.app.Fragment {
 
                     for (final Albume a:albumsList
                          ) {
-                        ApiFactory.getApi().getAlbum(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),
-                                "1",
-                                String.valueOf(a.getId())).enqueue(new Callback<ResponseContainer<PhotoContainer>>() {
-                            @Override
-                            public void onResponse(Call<ResponseContainer<PhotoContainer>> call, Response<ResponseContainer<PhotoContainer>> response) {
-                                if(response.body().getResponse()!=null){
-                                    Log.d("TAG21", "Album " + a.getId() + " size - " + response.body().getResponse().getPhotos().size());
-                                    albums.put(a.getId(), response.body().getResponse().getPhotos());
-                                }
-                                adapter.update(albumsList, albums);
-                            }
-
-                            @Override
-                            public void onFailure(Call<ResponseContainer<PhotoContainer>> call, Throwable t) {
-                            }
-                        });
                     }
-
                     adapter.update(albumsList, albums);
-
-
-
                 }
             }
 
@@ -112,6 +101,44 @@ public class PhotoAlbumsFragment extends android.support.v4.app.Fragment {
 
             }
         });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(final EventBusMessages.LoadAlbum event){
+        if(!albums.containsKey(event.getAlbumId())){
+            Log.d("TAG21", "Album loading.... position - " + event.getAdapterPosition());
+            ApiFactory.getApi().getAlbum(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),
+                    "1",
+                    String.valueOf(event.getAlbumId())).enqueue(new Callback<ResponseContainer<PhotoContainer>>() {
+                @Override
+                public void onResponse(Call<ResponseContainer<PhotoContainer>> call, Response<ResponseContainer<PhotoContainer>> response) {
+                    if(response.body().getResponse()!=null){
+                        Log.d("TAG21", "Album " + event.getAlbumId() + " size - " + response.body().getResponse().getPhotos().size());
+                        albums.put(event.getAlbumId(), response.body().getResponse().getPhotos());
+                    }
+                    adapter.updatePosition(albumsList, albums, event.getAdapterPosition());
+                }
+
+                @Override
+                public void onFailure(Call<ResponseContainer<PhotoContainer>> call, Throwable t) {
+                }
+            });
+        } else {
+            Log.d("TAG21", "Album already loaded");
+        }
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
     }
 
 }

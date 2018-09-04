@@ -38,6 +38,7 @@ import app.mycity.mycity.views.adapters.FeedRecyclerAdapter;
 import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import fr.arnaudguyon.tabstacker.TabStacker;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -45,7 +46,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class FeedFragment extends android.support.v4.app.Fragment {
+public class FeedFragment extends android.support.v4.app.Fragment implements TabStacker.TabStackInterface {
 
 
     @BindView(R.id.feedFragmentRecyclerView)
@@ -90,7 +91,7 @@ public class FeedFragment extends android.support.v4.app.Fragment {
                         Log.d("TAG21", "ЗАГРУЗКА ДАННЫХ " + postList.size());
                         isLoading = true;
                         // load if we don't load all
-                        if(totalCount >= postList.size()){
+                        if(totalCount > postList.size()){
                             Log.d("TAG21", "load feed ");
                             loadFeed(postList.size());
                         }
@@ -123,7 +124,8 @@ public class FeedFragment extends android.support.v4.app.Fragment {
                         profiles.put(p.getId(), p);
                     }
 
-                    Log.d("TAG21", "post size - " + postList.size());
+                    Log.d("TAG21", "post size - " + postList.size() + " total - " + totalCount);
+                    isLoading = false;
 
                 } else {
                     Log.d("TAG21", "RESPONSE ERROR ");
@@ -237,4 +239,23 @@ public class FeedFragment extends android.support.v4.app.Fragment {
         super.onStop();
     }
 
+    @Override
+    public void onTabFragmentPresented(TabStacker.PresentReason presentReason) {
+
+    }
+
+    @Override
+    public void onTabFragmentDismissed(TabStacker.DismissReason dismissReason) {
+
+    }
+
+    @Override
+    public View onSaveTabFragmentInstance(Bundle bundle) {
+        return null;
+    }
+
+    @Override
+    public void onRestoreTabFragmentInstance(Bundle bundle) {
+
+    }
 }

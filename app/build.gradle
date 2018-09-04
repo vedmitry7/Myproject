@@ -37,6 +37,10 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:27.1.1'
 
 
+
+    //TabStacker
+    implementation 'com.github.smart-fun:TabStacker:1.0.4'
+
     //Maps
     implementation 'com.google.android.gms:play-services-maps:15.0.1'
 

@@ -121,6 +121,8 @@ public class PlacesCheckinFragment extends android.support.v4.app.Fragment {
 
                     postList.addAll(response.body().getResponse().getItems());
 
+                    if(response.body().getResponse().getProfiles()!=null
+                            )
                     for (Profile p: response.body().getResponse().getProfiles()
                             ) {
                         profiles.put(p.getId(), p);
