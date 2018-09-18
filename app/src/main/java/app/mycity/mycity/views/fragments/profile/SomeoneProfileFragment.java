@@ -1,16 +1,14 @@
 package app.mycity.mycity.views.fragments.profile;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,8 +16,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -28,8 +24,6 @@ import com.squareup.picasso.Picasso;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -40,26 +34,22 @@ import java.util.TimerTask;
 import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
-import app.mycity.mycity.api.model.Likes;
 import app.mycity.mycity.api.model.Post;
 import app.mycity.mycity.api.model.ResponseLike;
-import app.mycity.mycity.api.model.ResponseSavePhoto;
-import app.mycity.mycity.api.model.ResponseUploadServer;
-import app.mycity.mycity.api.model.ResponseUploading;
 import app.mycity.mycity.api.model.ResponseWall;
 import app.mycity.mycity.filter_desc_post.ExpandableLayout;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.activities.FullViewActivity;
+import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
 import app.mycity.mycity.api.ApiFactory;
-import app.mycity.mycity.api.model.Photo;
-import app.mycity.mycity.api.model.PhotoContainer;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.User;
 import app.mycity.mycity.api.model.UsersContainer;
 import app.mycity.mycity.views.activities.MainAct;
 import app.mycity.mycity.views.adapters.CheckinRecyclerAdapter;
+import app.mycity.mycity.views.fragments.subscribers.SubscribersOnlineListFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -82,8 +72,9 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
     @BindView(R.id.profileFragName)
     TextView name;
-    @BindView(R.id.profileFragFriendsTv)
-    TextView friendsCount;
+
+   /* @BindView(R.id.profileFragSubscriberTv)
+    TextView friendsCount;*/
 
     @BindView(R.id.checkinCount)
     TextView checkinCount;
@@ -99,6 +90,15 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
     @BindView(R.id.profilePlaceHolder)
     ConstraintLayout placeHolder;
+
+    @BindView(R.id.profileFragSubscriberTv)
+    TextView subscribersCount;
+
+    @BindView(R.id.profileFragSubscriptionTv)
+    TextView subscriptionsCount;
+
+    @BindView(R.id.profileNestedScrollView)
+    NestedScrollView scrollView;
 
     CheckinRecyclerAdapter adapter;
 
@@ -119,6 +119,9 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
     String userId;
 
+    Storage storage;
+    boolean mayRestore;
+
     public void showContent() {
 
         if (friendLoad && checkinLoad && infoLoad) {
@@ -133,6 +136,19 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
         //setRetainInstance(true);
     }
 
+
+
+    public static SomeoneProfileFragment createInstance(String name, String userId) {
+        SomeoneProfileFragment fragment = new SomeoneProfileFragment();
+        Log.i("TAG21", "Create SomeoneProfileFragment " + name);
+        Bundle bundle = new Bundle();
+        bundle.putString("name", name);
+        bundle.putString("userId", userId);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -146,7 +162,7 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
         super.onViewCreated(view, savedInstanceState);
         placeHolder.setVisibility(View.VISIBLE);
 
-        userId = getArguments().getString("ID");
+        userId = getArguments().getString("userId");
         Log.i("TAG21", "USER ID " + userId);
 
 
@@ -157,7 +173,9 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setNestedScrollingEnabled(false);
 
-        postList = new ArrayList<>();
+        if(postList == null){
+            postList = new ArrayList<>();
+        }
 
         adapter = new CheckinRecyclerAdapter(postList);
         adapter.setImageClickListener(this);
@@ -167,7 +185,8 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
 
         getInfo();
-        getFriendsCount();
+       // getFriendsCount();
+        getSubscriberCount();
         getCheckins();
 
 
@@ -229,6 +248,30 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
     public void onAttach(Context context) {
         super.onAttach(context);
         activity = (MainAct) context;
+
+        storage = (Storage) context;
+        postList = (List<Post>)storage.getDate((String) getArguments().get("name") + "_posts");
+        if(postList!=null) {
+            Log.i("TAG21", "Post size " + postList.size());
+            mayRestore = true;
+        }
+        else{
+            Log.i("TAG21", "Post null ");
+            mayRestore = false;
+        }
+
+        String[] mass = (String[]) storage.getDate((String) getArguments().get("name")+"_info");
+        if(mass!=null){
+            Log.i("TAG21", "Info not null");
+            name.setText(mass[0]);
+            subscribersCount.setText(mass[1]);
+            subscriptionsCount.setText(mass[2]);
+            scrollView.setVerticalScrollbarPosition(Integer.valueOf(mass[3]));
+            Log.i("TAG21", "Position  restore " + mass[3]);
+        } else {
+            Log.i("TAG21", "Info null");
+        }
+        //storage.setDate((String) getArguments().get("name")+"_info", mass);
     }
 
 
@@ -269,23 +312,35 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
         });
     }
 
-    private void getFriendsCount() {
-
-        ApiFactory.getApi().getUsersById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId, "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
+    private void getSubscriberCount(){
+        ApiFactory.getApi().getSubscribersCount(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN)).enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<UsersContainer>> call, retrofit2.Response<ResponseContainer<UsersContainer>> response) {
                 UsersContainer users = response.body().getResponse();
 
-                if (users != null) {
-                    friendsCount.setText(String.valueOf(users.getFriends().size()));
-                } else {
-
+                if(users != null){
+                    subscribersCount.setText(String.valueOf(users.getFriends().size()));
                 }
-
                 friendLoad = true;
-
                 showContent();
+            }
 
+            @Override
+            public void onFailure(retrofit2.Call<ResponseContainer<UsersContainer>> call, Throwable t) {
+
+            }
+        });
+
+        ApiFactory.getApi().getSubscriptionsCount(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN)).enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
+            @Override
+            public void onResponse(retrofit2.Call<ResponseContainer<UsersContainer>> call, retrofit2.Response<ResponseContainer<UsersContainer>> response) {
+                UsersContainer users = response.body().getResponse();
+
+                if(users != null){
+                    subscriptionsCount.setText(String.valueOf(users.getFriends().size()));
+                }
+                friendLoad = true;
+                showContent();
             }
 
             @Override
@@ -297,6 +352,9 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
     private void getCheckins() {
 
+
+        if(!mayRestore){
+            Log.i("TAG21", "Cant restore checkins");
         ApiFactory.getApi().getWallById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId).enqueue(new Callback<ResponseContainer<ResponseWall>>() {
             @Override
             public void onResponse(Call<ResponseContainer<ResponseWall>> call, Response<ResponseContainer<ResponseWall>> response) {
@@ -321,6 +379,12 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
                 Log.d("TAG21", "fail get wall");
             }
         });
+        } else {
+            Log.i("TAG21", "Restore checkins ) ");
+            adapter.notifyDataSetChanged();
+            checkinLoad = true;
+            showContent();
+        }
 
 
         /*      ApiFactory.getApi().getPhotosById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),SharedManager.getProperty(Constants.KEY_MY_ID), "4").enqueue(new Callback<ResponseContainer<PhotoContainer>>() {
@@ -370,10 +434,18 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
         // activity.startSettings(0);
     }
 
-    @OnClick(R.id.profileFragFriendsButton)
-    public void friends(View v) {
-        Log.d("TAG", "FRIENDS");
-        activity.startFriendsById(userId);
+    @OnClick(R.id.profileFragSubscribersButton)
+    public void subscribers(View v){
+        Log.d("TAG21", "Start SUBSCRIBERS");
+     //   activity.startSubscribers();
+        EventBus.getDefault().post(new EventBusMessages.OpenSubscribers(userId));
+
+    }
+
+    @OnClick(R.id.profileFragSubscriptionsButton)
+    public void subscriptions(View v){
+        Log.d("TAG21", "Start SUBSCRIPTIONS");
+        EventBus.getDefault().post(new EventBusMessages.OpenSubscriptions(getArguments().getString("userId")));
     }
 
     @Override
@@ -470,6 +542,22 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
     @Override
     public void onTabFragmentDismissed(TabStacker.DismissReason dismissReason) {
 
+        Log.i("TAG21", "Fragment Dismissed Save Data " + getArguments().get("name"));
+        Log.i("TAG21", "Scroll - " +         scrollView.getScrollY());
+
+        if(dismissReason != TabStacker.DismissReason.BACK){
+            storage.setDate((String) getArguments().get("name")+"_posts", postList);
+            String[] mass = new String[4];
+            mass[0] = name.getText().toString();
+            mass[1] = subscribersCount.getText().toString();
+            mass[2] = subscriptionsCount.getText().toString();
+            mass[3] = String.valueOf(scrollView.getScrollY());
+            storage.setDate((String) getArguments().get("name")+"_info", mass);
+        } else {
+            Log.i("TAG21", "Profile Fragment Delete Data");
+            storage.setDate((String) getArguments().get("name")+"_posts", null);
+            storage.setDate((String) getArguments().get("name")+"_info", null);
+        }
     }
 
     @Override

@@ -1,4 +1,4 @@
-package app.mycity.mycity.views.fragments.friends;
+package app.mycity.mycity.views.fragments.subscribers;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -8,17 +8,26 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 import app.mycity.mycity.R;
-import app.mycity.mycity.views.adapters.MyFriendsPagerAdapter;
+import app.mycity.mycity.views.activities.Storage;
+import app.mycity.mycity.views.adapters.SubscribersPagerAdapter;
+import app.mycity.mycity.views.fragments.profile.ProfileFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import fr.arnaudguyon.tabstacker.TabStacker;
 
-public class FriendsFragment extends Fragment implements TabStacker.TabStackInterface{
+public class SubscribersFragment extends Fragment implements TabStacker.TabStackInterface{
 
 
     @BindView(R.id.myFriendsViewPager)
@@ -26,13 +35,35 @@ public class FriendsFragment extends Fragment implements TabStacker.TabStackInte
     @BindView(R.id.myFriendsTabLayout)
     TabLayout tabLayout;
 
+    @BindView(R.id.profileFragToolbarTitle)
+    TextView title;
+
+    Storage storage;
+
+
+    public static SubscribersFragment createInstance(String name, String userId) {
+        SubscribersFragment fragment = new SubscribersFragment();
+        Log.i("TAG21", "Create Subscribers " + name + " " + userId);
+        Bundle bundle = new Bundle();
+        bundle.putString("name", name);
+        bundle.putString("userId", userId);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
     FragmentManager fragmentManager;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_my_friends, container, false);
+        View view = inflater.inflate(R.layout.fragment_subscriptions, container, false);
         ButterKnife.bind(this, view);
+
         return view;
+    }
+
+    @OnClick (R.id.profileFragBackButtonContainer)
+    public void back(View v){
+        getActivity().onBackPressed();
     }
 
     @Override
@@ -42,6 +73,8 @@ public class FriendsFragment extends Fragment implements TabStacker.TabStackInte
         // Log.i("TAG21","Friends stack count - " + getActivity().getFragmentManager().getBackStackEntryCount());
      //   Log.i("TAG21","Friends Fragment - " + getActivity().getFragmentManager().getBackStackEntryCount());
         Log.i("TAG","Friends fragment on CreateView");
+
+        title.setText("Подписчики");
 
         if(tabLayout!=null){
             Log.i("TAG","TAB LAYOUT ! NULL");
@@ -55,9 +88,9 @@ public class FriendsFragment extends Fragment implements TabStacker.TabStackInte
             Log.i("TAG","getChildFragmentManager !" +
                     " NULL");
         }
-        MyFriendsPagerAdapter pagerAdapter = new MyFriendsPagerAdapter(getChildFragmentManager());
+        SubscribersPagerAdapter pagerAdapter = new SubscribersPagerAdapter(getChildFragmentManager(), getArguments().getString("name"), getArguments().getString("userId"));
         viewPager.setAdapter(pagerAdapter);
-        viewPager.setOffscreenPageLimit(3);
+        viewPager.setOffscreenPageLimit(2);
         //viewPager.addOnPageChangeListener(pagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
@@ -69,7 +102,7 @@ public class FriendsFragment extends Fragment implements TabStacker.TabStackInte
         super.onAttach(context);
         Log.d("TAG", "Attach " + this.getClass().getSimpleName());
         // fragmentManager = ((MainActivity2) context).getSupportFragmentManager();
-
+        storage = (Storage) context;
     }
 
     public void onStart() {
@@ -117,7 +150,25 @@ public class FriendsFragment extends Fragment implements TabStacker.TabStackInte
 
     @Override
     public void onTabFragmentDismissed(TabStacker.DismissReason dismissReason) {
+        Log.d("TAG21", "REASON - " + dismissReason);
+        if(dismissReason == TabStacker.DismissReason.BACK){
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    storage.setDate(getArguments().get("name") + "_userlist", null);
+                    storage.setDate(getArguments().get("name") + "_userListOnline", null);
+                }
+            }, 200);
+            Log.d("TAG21", "Delete - " + getArguments().get("name") + "_userlist");
+            Log.d("TAG21", "Delete - " + getArguments().get("name") + "_userListOnline");
 
+
+            if(storage.getDate(getArguments().get("name") + "_userlist")==null){
+                Log.d("TAG21", "Delete -_work");
+            } else {
+                Log.d("TAG21", "Delete - not _work");
+            }
+        }
     }
 
     @Override

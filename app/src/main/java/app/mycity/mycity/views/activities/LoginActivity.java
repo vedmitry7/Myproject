@@ -2,6 +2,7 @@ package app.mycity.mycity.views.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -45,6 +46,12 @@ public class LoginActivity extends AppCompatActivity {
     @BindView(R.id.loginActPasswordEt)
     EditText password;
 
+
+    @BindView(R.id.loginString)
+    View loginString;
+
+    @BindView(R.id.passwordString)
+    View passwordString;
     int selection = 0;
 
     @Override
@@ -53,11 +60,36 @@ public class LoginActivity extends AppCompatActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_login_new);
 
         ButterKnife.bind(this);
         Typeface type = Typeface.createFromAsset(getAssets(),"abril_fatface_regular.otf");
         label.setTypeface(type);
+
+        login.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
+                    loginString.setBackgroundColor(Color.WHITE);
+                }
+                else {
+                    loginString.setBackgroundColor(getResources().getColor(R.color.white_50percent));
+                }
+            }
+        });
+        password.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
+                    passwordString.setBackgroundColor(Color.WHITE);
+                }
+                else {
+                    passwordString.setBackgroundColor(getResources().getColor(R.color.white_50percent));
+                }
+            }
+        });
+
+
     }
 
     @OnClick(R.id.loginActRegistrationButtonTv)
@@ -66,6 +98,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+/*
     @OnClick(R.id.showPasswordBtn)
     public void showPassword(View v){
         v.setOnTouchListener(new View.OnTouchListener() {
@@ -85,7 +118,7 @@ public class LoginActivity extends AppCompatActivity {
                 return false;
             }
         });
-    }
+    }*/
 
     @OnClick(R.id.loginActForgetPasswordButtonTv)
     public void forgetPassword(View view) {

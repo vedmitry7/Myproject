@@ -4,11 +4,13 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.PointerIcon;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,6 +20,7 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
+import app.mycity.mycity.App;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.model.Likes;
 import app.mycity.mycity.api.model.Photo;
@@ -74,8 +77,21 @@ public class CheckinRecyclerAdapter extends RecyclerView.Adapter<CheckinRecycler
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        WindowManager windowManager = (WindowManager) context
+                .getSystemService(Context.WINDOW_SERVICE);
+        windowManager.getDefaultDisplay().getMetrics(metrics);
+        int displayWidth = metrics.widthPixels;
+        int paddings = App.dpToPx(context, 8);
+        int pictureWidth = (displayWidth - paddings)/3;
+
+        Log.d("TAG", "picture width - " + pictureWidth);
+
         Picasso.get()
                 .load(postList.get(position).getAttachments().get(0).getPhoto780())
+                .resize(pictureWidth, pictureWidth)
+                .centerCrop()
                 .into(holder.photo);
 
         if(holder.likesCount!=null)

@@ -2,6 +2,7 @@ package app.mycity.mycity;
 
 public class Constants {
     public static final String URL_BASE = "http://192.168.0.104/api/";
+    //public static final String URL_BASE = "http://front.itmacros.beget.tech/api/";
 
     public static final String KEY_MY_ID = "my_id";
     public static final String KEY_ACCESS_TOKEN = "access_token";

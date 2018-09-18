@@ -39,6 +39,9 @@ public class Post {
     @SerializedName("likes")
     @Expose
     private Likes likes;
+    @SerializedName("visits")
+    @Expose
+    private Visits visits;
     @SerializedName("attachments")
     @Expose
     private List<Photo> attachments = null;
@@ -137,5 +140,13 @@ public class Post {
 
     public void setLikes(Likes likes) {
         this.likes = likes;
+    }
+
+    public Visits getVisits() {
+        return visits;
+    }
+
+    public void setVisits(Visits visits) {
+        this.visits = visits;
     }
 }

@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -42,6 +43,7 @@ import app.mycity.mycity.views.adapters.PlacesRecyclerAdapter;
 import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import fr.arnaudguyon.tabstacker.TabStacker;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -55,6 +57,8 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
 
     @BindView(R.id.placesFragmentRecyclerView)
     RecyclerView recyclerView;
+    @BindView(R.id.toolBarTitle)
+    TextView title;
 
     PlacesRecyclerAdapter adapter;
 
@@ -64,6 +68,11 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
 
     int totalCount;
 
+    @OnClick(R.id.mainActAddBtn)
+    public void photo(View v){
+        Log.d("TAG21", "PHOTO - ");
+        EventBus.getDefault().post(new EventBusMessages.MakeCheckin());
+    }
 
     @Nullable
     @Override
@@ -77,6 +86,7 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        title.setText("Места");
 
         placeList = new ArrayList<>();
         adapter = new PlacesRecyclerAdapter(placeList);

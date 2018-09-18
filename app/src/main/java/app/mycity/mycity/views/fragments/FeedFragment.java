@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -38,6 +39,7 @@ import app.mycity.mycity.views.adapters.FeedRecyclerAdapter;
 import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import fr.arnaudguyon.tabstacker.TabStacker;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -52,6 +54,9 @@ public class FeedFragment extends android.support.v4.app.Fragment implements Tab
     @BindView(R.id.feedFragmentRecyclerView)
     RecyclerView recyclerView;
 
+    @BindView(R.id.toolBarTitle)
+    TextView title;
+
     FeedRecyclerAdapter adapter;
 
     List<Post> postList;
@@ -60,6 +65,12 @@ public class FeedFragment extends android.support.v4.app.Fragment implements Tab
     boolean isLoading;
 
     int totalCount;
+
+    @OnClick(R.id.mainActAddBtn)
+    public void photo(View v){
+        Log.d("TAG21", "PHOTO - ");
+        EventBus.getDefault().post(new EventBusMessages.MakeCheckin());
+    }
 
     @Nullable
     @Override
@@ -73,6 +84,7 @@ public class FeedFragment extends android.support.v4.app.Fragment implements Tab
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        title.setText("Лента");
 
         postList = new ArrayList<>();
         adapter = new FeedRecyclerAdapter(postList, profiles);

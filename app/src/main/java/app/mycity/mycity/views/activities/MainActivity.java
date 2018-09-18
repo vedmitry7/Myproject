@@ -39,11 +39,11 @@ import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.fragments.DialogsFragment;
 import app.mycity.mycity.views.fragments.FeedFragment;
-import app.mycity.mycity.views.fragments.friends.FriendsFragment;
+import app.mycity.mycity.views.fragments.subscribers.SubscribersFragment;
 import app.mycity.mycity.views.fragments.LongListFragment;
 import app.mycity.mycity.views.fragments.places.PlaceFragment;
 import app.mycity.mycity.views.fragments.places.PlacesFragment;
-import app.mycity.mycity.views.fragments.friends.SomeoneFriendsFragment;
+import app.mycity.mycity.views.fragments.subscribers.SomeoneFriendsFragment;
 import app.mycity.mycity.views.fragments.profile.ProfileFragment;
 import app.mycity.mycity.views.fragments.profile.SomeoneProfileFragment;
 import app.mycity.mycity.views.fragments.settings.MainSettingsFragment;
@@ -261,28 +261,6 @@ public class MainActivity extends AppCompatActivity implements MainAct {
                 transaction.commit();
                 break;
         }
-    }
-
-    @Override
-    public void startFriends() {
-        FriendsFragment myFriendsFragment = new FriendsFragment();
-        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.main_act_fragment_container, myFriendsFragment);
-        transaction.addToBackStack("friends");
-        transaction.commit();
-    }
-
-    @Override
-    public void startFriendsById(String id) {
-        SomeoneFriendsFragment someoneFriendsFragment = new SomeoneFriendsFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("ID", id);
-        someoneFriendsFragment.setArguments(bundle);
-        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
-   //     transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
-        transaction.replace(R.id.main_act_fragment_container, someoneFriendsFragment);
-        transaction.addToBackStack("idFriends");
-        transaction.commit();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

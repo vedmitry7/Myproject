@@ -1,7 +1,6 @@
 package app.mycity.mycity;
 
 import android.app.AlarmManager;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -31,7 +30,6 @@ import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.activities.ChatActivity;
 import io.realm.Realm;
-import io.realm.RealmConfiguration;
 
 public class TestService extends Service {
 
@@ -44,6 +42,7 @@ public class TestService extends Service {
     public TestService() {
         Log.i("Test", "Service: constructor");
     }
+
     @Override
     public IBinder onBind(Intent intent) {
         Log.i("Test", "Service: onBind");
@@ -81,7 +80,12 @@ public class TestService extends Service {
     private void initSocket() {
         {
             try {
-                mSocket = IO.socket("http://192.168.0.104:8000");
+                if(SharedManager.getProperty("socketServer")!=null)
+                    mSocket = IO.socket("http://" + SharedManager.getProperty("socketServer"));
+                else
+                    Log.i("TAG21", "server null");
+
+                //   mSocket = IO.socket("http://192.168.0.104:8000");
             } catch (URISyntaxException e) {}
         }
 

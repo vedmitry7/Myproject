@@ -7,9 +7,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.Log;
 
-import app.mycity.mycity.views.fragments.friends.FriendsAllListFragment;
-import app.mycity.mycity.views.fragments.friends.FriendsCommonListFragment;
-import app.mycity.mycity.views.fragments.friends.FriendsOnlineListFragment;
+import app.mycity.mycity.views.fragments.subscribers.SubscribersListFragment;
+import app.mycity.mycity.views.fragments.subscribers.FriendsCommonListFragment;
+import app.mycity.mycity.views.fragments.subscribers.SubscribersOnlineListFragment;
 
 
 public class SomeoneFriendsPagerAdapter extends FragmentStatePagerAdapter {
@@ -17,8 +17,8 @@ public class SomeoneFriendsPagerAdapter extends FragmentStatePagerAdapter {
     private FragmentManager fm;
     private TabLayout tabLayout;
 
-    FriendsAllListFragment friendsAllListFragment;
-    FriendsOnlineListFragment friendsOnlineListFragment;
+    SubscribersListFragment friendsAllListFragment;
+    SubscribersOnlineListFragment friendsOnlineListFragment;
 
     public SomeoneFriendsPagerAdapter(FragmentManager fm, TabLayout tabLayout, String id) {
         super(fm);
@@ -26,8 +26,8 @@ public class SomeoneFriendsPagerAdapter extends FragmentStatePagerAdapter {
         Bundle bundle = new Bundle();
         bundle.putString("ID", id);
 
-        friendsAllListFragment = new FriendsAllListFragment();
-        friendsOnlineListFragment = new FriendsOnlineListFragment();
+        friendsAllListFragment = new SubscribersListFragment();
+        friendsOnlineListFragment = new SubscribersOnlineListFragment();
 
         friendsAllListFragment.setArguments(bundle);
         friendsOnlineListFragment.setArguments(bundle);

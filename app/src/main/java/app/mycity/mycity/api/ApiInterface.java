@@ -18,6 +18,7 @@ import app.mycity.mycity.api.model.ResponseSavePhoto;
 import app.mycity.mycity.api.model.ResponseSocketServer;
 import app.mycity.mycity.api.model.ResponseUploadServer;
 import app.mycity.mycity.api.model.ResponseUploading;
+import app.mycity.mycity.api.model.ResponseVisit;
 import app.mycity.mycity.api.model.ResponseWall;
 import app.mycity.mycity.api.model.SendMessageResponse;
 import app.mycity.mycity.api.model.User;
@@ -50,6 +51,39 @@ public interface ApiInterface {
     Call<ResponseContainer<User>> getUser(@Field("access_token") String accessToken,
                                           @Field("fields") String fields);
 
+    //TOP users
+    @FormUrlEncoded
+    @POST("users.getUsers")
+    Call<ResponseContainer<UsersContainer>> getTopUsers(@Field("access_token") String accessToken,
+                                                        @Field("fields") String fields,
+                                                        @Field("order") String order);
+
+    //Subscribers
+    @FormUrlEncoded
+    @POST("subscribers.get")
+    Call<ResponseContainer<UsersContainer>> getSubscribers(@Field("access_token") String accessToken,
+                                                           @Field("user_id") String id,
+                                                           @Field("only_online") int online,
+                                                           @Field("fields") String fields);
+
+    //Subscribers Count
+    @FormUrlEncoded
+    @POST("subscribers.get")
+    Call<ResponseContainer<UsersContainer>> getSubscribersCount(@Field("access_token") String accessToken);
+
+    //Subscriptions // 1 - online
+    @FormUrlEncoded
+    @POST("subscribers.getSubscriptions")
+    Call<ResponseContainer<UsersContainer>> getSubscriptions(@Field("access_token") String accessToken,
+                                                           @Field("user_id") String id,
+                                                           @Field("only_online") int online,
+                                                           @Field("fields") String fields);
+
+    @FormUrlEncoded
+    @POST("subscribers.getSubscriptions")
+    Call<ResponseContainer<UsersContainer>> getSubscriptionsCount(@Field("access_token") String accessToken);
+
+
     @FormUrlEncoded
     @POST("users.get")
     Call<ResponseContainer<User>> getUserById(@Field("access_token") String accessToken,
@@ -59,6 +93,8 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("friends.get")
     Call<ResponseContainer<UsersContainer>> getUsers(@Field("access_token") String accessToken);
+
+
 
     @FormUrlEncoded
     @POST("friends.get")
@@ -232,12 +268,42 @@ public interface ApiInterface {
                                                @Field("item_id") String itemId,
                                                @Field("owner_id") String ownerId);
 
+
+    //PLACE EVENTS
+    @FormUrlEncoded
+    @POST("events.get")
+    Call<ResponseContainer<ResponseWall>> getEvents(@Field("access_token") String token,
+                                                  @Field("group_id") String groupId);
+
+    @FormUrlEncoded
+    @POST("events.addVisit")
+    Call<ResponseContainer<ResponseVisit>> addVisit(@Field("access_token") String token,
+                                               @Field("event_id") String eventId,
+                                               @Field("owner_id") String ownerId);
+
+    @FormUrlEncoded
+    @POST("events.removeVisit")
+    Call<ResponseContainer<ResponseVisit>> removeVisit(@Field("access_token") String token,
+                                                       @Field("event_id") String eventId,
+                                                       @Field("owner_id") String ownerId);
+
+    //FEED
     @FormUrlEncoded
     @POST("feed.get")
     Call<ResponseContainer<ResponseWall>> getFeed(@Field("access_token") String token,
                                                  @Field("extended") String type,
                                                  @Field("offset") int offset,
                                                  @Field("fields") String fields);
+
+
+    //FEED
+    @FormUrlEncoded
+    @POST("feed.get")
+    Call<ResponseContainer<ResponseWall>> getTopCheckin(@Field("access_token") String token,
+                                                  @Field("extended") String type,
+                                                  @Field("offset") int offset,
+                                                  @Field("fields") String fields,
+                                                  @Field("order") String order);  // top, popular
 
 
     @FormUrlEncoded
@@ -274,8 +340,6 @@ public interface ApiInterface {
     Call<ResponseContainer<ResponsePlaces>> getPlaces(@Field("access_token") String token,
                                                       @Field("offset") int offset,
                                                       @Field("city_id ") int cityId);
-
-
 
 
 }

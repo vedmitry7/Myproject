@@ -113,7 +113,7 @@
             app:layout_constraintTop_toBottomOf="@+id/profileFragDescription">
 
             <RelativeLayout
-                android:id="@+id/profileFragFriendsButton"
+                android:id="@+id/profileFragSubscribersButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -131,7 +131,7 @@
 
                 <TextView
                     android:textSize="16dp"
-                    android:id="@+id/profileFragFriendsTv"
+                    android:id="@+id/profileFragSubscriberTv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/profileFragLabelFriends"

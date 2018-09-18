@@ -28,6 +28,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -43,14 +44,16 @@ import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.fragments.DialogsFragment;
 import app.mycity.mycity.views.fragments.FeedFragment;
-import app.mycity.mycity.views.fragments.friends.FriendsFragment;
+import app.mycity.mycity.views.fragments.subscribers.SubscribersFragment;
 import app.mycity.mycity.views.fragments.LongListFragment;
-import app.mycity.mycity.views.fragments.friends.SomeoneFriendsFragment;
+import app.mycity.mycity.views.fragments.subscribers.SomeoneFriendsFragment;
+import app.mycity.mycity.views.fragments.subscribers.SubscriptionFragment;
 import app.mycity.mycity.views.fragments.places.PlaceFragment;
 import app.mycity.mycity.views.fragments.places.PlacesFragment;
 import app.mycity.mycity.views.fragments.profile.ProfileFragment;
 import app.mycity.mycity.views.fragments.profile.SomeoneProfileFragment;
 import app.mycity.mycity.views.fragments.settings.MainSettingsFragment;
+import app.mycity.mycity.views.fragments.top.TopFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -61,7 +64,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity2 extends AppCompatActivity implements MainAct {
+public class MainActivity2 extends AppCompatActivity implements MainAct, Storage {
 
     @BindView(R.id.main_act_top_button)     ImageView topButton;
     @BindView(R.id.main_act_places_button)  ImageView placesButton;
@@ -73,8 +76,26 @@ public class MainActivity2 extends AppCompatActivity implements MainAct {
     @BindView(R.id.main_act_messages_container)         RelativeLayout messageButton;
     @BindView(R.id.main_act_notification_container)     RelativeLayout notificattionButton;
 
-
     private TabStacker mTabStacker;
+
+    String currentTab;
+
+    HashMap<String, Object> date =new HashMap<>();
+
+    @Override
+    public Object getDate(String key) {
+        Log.i("TAG21", "GET DATE " + key );
+        if(date.containsKey(key)){
+            Log.i("TabFragment", "contains");
+            return date.get(key);
+        }
+        return null;
+    }
+
+    @Override
+    public void setDate(String key, Object date) {
+        this.date.put(key, date);
+    }
 
     private enum Tab {
         TAB_TOP(R.id.main_act_top_button),
@@ -124,14 +145,20 @@ public class MainActivity2 extends AppCompatActivity implements MainAct {
 
         mTabStacker = new TabStacker(getSupportFragmentManager(), R.id.main_act_fragment_container);
 
+
+
         if (savedInstanceState == null) {
             // new Activity: creates the first Tab
             selectTab(Tab.TAB_FEED);
         } else {
             // restoring Activity: restore the TabStacker, and select the saved selected tab
-            mTabStacker.restoreInstance(savedInstanceState);
+      /*      mTabStacker.restoreInstance(savedInstanceState);
             Tab selectedTab = Tab.valueOf(mTabStacker.getCurrentTabName());
-            selectTab(selectedTab);
+            selectTab(selectedTab);*/
+
+
+            selectTab(Tab.TAB_FEED);
+
         }
 
         //Tab click listener
@@ -177,28 +204,33 @@ public class MainActivity2 extends AppCompatActivity implements MainAct {
 
         // switch to Tab Stack
         String tabName = clickedTab.name();
+        currentTab = clickedTab.name();
+
         if (!mTabStacker.switchToTab(tabName)) {    // tries to switch to the TAB STACK
             // no fragment yet on this stack -> push the 1st fragment of the stack
 
-            android.support.v4.app.Fragment fragment;
+            android.support.v4.app.Fragment fragment = null;
+
             switch (clickedTab){
                 case TAB_TOP:
+                    fragment = new TopFragment();
                     break;
                 case TAB_PLACES:
                     fragment = new PlacesFragment();
-                    mTabStacker.replaceFragment(fragment, null);  // no animation
                     break;
                 case TAB_PROFILE:
-                    fragment = new ProfileFragment();
-                    mTabStacker.replaceFragment(fragment, null);  // no animation
+                    fragment = ProfileFragment.createInstance(tabName + "_" + mTabStacker.getCurrentTabSize());
                     break;
                 case TAB_SEARCH:
+                    fragment = new FeedFragment();
                     break;
                 case TAB_FEED:
                     fragment = new FeedFragment();
-                    mTabStacker.replaceFragment(fragment, null);  // no animation
                     break;
             }
+
+            mTabStacker.replaceFragment(fragment, null);  // no animation
+
         }
     }
 
@@ -220,7 +252,9 @@ public class MainActivity2 extends AppCompatActivity implements MainAct {
             public void onResponse(Call<ResponseContainer<ResponseSocketServer>> call, Response<ResponseContainer<ResponseSocketServer>> response) {
                 if(response.body()!=null){
                     SharedManager.addProperty("ts", response.body().getResponse().getTs());
+                    SharedManager.addProperty("socketServer", response.body().getResponse().getServer());
                     Log.d("TAG21", "update TS - " + response.body().getResponse().getTs());
+                    Log.d("TAG21", "Socket Server - " + response.body().getResponse().getServer());
                     Toast.makeText(MainActivity2.this, response.body().getResponse().getTs(), Toast.LENGTH_SHORT).show();
                 }
             }
@@ -242,9 +276,8 @@ public class MainActivity2 extends AppCompatActivity implements MainAct {
         Realm.setDefaultConfiguration(config);
     }
 
-    @OnClick(R.id.mainActAddBtn)
-    public void photo(View v){
-
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(EventBusMessages.MakeCheckin event){
         Log.d("TAG21", "PHOTO - ");
         Dexter.withActivity(this).withPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .withListener(new MultiplePermissionsListener() {
@@ -283,7 +316,6 @@ public class MainActivity2 extends AppCompatActivity implements MainAct {
         transaction.commit();*/
     }
 
-
     @OnClick(R.id.main_act_search_button_container)
     public void search(View v){
         setIndicator(searchButton);
@@ -306,7 +338,6 @@ public class MainActivity2 extends AppCompatActivity implements MainAct {
         transaction.commit();*/
     }
 
-
     @OnClick(R.id.main_act_profile_button_container)
     public void profile(View v){
    /*     profileFragment = new ProfileFragment();
@@ -319,6 +350,7 @@ public class MainActivity2 extends AppCompatActivity implements MainAct {
 
         clearFragmentStack();*/
     }
+
     void clearFragmentStack(){
         FragmentManager fm = getFragmentManager(); // or 'getSupportFragmentManager();'
         int count = fm.getBackStackEntryCount();
@@ -370,19 +402,24 @@ public class MainActivity2 extends AppCompatActivity implements MainAct {
         }
     }
 
-    @Override
-    public void startFriends() {
-     /*   FriendsFragment myFriendsFragment = new FriendsFragment();
-        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.main_act_fragment_container, myFriendsFragment);
-        transaction.addToBackStack("friends");
-        transaction.commit();
-*/
-        FriendsFragment myFriendsFragment = new FriendsFragment();
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void startSubscribers(EventBusMessages.OpenSubscribers event) {
+        SubscribersFragment myFriendsFragment = SubscribersFragment.createInstance(currentTab + "_" + mTabStacker.getCurrentTabSize(), event.getUserId());
         mTabStacker.replaceFragment(myFriendsFragment, null);
     }
 
-    @Override
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void startSubscribers(EventBusMessages.OpenSubscriptions event) {
+        SubscriptionFragment subscriptionFragment = SubscriptionFragment.createInstance(currentTab + "_" + mTabStacker.getCurrentTabSize(), event.getUserId());
+        mTabStacker.replaceFragment(subscriptionFragment, null);
+    }
+
+    String getFragmentName(){
+        return currentTab + "_" + mTabStacker.getCurrentTabSize();
+    }
+
     public void startFriendsById(String id) {
 /*        SomeoneFriendsFragment someoneFriendsFragment = new SomeoneFriendsFragment();
         Bundle bundle = new Bundle();
@@ -405,10 +442,8 @@ public class MainActivity2 extends AppCompatActivity implements MainAct {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(EventBusMessages.OpenUser event){
-        SomeoneProfileFragment profileFragment = new SomeoneProfileFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("ID", event.getMessage());
-        profileFragment.setArguments(bundle);
+        SomeoneProfileFragment profileFragment = SomeoneProfileFragment.createInstance(currentTab + "_" + mTabStacker.getCurrentTabSize(), event.getMessage());
+
 
         mTabStacker.replaceFragment(profileFragment, null);
     /*    android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -504,6 +539,8 @@ public class MainActivity2 extends AppCompatActivity implements MainAct {
           // closefragment();
            super.onBackPressed();
        }*/
+
+
     @Override
     public void onBackPressed() {
         if (!mTabStacker.onBackPressed()) {

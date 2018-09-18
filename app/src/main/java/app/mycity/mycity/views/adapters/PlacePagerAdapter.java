@@ -9,6 +9,7 @@ import android.util.Log;
 import app.mycity.mycity.api.model.Place;
 import app.mycity.mycity.views.fragments.PhotoAlbumsFragment;
 import app.mycity.mycity.views.fragments.SimpleFragment;
+import app.mycity.mycity.views.fragments.places.PlaceEvents;
 import app.mycity.mycity.views.fragments.places.PlaceInfoFragment;
 import app.mycity.mycity.views.fragments.places.PlacesCheckinFragment;
 
@@ -32,7 +33,7 @@ public class PlacePagerAdapter extends FragmentPagerAdapter {
             case 2:
                 return new PhotoAlbumsFragment();
             case 3:
-                return new SimpleFragment();
+                return new PlaceEvents();
         }
         return new PlacesCheckinFragment();
     }

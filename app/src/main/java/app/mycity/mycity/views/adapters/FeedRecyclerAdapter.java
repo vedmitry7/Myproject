@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,6 +19,7 @@ import org.greenrobot.eventbus.EventBus;
 import java.util.List;
 import java.util.Map;
 
+import app.mycity.mycity.App;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.model.Post;
 import app.mycity.mycity.api.model.Profile;
@@ -59,22 +61,34 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
         if(context==null)
             context = parent.getContext();
 
-
-
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.feed_item, parent, false);
             return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Picasso.get().load(postList.get(position).getAttachments().get(0).getPhoto780()).into(holder.photo);
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+        Picasso.get()
+                .load(postList.get(position).getAttachments()
+                .get(0).getPhoto780()).resize(App.dpToPx(context, 360), App.dpToPx(context, 360))
+                .centerCrop()
+                .into(holder.photo);
 
         if(profiles.containsKey(postList.get(position).getOwnerId())){
             Profile profile = (Profile) profiles.get(postList.get(position).getOwnerId());
             Picasso.get()
                     .load(profile.getPhoto130())
+                    .resize(App.dpToPx(context, 36), App.dpToPx(context, 36))
+                    .centerCrop()
                     .into(holder.ownerImage);
+
             holder.name.setText(profile.getFirstName()+ " " + profile.getLastName());
+        /*    holder.ownerImage.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                    holder.ownerImage.getWidth();
+                    return false;
+                }
+            });*/
         }
 
         holder.time.setText(Util.getDatePretty(postList.get(position).getDate()));

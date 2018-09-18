@@ -110,7 +110,8 @@ public class DescriptionActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ResponseContainer<ResponseUploadServer>> call, Response<ResponseContainer<ResponseUploadServer>> response) {
                 ResponseUploadServer uploadServer = response.body().getResponse();
-                uploadFile();
+                Log.d("TAG21", "uploadServer" + uploadServer.getServer());
+                uploadFile(uploadServer.getBaseUrl());
             }
 
             @Override
@@ -120,14 +121,12 @@ public class DescriptionActivity extends AppCompatActivity {
         });
     }
 
-    private void uploadFile() {
+    private void uploadFile(String server) {
         final MultipartBody.Part filePart = MultipartBody.Part.createFormData("0", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
-
-
         final RequestBody action = RequestBody.create(MediaType.parse("text/plain"), "add_photo");
         final RequestBody id = RequestBody.create(MediaType.parse("text/plain"), "3");
 
-        ApiFactory.getmApiUploadServer("http://192.168.0.104/").upload(action, id, filePart).enqueue(new Callback<ResponseContainer<ResponseUploading>>() {
+        ApiFactory.getmApiUploadServer(server).upload(action, id, filePart).enqueue(new Callback<ResponseContainer<ResponseUploading>>() {
             @Override
             public void onResponse(Call<ResponseContainer<ResponseUploading>> call, Response<ResponseContainer<ResponseUploading>> response) {
 
@@ -140,7 +139,6 @@ public class DescriptionActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-
                 savePhoto(array.toString(), uploading.getServer());
             }
 

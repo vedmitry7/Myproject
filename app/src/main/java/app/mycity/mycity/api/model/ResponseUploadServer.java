@@ -8,12 +8,15 @@ public class ResponseUploadServer {
     @SerializedName("server")
     @Expose
     private String server;
+    @SerializedName("base_url")
+    @Expose
+    private String baseUrl;
     @SerializedName("user_id")
     @Expose
     private Integer userId;
-    @SerializedName("group_id")
+    @SerializedName("owner_id")
     @Expose
-    private Integer groupId;
+    private Integer ownerId;
 
     public String getServer() {
         return server;
@@ -21,6 +24,14 @@ public class ResponseUploadServer {
 
     public void setServer(String server) {
         this.server = server;
+    }
+
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
     }
 
     public Integer getUserId() {
@@ -31,12 +42,12 @@ public class ResponseUploadServer {
         this.userId = userId;
     }
 
-    public Integer getGroupId() {
-        return groupId;
+    public Integer getOwnerId() {
+        return ownerId;
     }
 
-    public void setGroupId(Integer groupId) {
-        this.groupId = groupId;
+    public void setOwnerId(Integer ownerId) {
+        this.ownerId = ownerId;
     }
 
 }

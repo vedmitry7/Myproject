@@ -6,18 +6,25 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.Log;
 
-import app.mycity.mycity.views.fragments.friends.FriendsAllListFragment;
-import app.mycity.mycity.views.fragments.friends.FriendsOnlineListFragment;
-import app.mycity.mycity.views.fragments.SimpleFragment;
+import app.mycity.mycity.views.fragments.subscribers.SubscribersListFragment;
+import app.mycity.mycity.views.fragments.subscribers.SubscribersOnlineListFragment;
+import app.mycity.mycity.views.fragments.subscribers.SubscriptionListFragment;
+import app.mycity.mycity.views.fragments.subscribers.SubscriptionsOnlineListFragment;
 
 
-public class MyFriendsPagerAdapter extends FragmentStatePagerAdapter {
+public class SubscriptionsPagerAdapter extends FragmentStatePagerAdapter {
 
     private FragmentManager fm;
     private TabLayout tabLayout;
 
-    public MyFriendsPagerAdapter(FragmentManager fm) {
+    String tabName;
+    String userId;
+
+
+    public SubscriptionsPagerAdapter(FragmentManager fm, String name, String userId) {
         super(fm);
+        tabName = name;
+        this.userId = userId;
         Log.d("TAG", "Constructor " + this.getClass().getSimpleName());
         Log.i("TAG3","new Friends Pager created");
     }
@@ -27,12 +34,10 @@ public class MyFriendsPagerAdapter extends FragmentStatePagerAdapter {
         switch (position){
             case 0:
                 Log.d("TAG", "new MyFriendsAllFragment() " + this.getClass().getSimpleName());
-                return new FriendsAllListFragment();
+                return SubscriptionListFragment.createInstance(tabName, userId);
             case 1:
                 Log.d("TAG", "new MyFriendsOnlineFragment() " + this.getClass().getSimpleName());
-                return new FriendsOnlineListFragment();
-            case 2:
-                return new SimpleFragment();
+                return SubscriptionsOnlineListFragment.createInstance(tabName, userId);
         }
         return null;
     }
@@ -46,14 +51,12 @@ public class MyFriendsPagerAdapter extends FragmentStatePagerAdapter {
                 return "Все";
             case 1:
                 return "Online";
-            case 2:
-                return "Заявки";
         }
         return null;
     }
 
     @Override
     public int getCount() {
-        return 3;
+        return 2;
     }
 }

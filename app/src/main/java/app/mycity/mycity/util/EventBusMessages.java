@@ -14,6 +14,30 @@ public class EventBusMessages {
         }
     }
 
+    public static class OpenSubscribers{
+        private final String userId;
+
+        public OpenSubscribers(String userId) {
+            this.userId = userId;
+        }
+
+        public String getUserId() {
+            return userId;
+        }
+    }
+
+    public static class OpenSubscriptions{
+        private final String userId;
+
+        public OpenSubscriptions(String userId) {
+            this.userId = userId;
+        }
+
+        public String getUserId() {
+            return userId;
+        }
+    }
+
     public static class LikePost {
         private final String itemId;
         private final String ownerId;
@@ -32,6 +56,30 @@ public class EventBusMessages {
         }
 
         public LikePost(String itemId, String ownerId, int adapterPosition) {
+            this.itemId = itemId;
+            this.ownerId = ownerId;
+            this.adapterPosition = adapterPosition;
+        }
+    }
+
+    public static class AddVisitor {
+        private final String itemId;
+        private final String ownerId;
+        private final int adapterPosition;
+
+        public String getItemId() {
+            return itemId;
+        }
+
+        public String getOwnerId() {
+            return ownerId;
+        }
+
+        public int getAdapterPosition() {
+            return adapterPosition;
+        }
+
+        public AddVisitor(String itemId, String ownerId, int adapterPosition) {
             this.itemId = itemId;
             this.ownerId = ownerId;
             this.adapterPosition = adapterPosition;
@@ -162,5 +210,8 @@ public class EventBusMessages {
         public void setAdapterPosition(int adapterPosition) {
             this.adapterPosition = adapterPosition;
         }
+    }
+
+    public static class MakeCheckin {
     }
 }

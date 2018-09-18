@@ -118,6 +118,7 @@ public class FilterImageActivity extends AppCompatActivity implements FiltersLis
         if(savedInstanceState==null){
             makeCheckin();
         } else {
+            finish();
             path = getIntent().getStringExtra("path");
             loadImage();
             setupViewPager(viewPager);

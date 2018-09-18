@@ -70,7 +70,7 @@ public class FriendsRecyclerAdapter extends RecyclerView.Adapter<FriendsRecycler
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d("TAG", userList.get(getAdapterPosition()).getFirstName() + " open profile");
+                    Log.d("TAG21", userList.get(getAdapterPosition()).getFirstName() + " open profile");
                     EventBus.getDefault().post(new EventBusMessages.OpenUser(userList.get(getAdapterPosition()).getId()));
                 }
             });
@@ -79,7 +79,7 @@ public class FriendsRecyclerAdapter extends RecyclerView.Adapter<FriendsRecycler
 
     public void update(List<User> users){
         userList = users;
-        Log.d("TAG", "update rec - rec list = " + userList.size());
+        Log.d("TAG21", "update rec - rec list = " + userList.size());
         Log.i("TAG3","All list recycler update");
         notifyDataSetChanged();
     }

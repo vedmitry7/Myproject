@@ -1,4 +1,4 @@
-package app.mycity.mycity.views.fragments.friends;
+package app.mycity.mycity.views.fragments.subscribers;
 
 import android.content.Context;
 import android.os.Bundle;
