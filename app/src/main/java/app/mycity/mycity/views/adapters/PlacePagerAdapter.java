@@ -3,11 +3,10 @@ package app.mycity.mycity.views.adapters;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.Log;
 
 import app.mycity.mycity.api.model.Place;
-import app.mycity.mycity.views.fragments.PhotoAlbumsFragment;
+import app.mycity.mycity.views.fragments.places.PhotoAlbumsFragment;
 import app.mycity.mycity.views.fragments.SimpleFragment;
 import app.mycity.mycity.views.fragments.places.PlaceEvents;
 import app.mycity.mycity.views.fragments.places.PlaceInfoFragment;
@@ -17,25 +16,29 @@ public class PlacePagerAdapter extends FragmentPagerAdapter {
 
     Place place;
 
-    public PlacePagerAdapter(FragmentManager fm, Place place) {
+    String tabName;
+
+    public PlacePagerAdapter(FragmentManager fm, Place place, String name) {
         super(fm);
         Log.d("TAG21", "Place pager Init");
         this.place = place;
+        tabName = name;
     }
+
 
     @Override
     public Fragment getItem(int position) {
         switch (position){
             case 0:
-                return PlacesCheckinFragment.createInstance(String.valueOf(place.getId()));
+                return PlacesCheckinFragment.createInstance(tabName, String.valueOf(place.getId()));
             case 1:
-                return new PlaceInfoFragment();
+                return PlaceInfoFragment.createInstance();
             case 2:
-                return new PhotoAlbumsFragment();
+                return PhotoAlbumsFragment.createInstance(tabName, place.getId());
             case 3:
-                return new PlaceEvents();
+                return PlaceEvents.createInstance(tabName, place.getId());
         }
-        return new PlacesCheckinFragment();
+        return new SimpleFragment();
     }
 
     @Override

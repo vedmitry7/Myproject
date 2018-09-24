@@ -48,6 +48,7 @@ import app.mycity.mycity.api.model.Post;
 import app.mycity.mycity.api.model.ResponseWall;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
+import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.activities.FullViewActivity;
 import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
@@ -170,6 +171,9 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
         placeHolder.setVisibility(View.VISIBLE);
         Log.i("TAG21","onViewCreated");
 
+        Util.indicateTabImageView(getContext(), view, 2);
+        Util.setOnTabClick(view);
+
         //      imageView.setShadow(App.dpToPx(getActivity(),10));
 
         mLayoutManager = new GridLayoutManager(this.getActivity(), 3);
@@ -274,7 +278,7 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
             name.setText(mass[0]);
             subscribersCount.setText(mass[1]);
             subscriptionsCount.setText(mass[2]);
-           scrollView.setVerticalScrollbarPosition(Integer.valueOf(mass[3]));
+            scrollView.setVerticalScrollbarPosition(Integer.valueOf(mass[3]));
             Log.i("TAG21", "Position  restore " + mass[3]);
         }
         //storage.setDate((String) getArguments().get("name")+"_info", mass);
@@ -670,7 +674,7 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
         RequestBody body = new FormBody.Builder()
                 .add("access_token", SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN))
                 .add("type", "post")
-                .add("item_id", postList.get(event.getAdapterPosition()).getId().toString())
+                .add("item_id", postList.get(event.getAdapterPosition()).getPos().toString())
                 .add("owner_id", postList.get(event.getAdapterPosition()).getOwnerId().toString())
                 .build();
 

@@ -19,6 +19,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import app.mycity.mycity.R;
+import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.adapters.SubscribersPagerAdapter;
 import app.mycity.mycity.views.fragments.profile.ProfileFragment;
@@ -41,12 +42,13 @@ public class SubscribersFragment extends Fragment implements TabStacker.TabStack
     Storage storage;
 
 
-    public static SubscribersFragment createInstance(String name, String userId) {
+    public static SubscribersFragment createInstance(String name, int tabPos, String userId) {
         SubscribersFragment fragment = new SubscribersFragment();
         Log.i("TAG21", "Create Subscribers " + name + " " + userId);
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
         bundle.putString("userId", userId);
+        bundle.putInt("tabPos", tabPos);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -73,6 +75,9 @@ public class SubscribersFragment extends Fragment implements TabStacker.TabStack
         // Log.i("TAG21","Friends stack count - " + getActivity().getFragmentManager().getBackStackEntryCount());
      //   Log.i("TAG21","Friends Fragment - " + getActivity().getFragmentManager().getBackStackEntryCount());
         Log.i("TAG","Friends fragment on CreateView");
+
+        Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
+        Util.setOnTabClick(view);
 
         title.setText("Подписчики");
 

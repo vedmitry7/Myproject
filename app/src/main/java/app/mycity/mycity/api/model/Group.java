@@ -3,11 +3,7 @@ package app.mycity.mycity.api.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Serializable;
-
-public class Place implements Serializable {
+public class Group {
     @SerializedName("id")
     @Expose
     private String id;
@@ -44,21 +40,6 @@ public class Place implements Serializable {
     @SerializedName("status")
     @Expose
     private String status;
-    @SerializedName("cover_id")
-    @Expose
-    private Integer coverId;
-    @SerializedName("cover_50")
-    @Expose
-    private String cover50;
-    @SerializedName("cover_70")
-    @Expose
-    private String cover70;
-    @SerializedName("cover_780")
-    @Expose
-    private String cover780;
-    @SerializedName("cover_orig")
-    @Expose
-    private String coverOrig;
     @SerializedName("country_id")
     @Expose
     private Integer countryId;
@@ -68,30 +49,18 @@ public class Place implements Serializable {
     @SerializedName("site")
     @Expose
     private String site;
-    @SerializedName("description")
-    @Expose
-    private String description;
-    @SerializedName("address")
-    @Expose
-    private String address;
-    @SerializedName("phone")
-    @Expose
-    private String phone;
-    @SerializedName("schedule")
-    @Expose
-    private String schedule;
-    @SerializedName("instagram")
-    @Expose
-    private String instagram;
-    @SerializedName("count_members")
-    @Expose
-    private Integer countMembers;
     @SerializedName("rate")
     @Expose
     private Integer rate;
     @SerializedName("count_rate")
     @Expose
     private Integer countRate;
+    @SerializedName("description")
+    @Expose
+    private String description;
+    @SerializedName("address")
+    @Expose
+    private String address;
     @SerializedName("date_create")
     @Expose
     private Integer dateCreate;
@@ -101,24 +70,6 @@ public class Place implements Serializable {
     @SerializedName("deactivated")
     @Expose
     private Integer deactivated;
-    @SerializedName("verified")
-    @Expose
-    private Integer verified;
-    @SerializedName("is_member")
-    @Expose
-    private Integer isMember;
-    @SerializedName("can_edit")
-    @Expose
-    private Integer canEdit;
-    @SerializedName("latitude")
-    @Expose
-    private Double latitude;
-    @SerializedName("longitude")
-    @Expose
-    private Double longitude;
-    @SerializedName("distance")
-    @Expose
-    private Object distance;
 
     public String getId() {
         return id;
@@ -216,46 +167,6 @@ public class Place implements Serializable {
         this.status = status;
     }
 
-    public Integer getCoverId() {
-        return coverId;
-    }
-
-    public void setCoverId(Integer coverId) {
-        this.coverId = coverId;
-    }
-
-    public String getCover50() {
-        return cover50;
-    }
-
-    public void setCover50(String cover50) {
-        this.cover50 = cover50;
-    }
-
-    public String getCover70() {
-        return cover70;
-    }
-
-    public void setCover70(String cover70) {
-        this.cover70 = cover70;
-    }
-
-    public String getCover780() {
-        return cover780;
-    }
-
-    public void setCover780(String cover780) {
-        this.cover780 = cover780;
-    }
-
-    public String getCoverOrig() {
-        return coverOrig;
-    }
-
-    public void setCoverOrig(String coverOrig) {
-        this.coverOrig = coverOrig;
-    }
-
     public Integer getCountryId() {
         return countryId;
     }
@@ -280,54 +191,6 @@ public class Place implements Serializable {
         this.site = site;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getSchedule() {
-        return schedule;
-    }
-
-    public void setSchedule(String schedule) {
-        this.schedule = schedule;
-    }
-
-    public String getInstagram() {
-        return instagram;
-    }
-
-    public void setInstagram(String instagram) {
-        this.instagram = instagram;
-    }
-
-    public Integer getCountMembers() {
-        return countMembers;
-    }
-
-    public void setCountMembers(Integer countMembers) {
-        this.countMembers = countMembers;
-    }
-
     public Integer getRate() {
         return rate;
     }
@@ -342,6 +205,22 @@ public class Place implements Serializable {
 
     public void setCountRate(Integer countRate) {
         this.countRate = countRate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public Integer getDateCreate() {
@@ -367,53 +246,4 @@ public class Place implements Serializable {
     public void setDeactivated(Integer deactivated) {
         this.deactivated = deactivated;
     }
-
-    public Integer getVerified() {
-        return verified;
-    }
-
-    public void setVerified(Integer verified) {
-        this.verified = verified;
-    }
-
-    public Integer getIsMember() {
-        return isMember;
-    }
-
-    public void setIsMember(Integer isMember) {
-        this.isMember = isMember;
-    }
-
-    public Integer getCanEdit() {
-        return canEdit;
-    }
-
-    public void setCanEdit(Integer canEdit) {
-        this.canEdit = canEdit;
-    }
-
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
-
-    public Object getDistance() {
-        return distance;
-    }
-
-    public void setDistance(Object distance) {
-        this.distance = distance;
-    }
-
 }

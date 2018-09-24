@@ -17,11 +17,13 @@ import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import app.mycity.mycity.App;
 import app.mycity.mycity.R;
+import app.mycity.mycity.api.model.Group;
 import app.mycity.mycity.api.model.Post;
 import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.util.EventBusMessages;
@@ -32,6 +34,7 @@ import butterknife.ButterKnife;
 public class PlacesEventRecyclerAdapter extends RecyclerView.Adapter<PlacesEventRecyclerAdapter.ViewHolder> {
 
     List<Post> postList;
+    Map groups;
 
     int layout;
     Context context;
@@ -45,8 +48,9 @@ public class PlacesEventRecyclerAdapter extends RecyclerView.Adapter<PlacesEvent
         this.imageClickListener = imageClickListener;
     }
 
-    public PlacesEventRecyclerAdapter(List<Post> postList) {
+    public PlacesEventRecyclerAdapter(List<Post> postList, Map groups) {
         this.postList = postList;
+        this.groups = groups;
     }
 
     public void setLayout(int layout){
@@ -72,6 +76,25 @@ public class PlacesEventRecyclerAdapter extends RecyclerView.Adapter<PlacesEvent
                 .get(0).getPhoto780()).resize(App.dpToPx(context, 360), App.dpToPx(context, 360))
                 .centerCrop()
                 .into(holder.photo);
+
+
+        if(groups.containsKey(postList.get(position).getOwnerId())){
+            Group group = (Group) groups.get(postList.get(position).getOwnerId());
+            Picasso.get()
+                    .load(group.getPhoto130())
+                    .resize(App.dpToPx(context, 36), App.dpToPx(context, 36))
+                    .centerCrop()
+                    .into(holder.ownerImage);
+
+            holder.name.setText(group.getName());
+        /*    holder.ownerImage.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                    holder.ownerImage.getWidth();
+                    return false;
+                }
+            });*/
+        }
 
         holder.time.setText(Util.getDatePretty(postList.get(position).getDate()));
 
@@ -191,8 +214,9 @@ public class PlacesEventRecyclerAdapter extends RecyclerView.Adapter<PlacesEvent
 
     }
 
-    public void update(List<Post> posts){
+    public void update(List<Post> posts, Map groups){
         postList = posts;
+        this.groups = groups;
         notifyDataSetChanged();
         Log.d("TAG21", "update Photo recycler");
     }

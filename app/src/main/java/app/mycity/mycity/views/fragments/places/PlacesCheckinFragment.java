@@ -20,11 +20,13 @@ import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
+import app.mycity.mycity.api.model.Place;
 import app.mycity.mycity.api.model.Post;
 import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponseWall;
 import app.mycity.mycity.util.SharedManager;
+import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.adapters.PlacesCheckinRecyclerAdapter;
 import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
 import butterknife.BindView;
@@ -50,9 +52,14 @@ public class PlacesCheckinFragment extends android.support.v4.app.Fragment {
     boolean isLoading;
     int totalCount;
 
-    public static PlacesCheckinFragment createInstance(String placeId) {
+    Storage storage;
+    private boolean mayRestore;
+
+
+    public static PlacesCheckinFragment createInstance(String name, String placeId) {
         PlacesCheckinFragment fragment = new PlacesCheckinFragment();
         Bundle bundle = new Bundle();
+        bundle.putString("name", name);
         bundle.putString("placeId", placeId);
         fragment.setArguments(bundle);
         return fragment;
@@ -76,8 +83,6 @@ public class PlacesCheckinFragment extends android.support.v4.app.Fragment {
         recyclerView.addItemDecoration(new ImagesSpacesItemDecoration(3, App.dpToPx(getActivity(), 4), false));
         recyclerView.setLayoutManager(mLayoutManager);
       //  recyclerView.setNestedScrollingEnabled(false);
-
-        postList = new ArrayList<>();
 
         adapter = new PlacesCheckinRecyclerAdapter(postList);
        // adapter.setImageClickListener(this);
@@ -108,47 +113,77 @@ public class PlacesCheckinFragment extends android.support.v4.app.Fragment {
         //super.onViewCreated(view, savedInstanceState);
     }
 
-    private void loadMedia(int offset) {
-        ApiFactory.getApi().getGroupWallById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), placeId, "checkin", "1").enqueue(new Callback<ResponseContainer<ResponseWall>>() {
-            @Override
-            public void onResponse(Call<ResponseContainer<ResponseWall>> call, Response<ResponseContainer<ResponseWall>> response) {
+    private void loadMedia(final int offset) {
+
+        if(mayRestore){
+            Log.d("TAG21", "RESTORE PLACE CHECKIN");
+            adapter.update(postList);
+        } else {
+            Log.d("TAG21", "Can not RESTORE PLACE CHECKIN ");
+            ApiFactory.getApi().getGroupWallById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), placeId, "checkin", "1", offset).enqueue(new Callback<ResponseContainer<ResponseWall>>() {
+                @Override
+                public void onResponse(Call<ResponseContainer<ResponseWall>> call, Response<ResponseContainer<ResponseWall>> response) {
 
 
-                if(response.body().getResponse()!=null){
-                    Log.d("TAG21", "RESPONSE FEED OK");
+                    if(response.body().getResponse()!=null){
+                        Log.d("TAG21", "RESPONSE FEED OK");
 
-                    totalCount = response.body().getResponse().getCount();
+                        totalCount = response.body().getResponse().getCount();
 
-                    postList.addAll(response.body().getResponse().getItems());
+                        postList.addAll(response.body().getResponse().getItems());
 
-                    if(response.body().getResponse().getProfiles()!=null
-                            )
-                    for (Profile p: response.body().getResponse().getProfiles()
-                            ) {
-                        profiles.put(p.getId(), p);
+                        if(response.body().getResponse().getProfiles()!=null
+                                )
+                            for (Profile p: response.body().getResponse().getProfiles()
+                                    ) {
+                                profiles.put(p.getId(), p);
+                            }
+
+                        Log.d("TAG21", "post size - " + postList.size());
+
+                    } else {
+                        Log.d("TAG21", "RESPONSE ERROR ");
                     }
 
-                    Log.d("TAG21", "post size - " + postList.size());
+                    adapter.update(postList);
+                    //   adapter.notifyDataSetChanged();
 
-                } else {
-                    Log.d("TAG21", "RESPONSE ERROR ");
                 }
 
-                adapter.update(postList);
-             //   adapter.notifyDataSetChanged();
+                @Override
+                public void onFailure(Call<ResponseContainer<ResponseWall>> call, Throwable t) {
 
-            }
+                }
+            });
+        }
 
-            @Override
-            public void onFailure(Call<ResponseContainer<ResponseWall>> call, Throwable t) {
-
-            }
-        });
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+        storage = (Storage) context;
+
+        postList = (List<Post>) storage.getDate(getArguments().get("name")+ "_postList");
+        profiles = (Map) storage.getDate(getArguments().get("name")+ "_profiles");
+
+        if(postList==null){
+            Log.d("TAG21", "restore null");
+            postList = new ArrayList<>();
+            profiles = new HashMap();
+        } else {
+            Log.d("TAG21", "restore ok - " + postList.size());
+            mayRestore = true;
+        }
+
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d("TAG21", "Stop CHECKIN FRAGMENT Save " + getArguments().getString("name"));
+        storage.setDate(getArguments().get("name") + "_postList", postList);
+        storage.setDate(getArguments().get("name") + "_profiles", profiles);
+    }
 }

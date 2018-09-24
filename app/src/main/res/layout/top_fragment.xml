@@ -30,7 +30,7 @@
         android:id="@+id/myFriendsViewPager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/up_navbar_shadow"
         app:layout_constraintTop_toBottomOf="@+id/myFriendsTabLayout" />
 
 
@@ -41,6 +41,19 @@
         android:background="@drawable/toolbar_down_shadow_light"
         app:layout_constraintTop_toBottomOf="@+id/myFriendsTabLayout"
         tools:ignore="MissingConstraints" />
+
+
+    <View
+        android:id="@+id/up_navbar_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@drawable/toolbar_up_shadow"
+        app:layout_constraintBottom_toTopOf="@+id/navigationButtonsContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints" />
+
+    <include layout="@layout/navigation_bottom_buttons"/>
 
 
 </android.support.constraint.ConstraintLayout>

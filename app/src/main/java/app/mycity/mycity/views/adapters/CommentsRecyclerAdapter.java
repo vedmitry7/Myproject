@@ -31,6 +31,7 @@ import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecyclerAdapter.ViewHolder> {
 
@@ -157,6 +158,17 @@ public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecycl
                             getAdapterPosition()));
                 }
             });
+            View.OnClickListener clickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(profiles.containsKey(commentList.get(getAdapterPosition()).getFromId())){
+                        EventBus.getDefault().post(new EventBusMessages.OpenUser(((Profile) profiles.get(commentList.get(getAdapterPosition()).getFromId())).getId()));
+                    }
+                }
+            };
+
+            name.setOnClickListener(clickListener);
+            ownerImage.setOnClickListener(clickListener);
 
             settings.setOnClickListener(new View.OnClickListener() {
                 @Override

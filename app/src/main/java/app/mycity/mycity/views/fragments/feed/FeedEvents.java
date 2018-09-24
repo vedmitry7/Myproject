@@ -1,4 +1,4 @@
-package app.mycity.mycity.views.fragments.places;
+package app.mycity.mycity.views.fragments.feed;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -32,13 +32,12 @@ import app.mycity.mycity.api.model.ResponseVisit;
 import app.mycity.mycity.api.model.ResponseWall;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
-import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.adapters.PlacesEventRecyclerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import fr.arnaudguyon.tabstacker.TabStacker;
 
-public class PlaceEvents extends android.support.v4.app.Fragment{
+public class FeedEvents extends android.support.v4.app.Fragment implements TabStacker.TabStackInterface {
 
 
     @BindView(R.id.placeEventsFragmentRecyclerView)
@@ -55,10 +54,6 @@ public class PlaceEvents extends android.support.v4.app.Fragment{
     boolean isLoading;
     int totalCount;
 
-    Storage storage;
-
-    boolean mayRestore;
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -67,19 +62,12 @@ public class PlaceEvents extends android.support.v4.app.Fragment{
         return view;
     }
 
-    public static PlaceEvents createInstance(String name, String placeId) {
-        PlaceEvents fragment = new PlaceEvents();
-        Bundle bundle = new Bundle();
-        bundle.putString("name", name);
-        bundle.putString("placeId", placeId);
-        fragment.setArguments(bundle);
-        return fragment;
-    }
-
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        postList = new ArrayList<>();
+        groups = new HashMap();
         adapter = new PlacesEventRecyclerAdapter(postList, groups);
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -113,47 +101,45 @@ public class PlaceEvents extends android.support.v4.app.Fragment{
 
     private void loadFeed(int offset) {
 
-        if(mayRestore){
-            adapter.update(postList, groups);
-        } else {
-            ApiFactory.getApi().getEvents(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("placeId"), "1", offset).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
-                @Override
-                public void onResponse(retrofit2.Call<ResponseContainer<ResponseWall>> call, retrofit2.Response<ResponseContainer<ResponseWall>> response) {
+        ApiFactory.getApi().getAllEvents(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "1").enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
+            @Override
+            public void onResponse(retrofit2.Call<ResponseContainer<ResponseWall>> call, retrofit2.Response<ResponseContainer<ResponseWall>> response) {
 
-                    if(response!=null && response.body().getResponse()!=null){
-                        Log.d("TAG21", "RESPONSE Events OK");
+                if(response!=null && response.body().getResponse()!=null){
+                    Log.d("TAG21", "RESPONSE Events OK");
 
-                        if(response.body().getResponse().getCount()==0){
-                            placeHolderNoEvents.setVisibility(View.VISIBLE);
-                        } else {
-                            placeHolderNoEvents.setVisibility(View.GONE);
-                        }
-
-                        totalCount = response.body().getResponse().getCount();
-                        if(totalCount>0){
-                            postList.addAll(response.body().getResponse().getItems());
-                            for (Group g: response.body().getResponse().getGroups()
-                                    ) {
-                                groups.put(g.getId(), g);
-                            }
-                        }
-
-                        Log.d("TAG21", "Events size - " + postList.size() + " total - " + totalCount);
-                        isLoading = false;
-
+                    if(response.body().getResponse().getCount()==0){
+                        placeHolderNoEvents.setVisibility(View.VISIBLE);
                     } else {
-                        Log.d("TAG21", "RESPONSE ERROR ");
+                        placeHolderNoEvents.setVisibility(View.GONE);
                     }
 
-                    adapter.notifyDataSetChanged();
+                    totalCount = response.body().getResponse().getCount();
 
+                    postList.addAll(response.body().getResponse().getItems());
+
+                    for (Group g: response.body().getResponse().getGroups()
+                            ) {
+                        groups.put(String.valueOf(g.getId()), g);
+                        Log.d("TAG21", "GGG - " + g.getName());
+                    }
+
+                    Log.d("TAG21", "Events size - " + postList.size() + " total - " + totalCount);
+                    isLoading = false;
+
+                } else {
+                    Log.d("TAG21", "RESPONSE ERROR ");
                 }
 
-                @Override
-                public void onFailure(retrofit2.Call<ResponseContainer<ResponseWall>> call, Throwable t) {
-                }
-            });
-        }
+               adapter.update(postList, groups);
+
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<ResponseContainer<ResponseWall>> call, Throwable t) {
+
+            }
+        });
 
         /*RequestBody requestBody = new FormBody.Builder()
                 .add("access_token", SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN))
@@ -177,6 +163,12 @@ public class PlaceEvents extends android.support.v4.app.Fragment{
         });*/
 
     }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+    }
+
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(final EventBusMessages.LikePost event) {
@@ -288,27 +280,6 @@ public class PlaceEvents extends android.support.v4.app.Fragment{
 
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        storage = (Storage) context;
-
-        postList = (List<Post>) storage.getDate(getArguments().get("name")+ "_eventsPostList");
-        groups = (Map) storage.getDate(getArguments().get("name")+ "_eventsGroups");
-
-
-        if(postList==null){
-            Log.d("TAG21", "restore null");
-            postList = new ArrayList<>();
-            groups = new HashMap();
-        } else {
-            Log.d("TAG21", "restore ok - " + postList.size());
-            mayRestore = true;
-        }
-
-    }
-
-    @Override
     public void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
@@ -317,11 +288,26 @@ public class PlaceEvents extends android.support.v4.app.Fragment{
     @Override
     public void onStop() {
         EventBus.getDefault().unregister(this);
-        Log.d("TAG21", "Stop EVENTS FRAGMENT Save " + getArguments().getString("name"));
-        storage.setDate(getArguments().get("name") + "_eventsPostList", postList);
-        storage.setDate(getArguments().get("name") + "_eventsGroups", groups);
-
         super.onStop();
     }
 
+    @Override
+    public void onTabFragmentPresented(TabStacker.PresentReason presentReason) {
+
+    }
+
+    @Override
+    public void onTabFragmentDismissed(TabStacker.DismissReason dismissReason) {
+
+    }
+
+    @Override
+    public View onSaveTabFragmentInstance(Bundle bundle) {
+        return null;
+    }
+
+    @Override
+    public void onRestoreTabFragmentInstance(Bundle bundle) {
+
+    }
 }

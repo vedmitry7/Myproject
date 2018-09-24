@@ -17,7 +17,7 @@ public class Post {
     private String ownerId;
     @SerializedName("group_id")
     @Expose
-    private Integer groupId;
+    private String groupId;
     @SerializedName("from_group")
     @Expose
     private Integer fromGroup;
@@ -45,6 +45,17 @@ public class Post {
     @SerializedName("attachments")
     @Expose
     private List<Photo> attachments = null;
+    @SerializedName("place_id")
+    @Expose
+    private String placeId;
+
+    public String getPlaceId() {
+        return placeId;
+    }
+
+    public void setPlaceId(String placeId) {
+        this.placeId = placeId;
+    }
 
     public Integer getId() {
         return id;
@@ -70,11 +81,11 @@ public class Post {
         this.ownerId = ownerId;
     }
 
-    public Integer getGroupId() {
+    public String getGroupId() {
         return groupId;
     }
 
-    public void setGroupId(Integer groupId) {
+    public void setGroupId(String groupId) {
         this.groupId = groupId;
     }
 

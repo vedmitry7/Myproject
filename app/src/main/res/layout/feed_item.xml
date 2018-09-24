@@ -72,15 +72,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
+        android:layout_marginLeft="16dp"
         android:layout_marginRight="8dp"
-        android:text="НК Сахарок"
+        android:layout_marginStart="16dp"
+        android:text=""
         android:textColor="@android:color/black"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/imageView9"
-        app:layout_constraintHorizontal_bias="0.088"
         app:layout_constraintStart_toEndOf="@+id/imageView5"
         app:layout_constraintTop_toBottomOf="@+id/feedImageCardView"
-        app:layout_constraintVertical_bias="0.448"
         tools:ignore="MissingConstraints" />
 
     <ImageView

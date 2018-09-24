@@ -18,6 +18,10 @@ public class ResponseWall {
     @Expose
     private List<Profile> profiles = null;
 
+    @SerializedName("groups")
+    @Expose
+    private List<Group> groups = null;
+
     public Integer getCount() {
         return count;
     }
@@ -40,5 +44,13 @@ public class ResponseWall {
 
     public void setItems(List<Post> items) {
         this.items = items;
+    }
+
+    public List<Group> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
     }
 }

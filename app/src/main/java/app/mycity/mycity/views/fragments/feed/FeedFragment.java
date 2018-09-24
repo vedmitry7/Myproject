@@ -1,31 +1,34 @@
-package app.mycity.mycity.views.fragments.subscribers;
+package app.mycity.mycity.views.fragments.feed;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import org.greenrobot.eventbus.EventBus;
 
+import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
+import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.activities.Storage;
-import app.mycity.mycity.views.adapters.SubscriptionsPagerAdapter;
+import app.mycity.mycity.views.adapters.FeedPagerAdapter;
+import app.mycity.mycity.views.adapters.TopPagerAdapter;
+import app.mycity.mycity.views.fragments.subscribers.SubscribersFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import fr.arnaudguyon.tabstacker.TabStacker;
 
-public class SubscriptionFragment extends Fragment implements TabStacker.TabStackInterface{
+public class FeedFragment extends Fragment implements TabStacker.TabStackInterface{
 
 
     @BindView(R.id.myFriendsViewPager)
@@ -33,51 +36,42 @@ public class SubscriptionFragment extends Fragment implements TabStacker.TabStac
     @BindView(R.id.myFriendsTabLayout)
     TabLayout tabLayout;
 
-    @BindView(R.id.profileFragToolbarTitle)
+    @BindView(R.id.toolBarTitle)
     TextView title;
 
-    FragmentManager fragmentManager;
-
     Storage storage;
-
-
-
-    public static SubscriptionFragment createInstance(String fragmentId, int tabPos, String userId) {
-        SubscriptionFragment fragment = new SubscriptionFragment();
-        Log.i("TAG21", "Create Subscribers " + fragmentId);
-        Bundle bundle = new Bundle();
-        bundle.putString("name", fragmentId);
-        bundle.putString("userId", userId);
-        bundle.putInt("tabPos", tabPos);
-        fragment.setArguments(bundle);
-        return fragment;
-    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_subscriptions, container, false);
+        View view = inflater.inflate(R.layout.feed_fragment, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
 
-    @OnClick(R.id.profileFragBackButtonContainer)
-    public void back(View v){
-        getActivity().onBackPressed();
+
+    public static FeedFragment createInstance(String name, int tabPos) {
+        FeedFragment fragment = new FeedFragment();
+        Log.i("TAG21", "Create FeedFragment " + name);
+        Bundle bundle = new Bundle();
+        bundle.putString("name", name);
+        bundle.putInt("tabPos", tabPos);
+        fragment.setArguments(bundle);
+        return fragment;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        Util.indicateTabImageView(getContext(), view, 4);
+        Util.setOnTabClick(view);
+
+        title.setText("Лента");
+
         // Log.i("TAG21","Friends stack count - " + getActivity().getFragmentManager().getBackStackEntryCount());
      //   Log.i("TAG21","Friends Fragment - " + getActivity().getFragmentManager().getBackStackEntryCount());
         Log.i("TAG","Friends fragment on CreateView");
-
-        Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
-        Util.setOnTabClick(view);
-
-        title.setText("Подписки");
 
         if(tabLayout!=null){
             Log.i("TAG","TAB LAYOUT ! NULL");
@@ -91,13 +85,19 @@ public class SubscriptionFragment extends Fragment implements TabStacker.TabStac
             Log.i("TAG","getChildFragmentManager !" +
                     " NULL");
         }
-        SubscriptionsPagerAdapter pagerAdapter = new SubscriptionsPagerAdapter(getChildFragmentManager(), getArguments().getString("name"), getArguments().getString("userId"));
+        FeedPagerAdapter pagerAdapter = new FeedPagerAdapter(getChildFragmentManager(), getArguments().getString("name"));
         viewPager.setAdapter(pagerAdapter);
-        viewPager.setOffscreenPageLimit(2);
+        viewPager.setOffscreenPageLimit(3);
         //viewPager.addOnPageChangeListener(pagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
         Log.d("TAG", "Start " + this.getClass().getSimpleName());
+    }
+
+    @OnClick(R.id.mainActAddBtn)
+    public void photo(View v){
+        Log.d("TAG21", "PHOTO - ");
+        EventBus.getDefault().post(new EventBusMessages.MakeCheckin());
     }
 
     @Override
@@ -105,7 +105,6 @@ public class SubscriptionFragment extends Fragment implements TabStacker.TabStac
         super.onAttach(context);
         Log.d("TAG", "Attach " + this.getClass().getSimpleName());
         // fragmentManager = ((MainActivity2) context).getSupportFragmentManager();
-
         storage = (Storage) context;
     }
 
@@ -154,18 +153,7 @@ public class SubscriptionFragment extends Fragment implements TabStacker.TabStac
 
     @Override
     public void onTabFragmentDismissed(TabStacker.DismissReason dismissReason) {
-        Log.d("TAG21", "REASON - " + dismissReason);
-        if(dismissReason == TabStacker.DismissReason.BACK){
-            Log.d("TAG21", "Delete - " + getArguments().get("name") + "_userlist");
-            Log.d("TAG21", "Delete - " + getArguments().get("name") + "_userListOnline");
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    storage.setDate(getArguments().get("name") + "_userlist", null);
-                    storage.setDate(getArguments().get("name") + "_userListOnline", null);
-                }
-            }, 200);
-        }
+
     }
 
     @Override

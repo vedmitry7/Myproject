@@ -34,6 +34,12 @@ public class PlaceInfoFragment extends android.support.v4.app.Fragment implement
 
     @BindView(R.id.placeDescription)
     TextView description;
+    @BindView(R.id.placeAddress)
+    TextView address;
+    @BindView(R.id.placeSchedule)
+    TextView schedule;
+    @BindView(R.id.placeNumber)
+    TextView number;
 
     @Nullable
     @Override
@@ -41,6 +47,11 @@ public class PlaceInfoFragment extends android.support.v4.app.Fragment implement
         View view = inflater.inflate(R.layout.place_info_fragment, container, false);
         ButterKnife.bind(this, view);
         return view;
+    }
+
+    public static PlaceInfoFragment createInstance() {
+        PlaceInfoFragment fragment = new PlaceInfoFragment();
+        return fragment;
     }
 
     @Override
@@ -54,6 +65,12 @@ public class PlaceInfoFragment extends android.support.v4.app.Fragment implement
         place =  EventBus.getDefault().getStickyEvent(Place.class);
         Log.d("TAG21", "PLACE INFO - " + place.getName());
 
+        address.setText(place.getAddress());
+        schedule.setText(place.getSchedule());
+        if(place.getPhone()!=null){
+            number.setText(place.getPhone());
+        }
+
         if(place.getDescription()!= null && !place.getDescription().equals("")){
             description.setText(place.getDescription());
         } else {
@@ -63,7 +80,7 @@ public class PlaceInfoFragment extends android.support.v4.app.Fragment implement
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Log.d("TAG21", "MAP READY ");
+        Log.d("TAG21", "MAP READY place != null - " + String.valueOf(place!=null));
         mMap = googleMap;
 
         // Add a marker in Sydney, Australia, and move the camera.

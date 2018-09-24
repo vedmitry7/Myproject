@@ -16,11 +16,13 @@ import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import app.mycity.mycity.App;
 import app.mycity.mycity.R;
+import app.mycity.mycity.api.model.Group;
 import app.mycity.mycity.api.model.Post;
 import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.util.EventBusMessages;
@@ -32,6 +34,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
 
     List<Post> postList;
     Map profiles;
+    Map<String, Group> groups;
 
     int layout;
     Context context;
@@ -45,9 +48,10 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
         this.imageClickListener = imageClickListener;
     }
 
-    public FeedRecyclerAdapter(List<Post> postList, Map profiles) {
+    public FeedRecyclerAdapter(List<Post> postList, Map profiles, Map groups) {
         this.postList = postList;
         this.profiles = profiles;
+        this.groups = groups;
     }
 
     public void setLayout(int layout){
@@ -80,15 +84,22 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
                     .resize(App.dpToPx(context, 36), App.dpToPx(context, 36))
                     .centerCrop()
                     .into(holder.ownerImage);
-
             holder.name.setText(profile.getFirstName()+ " " + profile.getLastName());
-        /*    holder.ownerImage.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-                @Override
-                public boolean onPreDraw() {
-                    holder.ownerImage.getWidth();
-                    return false;
-                }
-            });*/
+        }
+
+        for (Map.Entry item : groups.entrySet())
+        {
+            Log.d("TAG", position + " Bind - " + item.getKey() + " " + ((Group)item.getValue()).getName());
+        }
+
+        if(groups.containsKey(postList.get(position).getPlaceId())){
+            String name = (groups.get(postList.get(position).getPlaceId())).getName();
+            Log.d("TAG", "groups contains " + postList.get(position).getPlaceId() + " so write " + name);
+            holder.place.setText((groups.get(postList.get(position).getPlaceId())).getName());
+        } else {
+            Log.d("TAG", "groups doesnt contains " + postList.get(position).getPlaceId());
+            holder.place.setText("place absent");
+
         }
 
         holder.time.setText(Util.getDatePretty(postList.get(position).getDate()));
@@ -121,7 +132,6 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
         @BindView(R.id.commentButton)
         ImageView commentButton;
 
-        @Nullable
         @BindView(R.id.placeLabel)
         TextView place;
 
@@ -179,16 +189,39 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
             name.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    EventBus.getDefault().post(new EventBusMessages.OpenUser(postList.get(getAdapterPosition()).getOwnerId()));
+                    EventBus.getDefault().post(new EventBusMessages.OpenUser(
+                            postList.get(getAdapterPosition()).getOwnerId()));
                 }
             });
-        }
 
+            place.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("TAG21", "click place - " + getAdapterPosition());
+                    if(getAdapterPosition()!=-1){
+                        if(groups.containsKey(postList.get(getAdapterPosition()).getPlaceId())){
+                            Log.d("TAG21", "click place contains " );
+                            EventBus.getDefault().post(new EventBusMessages.OpenPlace(
+                                            groups.get(postList.get(getAdapterPosition()).getPlaceId()).getId()));
+                        } else {
+                            Log.d("TAG21", "click place not contains" );
+                        }
+                    } else {
+                        Log.d("TAG21", "click place -1  - " + getAdapterPosition());
+                    }
+                }
+            });
+
+
+        }
     }
 
-    public void update(List<Post> posts){
+    public void update(List<Post> posts, Map profiles, Map groups){
         postList = posts;
+        this.profiles = profiles;
+        this.groups = groups;
+
         notifyDataSetChanged();
-        Log.d("TAG", "update Photo recycler");
+        Log.d("TAG", "update Photo recycler - " + groups.size());
     }
 }

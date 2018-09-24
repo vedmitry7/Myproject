@@ -6,7 +6,6 @@ import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
 import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -14,7 +13,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -42,10 +40,11 @@ import app.mycity.mycity.api.model.ResponseSocketServer;
 import app.mycity.mycity.filter_desc_post.FilterImageActivity;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
+import app.mycity.mycity.views.fragments.CommentsFragment;
 import app.mycity.mycity.views.fragments.DialogsFragment;
-import app.mycity.mycity.views.fragments.FeedFragment;
+import app.mycity.mycity.views.fragments.feed.FeedCheckinFragment;
+import app.mycity.mycity.views.fragments.feed.FeedFragment;
 import app.mycity.mycity.views.fragments.subscribers.SubscribersFragment;
-import app.mycity.mycity.views.fragments.LongListFragment;
 import app.mycity.mycity.views.fragments.subscribers.SomeoneFriendsFragment;
 import app.mycity.mycity.views.fragments.subscribers.SubscriptionFragment;
 import app.mycity.mycity.views.fragments.places.PlaceFragment;
@@ -66,19 +65,19 @@ import retrofit2.Response;
 
 public class MainActivity2 extends AppCompatActivity implements MainAct, Storage {
 
-    @BindView(R.id.main_act_top_button)     ImageView topButton;
+/*    @BindView(R.id.main_act_top_button)     ImageView topButton;
     @BindView(R.id.main_act_places_button)  ImageView placesButton;
     @BindView(R.id.main_act_search_button)  ImageView searchButton;
     @BindView(R.id.main_act_feed_button)    ImageView feedButton;
-
-    @BindView(R.id.main_act_profile_button) ImageView profileButton;
+    @BindView(R.id.main_act_profile_button) ImageView profileButton;*/
 
     @BindView(R.id.main_act_messages_container)         RelativeLayout messageButton;
     @BindView(R.id.main_act_notification_container)     RelativeLayout notificattionButton;
 
     private TabStacker mTabStacker;
 
-    String currentTab;
+
+    Tab currentTab;
 
     HashMap<String, Object> date =new HashMap<>();
 
@@ -97,23 +96,26 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
         this.date.put(key, date);
     }
 
+    @Override
+    public void remove(String key) {
+        date.remove(key);
+    }
+
     private enum Tab {
-        TAB_TOP(R.id.main_act_top_button),
-        TAB_PLACES(R.id.main_act_places_button),
-        TAB_PROFILE(R.id.main_act_profile_button),
-        TAB_SEARCH(R.id.main_act_search_button),
-        TAB_FEED(R.id.main_act_feed_button);
+        TAB_TOP(0),
+        TAB_PLACES(1),
+        TAB_PROFILE(2),
+        TAB_SEARCH(3),
+        TAB_FEED(4);
 
         private int mButtonResId;
 
-        Tab(@IdRes int buttonResId) {
+        Tab(int buttonResId) {
             mButtonResId = buttonResId;
         }
     }
 
     android.support.v4.app.FragmentManager fragmentManager;
-
-    ProfileFragment profileFragment;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -139,30 +141,27 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
 
         ButterKnife.bind(this);
 
-        setIndicator(profileButton);
+        //setIndicator(profileButton);
 
         fragmentManager = getSupportFragmentManager();
 
         mTabStacker = new TabStacker(getSupportFragmentManager(), R.id.main_act_fragment_container);
-
-
 
         if (savedInstanceState == null) {
             // new Activity: creates the first Tab
             selectTab(Tab.TAB_FEED);
         } else {
             // restoring Activity: restore the TabStacker, and select the saved selected tab
-      /*      mTabStacker.restoreInstance(savedInstanceState);
+            mTabStacker.restoreInstance(savedInstanceState);
             Tab selectedTab = Tab.valueOf(mTabStacker.getCurrentTabName());
-            selectTab(selectedTab);*/
-
+            selectTab(selectedTab);
 
             selectTab(Tab.TAB_FEED);
-
         }
 
         //Tab click listener
-        for (final Tab tab : Tab.values()) {
+
+ /*       for (final Tab tab : Tab.values()) {
             final ImageView button = findViewById(tab.mButtonResId);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -170,7 +169,7 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
                     onClickOnTab(tab);
                 }
             });
-        }
+        }*/
 
      /*   profileFragment = new ProfileFragment();
         myFriendsFragment = new LongListFragment();
@@ -200,11 +199,11 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
 
         Log.i("TAG21", "Select Tab " + clickedTab.name());
 
-        updateButtonStates(clickedTab);
+        //updateButtonStates(clickedTab);
 
         // switch to Tab Stack
         String tabName = clickedTab.name();
-        currentTab = clickedTab.name();
+        currentTab = clickedTab;
 
         if (!mTabStacker.switchToTab(tabName)) {    // tries to switch to the TAB STACK
             // no fragment yet on this stack -> push the 1st fragment of the stack
@@ -222,10 +221,10 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
                     fragment = ProfileFragment.createInstance(tabName + "_" + mTabStacker.getCurrentTabSize());
                     break;
                 case TAB_SEARCH:
-                    fragment = new FeedFragment();
+                    fragment = new FeedCheckinFragment();
                     break;
                 case TAB_FEED:
-                    fragment = new FeedFragment();
+                    fragment = FeedFragment.createInstance(getFragmentName(), getCurrentTabPosition());
                     break;
             }
 
@@ -234,8 +233,14 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void clickTab(EventBusMessages.SwichTab event) {
+        Log.i("TAG21", "Click new Tab " + event.getPos());
+        onClickOnTab(Tab.values()[event.getPos()]);
+    }
+
     // Update Button state (white / black)
-    private void updateButtonStates(Tab clickedTab) {
+/*    private void updateButtonStates(Tab clickedTab) {
         for(final Tab tab : Tab.values()) {
             ImageView button = findViewById(tab.mButtonResId);
             if(tab == clickedTab){
@@ -244,7 +249,7 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
                 button.setColorFilter(getResources().getColor(R.color.colorDefaultButton));
             }
         }
-    }
+    }*/
 
     private void updateTimestemp() {
         ApiFactory.getApi().getSocketServer(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN)).enqueue(new Callback<ResponseContainer<ResponseSocketServer>>() {
@@ -299,21 +304,21 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
 
     }
 
-    @OnClick(R.id.main_act_top_button_container)
+/*    @OnClick(R.id.main_act_top_button_container)
     public void top(View v){
         setIndicator(topButton);
     }
 
     @OnClick(R.id.main_act_places_button_container)
     public void places(View v){
-   /*     setIndicator(placesButton);
+   *//*     setIndicator(placesButton);
         PlacesFragment placesFragment = new PlacesFragment();
         mTabStacker.replaceFragment(placesFragment, null);
         android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
       //  transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
         transaction.add(R.id.main_act_fragment_container, placesFragment);
         transaction.addToBackStack(null);
-        transaction.commit();*/
+        transaction.commit();*//*
     }
 
     @OnClick(R.id.main_act_search_button_container)
@@ -329,18 +334,18 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
 
     @OnClick(R.id.main_act_feed_button_container)
     public void feed(View v){
-       /* setIndicator(feedButton);
+       *//* setIndicator(feedButton);
         FeedFragment feedFragment = new FeedFragment();
         android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
        // transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
         transaction.replace(R.id.main_act_fragment_container, feedFragment);
         transaction.addToBackStack(null);
-        transaction.commit();*/
+        transaction.commit();*//*
     }
 
     @OnClick(R.id.main_act_profile_button_container)
     public void profile(View v){
-   /*     profileFragment = new ProfileFragment();
+   *//*     profileFragment = new ProfileFragment();
 
         android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
@@ -348,8 +353,8 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
         transaction.addToBackStack("myProfile");
         transaction.commit();
 
-        clearFragmentStack();*/
-    }
+        clearFragmentStack();*//*
+    }*/
 
     void clearFragmentStack(){
         FragmentManager fm = getFragmentManager(); // or 'getSupportFragmentManager();'
@@ -379,13 +384,13 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
         transaction.commit();
     }
 
-    private void setIndicator(ImageView button){
+/*    private void setIndicator(ImageView button){
         topButton.setColorFilter(getResources().getColor(R.color.colorDefaultButton));
         placesButton.setColorFilter(getResources().getColor(R.color.colorDefaultButton));
         searchButton.setColorFilter(getResources().getColor(R.color.colorDefaultButton));
         feedButton.setColorFilter(getResources().getColor(R.color.colorDefaultButton));
         button.setColorFilter(getResources().getColor(R.color.colorAccent));
-    }
+    }*/
 
     @Override
     public void startSettings(int i) {
@@ -406,18 +411,26 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void startSubscribers(EventBusMessages.OpenSubscribers event) {
-        SubscribersFragment myFriendsFragment = SubscribersFragment.createInstance(currentTab + "_" + mTabStacker.getCurrentTabSize(), event.getUserId());
+        SubscribersFragment myFriendsFragment = SubscribersFragment.createInstance(
+                currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
+                getCurrentTabPosition(),
+                event.getUserId());
         mTabStacker.replaceFragment(myFriendsFragment, null);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void startSubscribers(EventBusMessages.OpenSubscriptions event) {
-        SubscriptionFragment subscriptionFragment = SubscriptionFragment.createInstance(currentTab + "_" + mTabStacker.getCurrentTabSize(), event.getUserId());
+        SubscriptionFragment subscriptionFragment = SubscriptionFragment.createInstance(
+                currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
+                getCurrentTabPosition(),
+                event.getUserId());
         mTabStacker.replaceFragment(subscriptionFragment, null);
     }
 
+
+
     String getFragmentName(){
-        return currentTab + "_" + mTabStacker.getCurrentTabSize();
+        return currentTab.name() + "_" + mTabStacker.getCurrentTabSize();
     }
 
     public void startFriendsById(String id) {
@@ -442,7 +455,10 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(EventBusMessages.OpenUser event){
-        SomeoneProfileFragment profileFragment = SomeoneProfileFragment.createInstance(currentTab + "_" + mTabStacker.getCurrentTabSize(), event.getMessage());
+        SomeoneProfileFragment profileFragment = SomeoneProfileFragment.createInstance(
+                currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
+                getCurrentTabPosition(),
+                event.getMessage());
 
 
         mTabStacker.replaceFragment(profileFragment, null);
@@ -453,45 +469,35 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
         transaction.commit();*/
     }
 
+    int getCurrentTabPosition(){
+        return Tab.valueOf(currentTab.name()).mButtonResId;
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(EventBusMessages.OpenComments event){
-        /*CommentsFragment commentsFragment = new CommentsFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("postId", event.getPostId());
-        bundle.putString("ownerId", event.getOwnerId());
-        commentsFragment.setArguments(bundle);
-        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
-        //    transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
-        transaction.replace(R.id.main_act_fragment_container, commentsFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();*/
+        CommentsFragment commentsFragment = CommentsFragment.createInstance(
+                getFragmentName(),
+                getCurrentTabPosition(),
+                event.getPostId(),
+                event.getOwnerId());
+        mTabStacker.replaceFragment(commentsFragment, null);
 
-        Intent intent = new Intent(this, CommentActivity.class);
+
+    /*    Intent intent = new Intent(this, CommentActivity.class);
         intent.putExtra("postId", event.getPostId());
         intent.putExtra("ownerId", event.getOwnerId());
-        startActivity(intent);
+        startActivity(intent);*/
     }
 
     EventBusMessages.OpenPlace openPlace;
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void openPlace(EventBusMessages.OpenPlace event){
-
-        PlaceFragment placeFragment = new PlaceFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("placeId", event.getId());
-        bundle.putString("photo780", event.getPhoto780());
-        bundle.putString("name", event.getName());
-        placeFragment.setArguments(bundle);
+        PlaceFragment placeFragment = PlaceFragment.createInstance(
+                currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
+                getCurrentTabPosition(),
+                event.getId());
         mTabStacker.replaceFragment(placeFragment, null);
-
-
-/*        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
-        //    transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
-        transaction.replace(R.id.main_act_fragment_container, placeFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();*/
-
     }
 
 

@@ -164,27 +164,28 @@ public class EventBusMessages {
 
     public static class OpenPlace {
         private String id;
-        private String photo780;
-        private String name;
 
         public String getId() {
             return id;
         }
 
-        public String getPhoto780() {
-            return photo780;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public OpenPlace(String id, String photo780, String name) {
+        public OpenPlace(String id) {
          this.id = id;
-         this.photo780 = photo780;
-         this.name = name;
         }
     }
+
+    public static class SwichTab {
+        private int tab;
+
+        public int getPos() {
+            return tab;
+        }
+
+        public SwichTab(int tab) {
+            this.tab = tab;
+        }
+    }
+
 
     public static class LoadAlbum{
         long albumId;

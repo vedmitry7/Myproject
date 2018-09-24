@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -28,17 +29,31 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.sql.Time;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
+import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.Place;
+import app.mycity.mycity.api.model.PlacesResponse;
+import app.mycity.mycity.api.model.Post;
+import app.mycity.mycity.api.model.ResponseContainer;
+import app.mycity.mycity.util.SharedManager;
+import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.activities.MainActivity;
 import app.mycity.mycity.views.activities.MainActivity2;
+import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.adapters.PlacePagerAdapter;
+import app.mycity.mycity.views.fragments.profile.ProfileFragment;
+import app.mycity.mycity.views.fragments.profile.SomeoneProfileFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import fr.arnaudguyon.tabstacker.TabStacker;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PlaceFragment extends Fragment implements TabStacker.TabStackInterface {
 
@@ -57,9 +72,20 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
     View delivery;
     @BindView(R.id.toolbarContent)
     LinearLayout toolbar;
+
+    @BindView(R.id.place_image)
+    ImageView imageView;
+
+    @BindView(R.id.placeProgressBar)
+    ConstraintLayout progressBar;
+
     private Place place;
 
     MainActivity2 activity2;
+
+    Storage storage;
+
+    boolean mayRestore;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Nullable
@@ -71,7 +97,20 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
         return view;
     }
 
-    void createPagerAdapter(){
+
+
+    public static PlaceFragment createInstance(String name, int tabPos, String placeId) {
+        PlaceFragment fragment = new PlaceFragment();
+        Log.i("TAG21", "Create PlaceFragment " + name);
+        Bundle bundle = new Bundle();
+        bundle.putString("name", name);
+        bundle.putString("placeId", placeId);
+        bundle.putInt("tabPos", tabPos);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
+    void createPagerAdapter(Place place){
        /* FragmentManager man = null;
         if(activity2.getChild()==null){
             man = getChildFragmentManager();
@@ -95,7 +134,7 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
             Log.d("TAG21", "getChildFragmentManager() != null " + getChildFragmentManager());
         }*/
 
-        PlacePagerAdapter adapter = new PlacePagerAdapter(getChildFragmentManager(), place);
+        PlacePagerAdapter adapter = new PlacePagerAdapter(getChildFragmentManager(), place, getArguments().getString("name"));
         viewPager.setAdapter(adapter);
         viewPager.setOffscreenPageLimit(3);
         tabLayout.setupWithViewPager(viewPager);
@@ -123,7 +162,44 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
         if(this.place != null) {
            // EventBus.getDefault().removeStickyEvent(place);
         }
-        createPagerAdapter();
+      //  loadPlace(place.getPos());
+    }
+
+    void loadPlace(String placeId) {
+        if(mayRestore){
+            createPagerAdapter(place);
+            showInfo(place);
+            hideProgressBar();
+        } else {
+            ApiFactory.getApi().getPlaceByIds(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), placeId).enqueue(new Callback<PlacesResponse>() {
+                @Override
+                public void onResponse(Call<PlacesResponse> call, Response<PlacesResponse> response) {
+                    Log.d("TAG21", "PLACE RESPONSE ");
+
+                    if (response.body().getResponse() != null) {
+                        Log.d("TAG21", "PLACE LOADED - " + response.body().getResponse().get(0).getName());
+                        place = response.body().getResponse().get(0);
+                        EventBus.getDefault().postSticky(response.body().getResponse().get(0));
+                        createPagerAdapter(response.body().getResponse().get(0));
+                        showInfo(response.body().getResponse().get(0));
+                        hideProgressBar();
+                    } else {
+                        Log.d("TAG21", "PLACE RESPONSE NULL");
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<PlacesResponse> call, Throwable t) {
+                    Log.d("TAG21", "PLACE RESPONSE FAIL " + t.getLocalizedMessage());
+                    Log.d("TAG21", "PLACE RESPONSE FAIL " + t.getCause());
+                }
+            });
+        }
+    }
+
+    void hideProgressBar(){
+        Log.d("TAG21", "HIDE PROGRESS BAR");
+        progressBar.setVisibility(View.GONE);
     }
 
     /*
@@ -141,23 +217,18 @@ D: 0 = 0
 D: 0 = 0
 */
 
+    void showInfo(Place place){
+        Picasso.get().load(place.getPhoto780()).into(imageView);
+        title.setText(place.getName());
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.d("TAG21", "onViewCreated");
 
-       // place =  EventBus.getDefault().getStickyEvent(Place.class);
-      //  createPagerAdapter();
-
-        ImageView imageView = view.findViewById(R.id.place_image);
-        //imageView.setImageResource(R.drawable.teapizdec);
-        String imagePath = getArguments().getString("photo780");
-        String name = getArguments().getString("name");
-        title.setText(name);
-
-        String placeId = getArguments().getString("placeId");
-
-        Picasso.get().load(imagePath).into(imageView);
+        Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
+        Util.setOnTabClick(view);
 
         final LinearLayout layout = view.findViewById(R.id.toolbarContent);
         layout.setVisibility(View.VISIBLE);
@@ -191,22 +262,46 @@ D: 0 = 0
             }
         });
 
-
+        loadPlace(getArguments().getString("placeId"));
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         activity2 = (MainActivity2) context;
+        storage = (Storage) context;
+        place = (Place) storage.getDate(getArguments().get("name")+ "_place");
+
+        if(place!=null){
+            mayRestore = true;
+        }
     }
 
     @Override
     public void onTabFragmentPresented(TabStacker.PresentReason presentReason) {
+        Log.d("TAG21", "Place : onTabFragmentPresented " + presentReason.name());
     }
 
     @Override
     public void onTabFragmentDismissed(TabStacker.DismissReason dismissReason) {
+        Log.d("TAG21", "Place : onTabFragmentDismissed " + dismissReason.name());
+        if(dismissReason == TabStacker.DismissReason.REPLACED){
+            Log.d("TAG21", "Place : onTabFragmentDismissed - save place");
+            storage.setDate(getArguments().get("name") + "_place", place);
+        }
 
+        if(dismissReason == TabStacker.DismissReason.BACK){
+            storage.remove(getArguments().get("name")+ "_place");
+
+            storage.remove(getArguments().get("name")+ "_eventsPostList");
+            storage.remove(getArguments().get("name")+ "_eventsGroups");
+
+            storage.remove(getArguments().get("name")+ "_albumsList");
+            storage.remove(getArguments().get("name")+ "_mapAlbums");
+
+            storage.remove(getArguments().get("name")+ "_postList");
+            storage.remove(getArguments().get("name")+ "_profiles");
+        }
     }
 
     @Override

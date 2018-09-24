@@ -37,6 +37,7 @@ import app.mycity.mycity.api.model.ResponsePlaces;
 import app.mycity.mycity.api.model.ResponseWall;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
+import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.adapters.CheckinRecyclerAdapter;
 import app.mycity.mycity.views.adapters.FeedRecyclerAdapter;
 import app.mycity.mycity.views.adapters.PlacesRecyclerAdapter;
@@ -85,6 +86,9 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        Util.indicateTabImageView(getContext(), view, 1);
+        Util.setOnTabClick(view);
 
         title.setText("Места");
 

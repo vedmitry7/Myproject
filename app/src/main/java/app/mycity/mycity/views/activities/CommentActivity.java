@@ -93,6 +93,7 @@ public class CommentActivity extends AppCompatActivity implements CommentsRecycl
 
         postId = getIntent().getStringExtra("postId");
         ownerId = getIntent().getStringExtra("ownerId");
+
         Log.d("TAG21", "Comment postId - " + postId);
         Log.d("TAG21", "Comment postId - " + ownerId);
         ButterKnife.bind(this);
@@ -133,7 +134,6 @@ public class CommentActivity extends AppCompatActivity implements CommentsRecycl
             Log.d("TAG21", "SharedManager.getProperty(Constants.KEY_PHOTO_130) NUUUUUUUUUUUUL ");
         } else {
             Log.d("TAG21", SharedManager.getProperty(Constants.KEY_PHOTO_130) );
-
         }
 
         layoutManager.setReverseLayout(true);

@@ -26,11 +26,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class TopPlacesRecyclerAdapter extends RecyclerView.Adapter<TopPlacesRecyclerAdapter.ViewHolder> {
 
     List<Place> placeList;
-
     Context context;
-
     Typeface type;
-
 
     public TopPlacesRecyclerAdapter(List<Place> placeList) {
         this.placeList = placeList;
@@ -86,9 +83,7 @@ public class TopPlacesRecyclerAdapter extends RecyclerView.Adapter<TopPlacesRecy
                 @Override
                 public void onClick(View v) {
                     EventBus.getDefault().post(new EventBusMessages.OpenPlace(
-                            String.valueOf(placeList.get(getAdapterPosition()).getId()),
-                            placeList.get(getAdapterPosition()).getPhoto780(),
-                            placeList.get(getAdapterPosition()).getName()));
+                            String.valueOf(placeList.get(getAdapterPosition()).getId())));
                     EventBus.getDefault().postSticky(placeList.get(getAdapterPosition()));
                 }
             });

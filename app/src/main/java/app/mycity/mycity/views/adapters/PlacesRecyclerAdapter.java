@@ -76,10 +76,8 @@ public class PlacesRecyclerAdapter extends RecyclerView.Adapter<PlacesRecyclerAd
                 @Override
                 public void onClick(View v) {
                     EventBus.getDefault().post(new EventBusMessages.OpenPlace(
-                            String.valueOf(placeList.get(getAdapterPosition()).getId()),
-                            placeList.get(getAdapterPosition()).getPhoto780(),
-                            placeList.get(getAdapterPosition()).getName()));
-                    EventBus.getDefault().postSticky(placeList.get(getAdapterPosition()));
+                            String.valueOf(placeList.get(getAdapterPosition()).getId())));
+                    //EventBus.getDefault().postSticky(placeList.get(getAdapterPosition()));
                 }
             });
         }

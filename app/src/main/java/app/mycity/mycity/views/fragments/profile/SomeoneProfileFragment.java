@@ -40,6 +40,7 @@ import app.mycity.mycity.api.model.ResponseWall;
 import app.mycity.mycity.filter_desc_post.ExpandableLayout;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
+import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.activities.FullViewActivity;
 import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
@@ -138,12 +139,13 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
 
 
-    public static SomeoneProfileFragment createInstance(String name, String userId) {
+    public static SomeoneProfileFragment createInstance(String name, int tabPos, String userId) {
         SomeoneProfileFragment fragment = new SomeoneProfileFragment();
         Log.i("TAG21", "Create SomeoneProfileFragment " + name);
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
         bundle.putString("userId", userId);
+        bundle.putInt("tabPos", tabPos);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -165,6 +167,8 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
         userId = getArguments().getString("userId");
         Log.i("TAG21", "USER ID " + userId);
 
+        Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
+        Util.setOnTabClick(view);
 
         //      imageView.setShadow(App.dpToPx(getActivity(),10));
 

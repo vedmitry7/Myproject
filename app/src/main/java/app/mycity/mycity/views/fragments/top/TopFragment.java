@@ -16,6 +16,7 @@ import org.greenrobot.eventbus.EventBus;
 
 import app.mycity.mycity.R;
 import app.mycity.mycity.util.EventBusMessages;
+import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.adapters.TopPagerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -51,6 +52,10 @@ public class TopFragment extends Fragment implements TabStacker.TabStackInterfac
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+
+        Util.indicateTabImageView(getContext(), view, 0);
+        Util.setOnTabClick(view);
 
         title.setText("Топ");
 

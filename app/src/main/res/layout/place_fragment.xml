@@ -1,93 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/container"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainPlaceContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="false">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/app_bar_layout"
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        android:layout_height="0dp"
+        android:fitsSystemWindows="false"
+        app:layout_constraintBottom_toTopOf="@+id/include4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/collapsing_toolbar"
+        <android.support.design.widget.AppBarLayout
+            android:id="@+id/app_bar_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fitsSystemWindows="true"
-            app:contentScrim="?attr/colorPrimary"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:titleEnabled="false">
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-            <include layout="@layout/collaps_bar"/>
-
-            <android.support.v7.widget.Toolbar
-                app:contentInsetLeft="0dp"
-                app:contentInsetStart="0dp"
-                android:contentInsetStart="0dp"
-                android:contentInsetLeft="0dp"
-                app:contentInsetStartWithNavigation= "0dp"
-                android:id="@+id/anim_toolbar"
+            <android.support.design.widget.CollapsingToolbarLayout
+                android:id="@+id/collapsing_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="104dp"
-                android:minHeight="?attr/actionBarSize"
-                android:gravity="top"
-                app:layout_collapseMode="pin"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:titleMarginTop="13dp" >
+                android:layout_height="wrap_content"
+                android:fitsSystemWindows="true"
+                app:contentScrim="?attr/colorPrimary"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:titleEnabled="false">
 
+                <include layout="@layout/collaps_bar" />
 
-                <LinearLayout
-                    android:paddingLeft="16dp"
-                    android:layout_gravity="top"
-                    app:layout_collapseMode="pin"
-                    android:id="@+id/toolbarContent"
-                    android:orientation="horizontal"
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/anim_toolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="56dp">
+                    android:layout_height="104dp"
+                    android:contentInsetLeft="0dp"
+                    android:contentInsetStart="0dp"
+                    android:gravity="top"
+                    android:minHeight="?attr/actionBarSize"
+                    app:contentInsetLeft="0dp"
+                    app:contentInsetStart="0dp"
+                    app:contentInsetStartWithNavigation="0dp"
+                    app:layout_collapseMode="pin"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                    app:titleMarginTop="13dp">
 
-                    <ImageView
-                        android:id="@+id/backButton"
-                        android:layout_gravity="center_vertical"
-                        android:src="@mipmap/ic_back"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp" />
 
-                    <TextView
-                        android:id="@+id/toolbarTitle"
-                        android:paddingLeft="16dp"
-                        android:layout_gravity="center_vertical"
-                        android:textColor="@android:color/white"
-                        android:text="Чайхана"
-                        android:textSize="20dp"
+                    <LinearLayout
+                        android:id="@+id/toolbarContent"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="56dp"
+                        android:layout_gravity="top"
+                        android:orientation="horizontal"
+                        android:paddingLeft="16dp"
+                        app:layout_collapseMode="pin">
 
-                </LinearLayout>
+                        <ImageView
+                            android:id="@+id/backButton"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_gravity="center_vertical"
+                            android:src="@mipmap/ic_back" />
 
-            </android.support.v7.widget.Toolbar>
+                        <TextView
+                            android:id="@+id/toolbarTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:paddingLeft="16dp"
+                            android:text="Чайхана"
+                            android:textColor="@android:color/white"
+                            android:textSize="20dp" />
 
-            <View
-                android:background="@android:color/white"
-                android:layout_gravity="bottom"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"/>
+                    </LinearLayout>
 
-            <android.support.design.widget.TabLayout
-                style="@style/AppTabLayoutPlaces"
-                android:id="@+id/placeTabLayout"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_gravity="bottom"
-                app:tabGravity="fill"
-                app:tabMode="scrollable"/>
+                </android.support.v7.widget.Toolbar>
 
-        </android.support.design.widget.CollapsingToolbarLayout>
-    </android.support.design.widget.AppBarLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_gravity="bottom"
+                    android:background="@android:color/white" />
 
-    <include layout="@layout/place_fragment_content"/>
+                <android.support.design.widget.TabLayout
+                    android:id="@+id/placeTabLayout"
+                    style="@style/AppTabLayoutPlaces"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_gravity="bottom"
+                    app:tabGravity="fill"
+                    app:tabMode="scrollable" />
 
-</android.support.design.widget.CoordinatorLayout>
+            </android.support.design.widget.CollapsingToolbarLayout>
+        </android.support.design.widget.AppBarLayout>
+
+        <include layout="@layout/place_fragment_content" />
+
+    </android.support.design.widget.CoordinatorLayout>
+
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/placeProgressBar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:visibility="visible">
+
+        <ProgressBar
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.25" />
+
+    </android.support.constraint.ConstraintLayout>
+
+
+    <View
+        android:id="@+id/up_navbar_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@drawable/toolbar_up_shadow"
+        app:layout_constraintBottom_toTopOf="@+id/include4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints" />
+
+    <include
+        android:id="@+id/include4"
+        layout="@layout/navigation_bottom_buttons"
+        tools:layout_editor_absoluteY="519dp"
+        tools:ignore="MissingConstraints" />
+
+
+</android.support.constraint.ConstraintLayout>
+
+

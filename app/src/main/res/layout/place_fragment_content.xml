@@ -20,10 +20,12 @@
 
     <View
         android:id="@+id/delivery"
-        android:layout_width="368dp"
+        android:layout_width="0dp"
         android:layout_height="1px"
         android:background="@color/deliver_color"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_editor_absoluteX="8dp"
         tools:ignore="MissingConstraints" />
+
+
 </android.support.constraint.ConstraintLayout>
