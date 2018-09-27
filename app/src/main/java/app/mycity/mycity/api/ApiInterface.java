@@ -22,6 +22,7 @@ import app.mycity.mycity.api.model.ResponseUploading;
 import app.mycity.mycity.api.model.ResponseVisit;
 import app.mycity.mycity.api.model.ResponseWall;
 import app.mycity.mycity.api.model.SendMessageResponse;
+import app.mycity.mycity.api.model.Success;
 import app.mycity.mycity.api.model.User;
 import app.mycity.mycity.api.model.UsersContainer;
 import okhttp3.MultipartBody;
@@ -124,8 +125,13 @@ public interface ApiInterface {
                                                                @Field("fields") String fields);
 
     @FormUrlEncoded
-    @POST("friends.add")
-    Call<ResponseContainer<UsersContainer>> addToFriends(@Field("access_token") String accessToken,
+    @POST("subscribers.add")
+    Call<ResponseContainer<Success>> addSubscription(@Field("access_token") String accessToken,
+                                                     @Field("user_id") String id);
+
+    @FormUrlEncoded
+    @POST("subscribers.delete")
+    Call<ResponseContainer<Success>> deleteSubscription(@Field("access_token") String accessToken,
                                                          @Field("user_id") String id);
 
     @FormUrlEncoded

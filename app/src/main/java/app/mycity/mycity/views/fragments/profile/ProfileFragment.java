@@ -147,11 +147,12 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
         //setRetainInstance(true);
     }
 
-    public static ProfileFragment createInstance(String name) {
+    public static ProfileFragment createInstance(String name, int tabPos) {
         ProfileFragment fragment = new ProfileFragment();
         Log.i("TAG21", "Create Profile " + name);
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
+        bundle.putInt("tabPos", tabPos);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -169,9 +170,8 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         placeHolder.setVisibility(View.VISIBLE);
-        Log.i("TAG21","onViewCreated");
 
-        Util.indicateTabImageView(getContext(), view, 2);
+        Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
         Util.setOnTabClick(view);
 
         //      imageView.setShadow(App.dpToPx(getActivity(),10));

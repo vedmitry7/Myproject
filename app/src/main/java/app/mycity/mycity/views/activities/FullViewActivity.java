@@ -1,5 +1,6 @@
 package app.mycity.mycity.views.activities;
 
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,6 +32,9 @@ public class FullViewActivity extends AppCompatActivity {
     @BindView(R.id.addCommentEditTextFullView)
     EditText editText;
 
+    @BindView(R.id.progressBar)
+    ConstraintLayout progressBar;
+
     String postId;
     String ownerId;
 
@@ -51,7 +55,18 @@ public class FullViewActivity extends AppCompatActivity {
 
 
         Picasso.get().load(path)
-                .into(photoView);
+                .into(photoView, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d("TAG21", "ssss");
+                        progressBar.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onError(Exception ex) {
+
+                    }
+                });
       //  photoView.setImageResource(R.drawable.image);
 
     }

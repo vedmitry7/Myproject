@@ -26,17 +26,20 @@ import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.Dialog;
 import app.mycity.mycity.api.model.DialogsContainer;
 import app.mycity.mycity.api.model.ResponseContainer;
+import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.activities.MainAct;
 import app.mycity.mycity.views.adapters.DialogsRecyclerAdapter;
+import app.mycity.mycity.views.fragments.profile.ProfileFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import fr.arnaudguyon.tabstacker.TabStacker;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class DialogsFragment extends Fragment {
+public class DialogsFragment extends Fragment implements TabStacker.TabStackInterface {
 
     @BindView(R.id.dialogsFragRecyclerView)
     RecyclerView recyclerView;
@@ -55,9 +58,24 @@ public class DialogsFragment extends Fragment {
         return view;
     }
 
+    public static DialogsFragment createInstance(String name, int tabPos) {
+        DialogsFragment fragment = new DialogsFragment();
+        Log.i("TAG21", "Create DIALOGS " + name);
+        Bundle bundle = new Bundle();
+        bundle.putString("name", name);
+        bundle.putInt("tabPos", tabPos);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        Log.i("TAG21","onViewCreated " + getArguments().getInt("tabPos"));
+
+        Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
+        Util.setOnTabClick(view);
 
         dialogList = new ArrayList<>();
 
@@ -130,4 +148,23 @@ public class DialogsFragment extends Fragment {
     }
 
 
+    @Override
+    public void onTabFragmentPresented(TabStacker.PresentReason presentReason) {
+
+    }
+
+    @Override
+    public void onTabFragmentDismissed(TabStacker.DismissReason dismissReason) {
+
+    }
+
+    @Override
+    public View onSaveTabFragmentInstance(Bundle bundle) {
+        return null;
+    }
+
+    @Override
+    public void onRestoreTabFragmentInstance(Bundle bundle) {
+
+    }
 }

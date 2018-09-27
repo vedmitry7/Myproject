@@ -35,6 +35,7 @@ import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.TestService;
 import app.mycity.mycity.api.ApiFactory;
+import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponseSocketServer;
 import app.mycity.mycity.filter_desc_post.FilterImageActivity;
@@ -218,7 +219,7 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
                     fragment = new PlacesFragment();
                     break;
                 case TAB_PROFILE:
-                    fragment = ProfileFragment.createInstance(tabName + "_" + mTabStacker.getCurrentTabSize());
+                    fragment = ProfileFragment.createInstance(tabName + "_" + mTabStacker.getCurrentTabSize(), 2);
                     break;
                 case TAB_SEARCH:
                     fragment = new FeedCheckinFragment();
@@ -374,23 +375,12 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
 
     @OnClick(R.id.main_act_messages_container)
     public void message(View v){
-        Log.d("TAG", "messages");
+        Log.d("TAG21", "messages " + getCurrentTabPosition());
 
-        DialogsFragment dialogsFragment = new DialogsFragment();
-        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
-        //  transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
-        transaction.replace(R.id.main_act_fragment_container, dialogsFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
+        DialogsFragment dialogsFragment = DialogsFragment.createInstance(getFragmentName(), getCurrentTabPosition());
+        mTabStacker.replaceFragment(dialogsFragment, null);
+
     }
-
-/*    private void setIndicator(ImageView button){
-        topButton.setColorFilter(getResources().getColor(R.color.colorDefaultButton));
-        placesButton.setColorFilter(getResources().getColor(R.color.colorDefaultButton));
-        searchButton.setColorFilter(getResources().getColor(R.color.colorDefaultButton));
-        feedButton.setColorFilter(getResources().getColor(R.color.colorDefaultButton));
-        button.setColorFilter(getResources().getColor(R.color.colorAccent));
-    }*/
 
     @Override
     public void startSettings(int i) {
@@ -455,18 +445,22 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(EventBusMessages.OpenUser event){
-        SomeoneProfileFragment profileFragment = SomeoneProfileFragment.createInstance(
-                currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
-                getCurrentTabPosition(),
-                event.getMessage());
 
-
+        android.support.v4.app.Fragment profileFragment;
+        if(event.getMessage().equals(SharedManager.getProperty(Constants.KEY_MY_ID))){
+            profileFragment = ProfileFragment.createInstance(
+                    getFragmentName(),
+                    getCurrentTabPosition());
+            Log.d("TAG21", "Start my profile");
+        } else {
+            profileFragment = SomeoneProfileFragment.createInstance(
+                    currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
+                    getCurrentTabPosition(),
+                    event.getMessage());
+            Log.d("TAG21", "Start someone");
+        }
         mTabStacker.replaceFragment(profileFragment, null);
-    /*    android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
-        //    transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
-        transaction.replace(R.id.main_act_fragment_container, profileFragment);
-        transaction.addToBackStack("someoneProfile");
-        transaction.commit();*/
+
     }
 
     int getCurrentTabPosition(){
@@ -481,12 +475,6 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
                 event.getPostId(),
                 event.getOwnerId());
         mTabStacker.replaceFragment(commentsFragment, null);
-
-
-    /*    Intent intent = new Intent(this, CommentActivity.class);
-        intent.putExtra("postId", event.getPostId());
-        intent.putExtra("ownerId", event.getOwnerId());
-        startActivity(intent);*/
     }
 
     EventBusMessages.OpenPlace openPlace;
@@ -539,6 +527,13 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
         return null;
     }
 
+    @Override
+    public void onBackPressed() {
+        if (!mTabStacker.onBackPressed()) {
+            super.onBackPressed();
+        }
+    }
+
     /*   @Override
        public void onBackPressed() {
            Log.d("TAG", "BaCk");
@@ -547,10 +542,11 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
        }*/
 
 
-    @Override
-    public void onBackPressed() {
-        if (!mTabStacker.onBackPressed()) {
-            super.onBackPressed();
-        }
-    }
+    /*    private void setIndicator(ImageView button){
+        topButton.setColorFilter(getResources().getColor(R.color.colorDefaultButton));
+        placesButton.setColorFilter(getResources().getColor(R.color.colorDefaultButton));
+        searchButton.setColorFilter(getResources().getColor(R.color.colorDefaultButton));
+        feedButton.setColorFilter(getResources().getColor(R.color.colorDefaultButton));
+        button.setColorFilter(getResources().getColor(R.color.colorAccent));
+    }*/
 }

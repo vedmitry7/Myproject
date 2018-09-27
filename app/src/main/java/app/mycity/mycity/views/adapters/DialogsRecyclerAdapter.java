@@ -12,12 +12,15 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.model.Dialog;
+import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.activities.ChatActivity;
@@ -122,7 +125,16 @@ public class DialogsRecyclerAdapter extends RecyclerView.Adapter<DialogsRecycler
                     context.startActivity(intent);
                 }
             });
+
+            image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EventBus.getDefault().post(new EventBusMessages.OpenUser("1"));
+                }
+            });
         }
+
+
     }
 
     public void update(List<Dialog> dialogs){

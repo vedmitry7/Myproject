@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.GridLayoutManager;
@@ -37,6 +38,7 @@ import app.mycity.mycity.R;
 import app.mycity.mycity.api.model.Post;
 import app.mycity.mycity.api.model.ResponseLike;
 import app.mycity.mycity.api.model.ResponseWall;
+import app.mycity.mycity.api.model.Success;
 import app.mycity.mycity.filter_desc_post.ExpandableLayout;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
@@ -50,7 +52,6 @@ import app.mycity.mycity.api.model.User;
 import app.mycity.mycity.api.model.UsersContainer;
 import app.mycity.mycity.views.activities.MainAct;
 import app.mycity.mycity.views.adapters.CheckinRecyclerAdapter;
-import app.mycity.mycity.views.fragments.subscribers.SubscribersOnlineListFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -73,6 +74,9 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
     @BindView(R.id.profileFragName)
     TextView name;
+
+    @BindView(R.id.someoneFragAdd)
+    FloatingActionButton fab;
 
    /* @BindView(R.id.profileFragSubscriberTv)
     TextView friendsCount;*/
@@ -116,7 +120,7 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
     ProgressDialog progressDialog;
 
-    boolean friendLoad, checkinLoad, infoLoad;
+    boolean friendLoad, checkinLoad, infoLoad, isSubscription;
 
     String userId;
 
@@ -284,10 +288,57 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
         getActivity().onBackPressed();
     }
 
+    @OnClick(R.id.someoneFragAdd)
+    public void addToFriends(View v) {
+
+        if(isSubscription){
+            Log.d("TAG21", "Delete subscription");
+            ApiFactory.getApi().deleteSubscription(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId).enqueue(new Callback<ResponseContainer<Success>>() {
+                @Override
+                public void onResponse(Call<ResponseContainer<Success>> call, Response<ResponseContainer<Success>> response) {
+                    Log.d("TAG21", "Add friends RESP");
+                    if(response.body()!=null){
+                        if(response.body().getResponse().getSuccess()==1){
+                            isSubscription = false;
+                            fab.setImageResource(R.drawable.ic_add_subscription);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseContainer<Success>> call, Throwable t) {
+                    Log.d("TAG21", "Add friends FAIL");
+                }
+            });
+        } else {
+            Log.d("TAG21", "Add subscription");
+            ApiFactory.getApi().addSubscription(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId).enqueue(new Callback<ResponseContainer<Success>>() {
+                @Override
+                public void onResponse(Call<ResponseContainer<Success>> call, Response<ResponseContainer<Success>> response) {
+                    Log.d("TAG21", "Add friends RESP");
+
+                    if(response.body()!=null){
+                        if(response.body().getResponse().getSuccess()==1){
+                            isSubscription = true;
+                            fab.setImageResource(R.drawable.ic_delete_subscription);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseContainer<Success>> call, Throwable t) {
+                    Log.d("TAG21", "Add friends FAIL");
+                }
+            });
+        }
+
+
+        // activity.startSettings(0);
+    }
 
     private void getInfo() {
         Log.i("TAG21", "Get Info");
-        ApiFactory.getApi().getUserById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId, "photo_780,photo_130").enqueue(new retrofit2.Callback<ResponseContainer<User>>() {
+        ApiFactory.getApi().getUserById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId, "photo_780,photo_130,is_subscription,is_subscriber").enqueue(new retrofit2.Callback<ResponseContainer<User>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<User>> call, retrofit2.Response<ResponseContainer<User>> response) {
                 User user = response.body().getResponse();
@@ -295,6 +346,13 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
                     Log.i("TAG21", user.getFirstName());
                     Log.i("TAG21", user.getLastName());
                     Log.i("TAG21", user.getPhoto780());
+
+                    if(user.getIsSubscription()==1){
+                        isSubscription = true;
+                        fab.setImageResource(R.drawable.ic_delete_subscription);
+                    } else {
+                        fab.setImageResource(R.drawable.ic_add_subscription);
+                    }
 
                     name.setText(user.getFirstName() + " " + user.getLastName());
 
@@ -418,25 +476,6 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
        // activity.startSettings(0);
     }
 
-    @OnClick(R.id.someoneFragAdd)
-    public void addToFriends(View v) {
-        Log.d("TAG", "Add friends ");
-
-        ApiFactory.getApi().addToFriends(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId).enqueue(new Callback<ResponseContainer<UsersContainer>>() {
-            @Override
-            public void onResponse(Call<ResponseContainer<UsersContainer>> call, Response<ResponseContainer<UsersContainer>> response) {
-                Log.d("TAG21", "Add friends RESP");
-
-            }
-
-            @Override
-            public void onFailure(Call<ResponseContainer<UsersContainer>> call, Throwable t) {
-                Log.d("TAG21", "Add friends FAIL");
-            }
-        });
-
-        // activity.startSettings(0);
-    }
 
     @OnClick(R.id.profileFragSubscribersButton)
     public void subscribers(View v){

@@ -71,9 +71,12 @@ public class User {
     @SerializedName("last_seen")
     @Expose
     private String lastSeen;
-    @SerializedName("is_friend")
+    @SerializedName("is_subscriber")
     @Expose
-    private String isFriend;
+    private Integer isSubscriber;
+    @SerializedName("is_subscription")
+    @Expose
+    private Integer isSubscription;
 
     public String getId() {
         return id;
@@ -251,12 +254,19 @@ public class User {
         this.lastSeen = lastSeen;
     }
 
-    public String getIsFriend() {
-        return isFriend;
+    public Integer getIsSubscriber() {
+        return isSubscriber;
     }
 
-    public void setIsFriend(String isFriend) {
-        this.isFriend = isFriend;
+    public void setIsSubscriber(Integer isSubscriber) {
+        this.isSubscriber = isSubscriber;
     }
 
+    public Integer getIsSubscription() {
+        return isSubscription;
+    }
+
+    public void setIsSubscription(Integer isSubscription) {
+        this.isSubscription = isSubscription;
+    }
 }

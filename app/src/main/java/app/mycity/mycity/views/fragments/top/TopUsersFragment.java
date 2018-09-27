@@ -22,6 +22,7 @@ import app.mycity.mycity.api.model.User;
 import app.mycity.mycity.api.model.UsersContainer;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.adapters.FriendsRecyclerAdapter;
+import app.mycity.mycity.views.adapters.TopUsersRecyclerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -31,7 +32,7 @@ public class TopUsersFragment extends Fragment {
     @BindView(R.id.myAllFriendsRecyclerAdapter)
     RecyclerView recyclerView;
 
-    FriendsRecyclerAdapter adapter;
+    TopUsersRecyclerAdapter adapter;
     List<User> userList;
 
     String id;
@@ -58,7 +59,7 @@ public class TopUsersFragment extends Fragment {
 
         userList = new ArrayList<>();
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
-        adapter = new FriendsRecyclerAdapter(userList);
+        adapter = new TopUsersRecyclerAdapter(userList);
         recyclerView.setAdapter(adapter);
         Log.d("TAG", "ViewCreated " + this.getClass().getSimpleName());
 
