@@ -1,5 +1,10 @@
 package app.mycity.mycity.util;
 
+import app.mycity.mycity.api.model.Group;
+import app.mycity.mycity.api.model.Post;
+import app.mycity.mycity.api.model.Profile;
+import retrofit2.http.POST;
+
 public class EventBusMessages {
 
     public static class OpenUser {
@@ -13,6 +18,49 @@ public class EventBusMessages {
             return message;
         }
     }
+
+    public static class OpenPlacePhoto {
+        private String placeId;
+        public OpenPlacePhoto(String placeId) {
+            this.placeId = placeId;
+        }
+
+        public String getPlaceId() {
+            return placeId;
+        }
+    }
+
+    public static class OpenPlacePhoto2 {
+        private final String placeId;
+        private Post post;
+        private Group group;
+        private Profile profile;
+
+        public Post getPost() {
+            return post;
+        }
+
+        public Profile getProfile() {
+            return profile;
+        }
+
+        public Group getGroup() {
+
+            return group;
+        }
+
+        public OpenPlacePhoto2(String placeId, Post post, Group group, Profile profile) {
+            this.placeId = placeId;
+            this.post = post;
+            this.group = group;
+            this.profile = profile;
+        }
+
+        public String getPlaceId() {
+            return placeId;
+        }
+    }
+
 
     public static class OpenSubscribers{
         private final String userId;
@@ -214,5 +262,17 @@ public class EventBusMessages {
     }
 
     public static class MakeCheckin {
+    }
+
+    public static class ShowImage {
+        int position;
+
+        public int getPosition() {
+            return position;
+        }
+
+        public ShowImage(int position) {
+            this.position = position;
+        }
     }
 }

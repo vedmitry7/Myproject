@@ -254,6 +254,7 @@ public interface ApiInterface {
                                                            @Field("place_id") String placeId,
                                                            @Field("filter") String filters,
                                                            @Field("extended") String extended,
+                                                           @Field("fields") String fields,
                                                            @Field("offset") int offset);
 
     @FormUrlEncoded

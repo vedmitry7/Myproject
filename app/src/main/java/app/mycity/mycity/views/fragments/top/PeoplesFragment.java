@@ -17,13 +17,13 @@ import org.greenrobot.eventbus.EventBus;
 import app.mycity.mycity.R;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.Util;
-import app.mycity.mycity.views.adapters.TopPagerAdapter;
+import app.mycity.mycity.views.adapters.PeoplesPagerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import fr.arnaudguyon.tabstacker.TabStacker;
 
-public class TopFragment extends Fragment implements TabStacker.TabStackInterface{
+public class PeoplesFragment extends Fragment implements TabStacker.TabStackInterface{
 
 
     @BindView(R.id.myFriendsViewPager)
@@ -57,7 +57,7 @@ public class TopFragment extends Fragment implements TabStacker.TabStackInterfac
         Util.indicateTabImageView(getContext(), view, 0);
         Util.setOnTabClick(view);
 
-        title.setText("Топ");
+        title.setText("Люди");
 
         // Log.i("TAG21","Friends stack count - " + getActivity().getFragmentManager().getBackStackEntryCount());
      //   Log.i("TAG21","Friends Fragment - " + getActivity().getFragmentManager().getBackStackEntryCount());
@@ -75,7 +75,7 @@ public class TopFragment extends Fragment implements TabStacker.TabStackInterfac
             Log.i("TAG","getChildFragmentManager !" +
                     " NULL");
         }
-        TopPagerAdapter pagerAdapter = new TopPagerAdapter(getChildFragmentManager());
+        PeoplesPagerAdapter pagerAdapter = new PeoplesPagerAdapter(getChildFragmentManager());
         viewPager.setAdapter(pagerAdapter);
         viewPager.setOffscreenPageLimit(3);
         //viewPager.addOnPageChangeListener(pagerAdapter);

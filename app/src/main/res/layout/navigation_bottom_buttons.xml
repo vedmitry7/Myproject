@@ -16,10 +16,10 @@
 
         <ImageView
             android:id="@+id/main_act_top_button"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_centerInParent="true"
-            android:src="@drawable/ic_star_black_24dp" />
+            android:src="@drawable/ic_group" />
 
     </RelativeLayout>
 
@@ -65,12 +65,12 @@
 
         <ImageView
             android:id="@+id/main_act_search_button"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:layout_centerInParent="true"
             android:background="@android:color/transparent"
             android:clickable="false"
-            android:src="@drawable/ic_magnify_black_24dp" />
+            android:src="@drawable/ic_poster3" />
 
     </RelativeLayout>
 

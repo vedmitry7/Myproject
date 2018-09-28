@@ -35,7 +35,6 @@ import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.TestService;
 import app.mycity.mycity.api.ApiFactory;
-import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponseSocketServer;
 import app.mycity.mycity.filter_desc_post.FilterImageActivity;
@@ -43,8 +42,8 @@ import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.fragments.CommentsFragment;
 import app.mycity.mycity.views.fragments.DialogsFragment;
-import app.mycity.mycity.views.fragments.feed.FeedCheckinFragment;
 import app.mycity.mycity.views.fragments.feed.FeedFragment;
+import app.mycity.mycity.views.fragments.feed.FeedPlacesCheckinFragment;
 import app.mycity.mycity.views.fragments.subscribers.SubscribersFragment;
 import app.mycity.mycity.views.fragments.subscribers.SomeoneFriendsFragment;
 import app.mycity.mycity.views.fragments.subscribers.SubscriptionFragment;
@@ -53,7 +52,7 @@ import app.mycity.mycity.views.fragments.places.PlacesFragment;
 import app.mycity.mycity.views.fragments.profile.ProfileFragment;
 import app.mycity.mycity.views.fragments.profile.SomeoneProfileFragment;
 import app.mycity.mycity.views.fragments.settings.MainSettingsFragment;
-import app.mycity.mycity.views.fragments.top.TopFragment;
+import app.mycity.mycity.views.fragments.top.PeoplesFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -213,7 +212,7 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
 
             switch (clickedTab){
                 case TAB_TOP:
-                    fragment = new TopFragment();
+                    fragment = new PeoplesFragment();
                     break;
                 case TAB_PLACES:
                     fragment = new PlacesFragment();
@@ -222,7 +221,7 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
                     fragment = ProfileFragment.createInstance(tabName + "_" + mTabStacker.getCurrentTabSize(), 2);
                     break;
                 case TAB_SEARCH:
-                    fragment = new FeedCheckinFragment();
+                    fragment = FeedFragment.createInstance(getFragmentName(), getCurrentTabPosition());
                     break;
                 case TAB_FEED:
                     fragment = FeedFragment.createInstance(getFragmentName(), getCurrentTabPosition());
@@ -485,6 +484,15 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
                 currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
                 getCurrentTabPosition(),
                 event.getId());
+        mTabStacker.replaceFragment(placeFragment, null);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void openPlacePhoto(EventBusMessages.OpenPlacePhoto event){
+        FeedPlacesCheckinFragment placeFragment = FeedPlacesCheckinFragment.createInstance(
+                currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
+                getCurrentTabPosition(),
+                event.getPlaceId());
         mTabStacker.replaceFragment(placeFragment, null);
     }
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -21,18 +22,17 @@ import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.User;
 import app.mycity.mycity.api.model.UsersContainer;
 import app.mycity.mycity.util.SharedManager;
-import app.mycity.mycity.views.adapters.FriendsRecyclerAdapter;
-import app.mycity.mycity.views.adapters.TopUsersRecyclerAdapter;
+import app.mycity.mycity.views.adapters.PeoplesRecyclerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class TopUsersFragment extends Fragment {
+public class AllPeoplesFragment extends Fragment {
 
 
     @BindView(R.id.myAllFriendsRecyclerAdapter)
     RecyclerView recyclerView;
 
-    TopUsersRecyclerAdapter adapter;
+    PeoplesRecyclerAdapter adapter;
     List<User> userList;
 
     String id;
@@ -58,8 +58,8 @@ public class TopUsersFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         userList = new ArrayList<>();
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
-        adapter = new TopUsersRecyclerAdapter(userList);
+        recyclerView.setLayoutManager(new GridLayoutManager(this.getActivity(), 2));
+        adapter = new PeoplesRecyclerAdapter(userList);
         recyclerView.setAdapter(adapter);
         Log.d("TAG", "ViewCreated " + this.getClass().getSimpleName());
 

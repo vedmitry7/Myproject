@@ -7,10 +7,8 @@ import android.util.Log;
 
 import app.mycity.mycity.views.fragments.SimpleFragment;
 import app.mycity.mycity.views.fragments.feed.FeedCheckinFragment;
+import app.mycity.mycity.views.fragments.feed.FeedCheckinFragmentNew;
 import app.mycity.mycity.views.fragments.feed.FeedEvents;
-import app.mycity.mycity.views.fragments.top.TopCheckinsFragment;
-import app.mycity.mycity.views.fragments.top.TopPlacesFragment;
-import app.mycity.mycity.views.fragments.top.TopUsersFragment;
 
 public class FeedPagerAdapter extends FragmentPagerAdapter {
 
@@ -27,11 +25,11 @@ public class FeedPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position){
             case 0:
-                return FeedCheckinFragment.createInstance(tabName);
+                return FeedCheckinFragmentNew.createInstance(tabName);
             case 1:
                 return new FeedEvents();
             case 2:
-                return new SimpleFragment();
+                return FeedCheckinFragment.createInstance(tabName);
 
         }
         return null;
@@ -48,9 +46,9 @@ public class FeedPagerAdapter extends FragmentPagerAdapter {
             case 0:
                 return "Чекины";
             case 1:
-                return "События";
+                return "Фотоотчеты";
             case 2:
-                return "Подписки";
+                return "Видеоотчеты";
         }
         return null;
     }

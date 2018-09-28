@@ -1,6 +1,7 @@
 package app.mycity.mycity.views.adapters;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,11 +22,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class TopUsersRecyclerAdapter extends RecyclerView.Adapter<TopUsersRecyclerAdapter.ViewHolder> {
+public class PeoplesRecyclerAdapter extends RecyclerView.Adapter<PeoplesRecyclerAdapter.ViewHolder> {
 
     List<User> userList;
 
-    public TopUsersRecyclerAdapter(List<User> userList) {
+    public PeoplesRecyclerAdapter(List<User> userList) {
         this.userList = userList;
         Log.d("TAG", "rec created");
     }
@@ -33,7 +34,7 @@ public class TopUsersRecyclerAdapter extends RecyclerView.Adapter<TopUsersRecycl
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.top_user_row, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_people, parent, false);
         Log.d("TAG", "rec created");
         return new ViewHolder(view);
     }
@@ -46,7 +47,7 @@ public class TopUsersRecyclerAdapter extends RecyclerView.Adapter<TopUsersRecycl
 
         Picasso.get().load(userList.get(position).getPhoto780()).into(holder.image);
 
-        holder.position.setText(String.valueOf(position+1));
+        //holder.position.setText(String.valueOf(position+1));
 
         Log.d("TAG21", "Bind FRIEND " + position);
         Log.i("TAG3","bind");
@@ -65,6 +66,7 @@ public class TopUsersRecyclerAdapter extends RecyclerView.Adapter<TopUsersRecycl
         @BindView(R.id.friendsRowImage)
         CircleImageView image;
 
+        @Nullable
         @BindView(R.id.positionTopCount)
         TextView position;
 

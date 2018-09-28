@@ -10,19 +10,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
 
-import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.adapters.FeedPagerAdapter;
-import app.mycity.mycity.views.adapters.TopPagerAdapter;
-import app.mycity.mycity.views.fragments.subscribers.SubscribersFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -64,7 +60,7 @@ public class FeedFragment extends Fragment implements TabStacker.TabStackInterfa
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Util.indicateTabImageView(getContext(), view, 4);
+        Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
         Util.setOnTabClick(view);
 
         title.setText("Лента");
