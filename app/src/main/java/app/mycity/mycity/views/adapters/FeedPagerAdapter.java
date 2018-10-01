@@ -27,9 +27,9 @@ public class FeedPagerAdapter extends FragmentPagerAdapter {
             case 0:
                 return FeedCheckinFragmentNew.createInstance(tabName);
             case 1:
-                return new FeedEvents();
+                return new SimpleFragment();
             case 2:
-                return FeedCheckinFragment.createInstance(tabName);
+                return new SimpleFragment();
 
         }
         return null;

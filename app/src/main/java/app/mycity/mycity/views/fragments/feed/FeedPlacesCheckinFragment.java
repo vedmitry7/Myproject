@@ -65,6 +65,9 @@ public class FeedPlacesCheckinFragment extends android.support.v4.app.Fragment i
     @BindView(R.id.feedImage)
     ImageView image;
 
+    @BindView(R.id.commentButton)
+    ImageView commentButton;
+
     @BindView(R.id.likeIcon)
     ImageView likeIcon;
 
@@ -73,6 +76,9 @@ public class FeedPlacesCheckinFragment extends android.support.v4.app.Fragment i
 
     @BindView(R.id.feedPostTime)
     TextView time;
+
+    @BindView(R.id.commentsCount)
+    TextView commentsCount;
 
     @BindView(R.id.likesCount)
     TextView likesCount;
@@ -89,6 +95,8 @@ public class FeedPlacesCheckinFragment extends android.support.v4.app.Fragment i
     String placeId;
 
     String currentPostId;
+    String currentOwnerId;
+    String currentUserId;
     int currentPostIdPosition;
 
     EventBusMessages.OpenPlacePhoto2 event;
@@ -129,7 +137,7 @@ public class FeedPlacesCheckinFragment extends android.support.v4.app.Fragment i
         Util.setOnTabClick(view);
 
         event =  EventBus.getDefault().getStickyEvent((EventBusMessages.OpenPlacePhoto2.class));
-        
+
 
         Log.d("TAG21", "Event " + event.getProfile().getPhoto130());
         if(event.getGroup()==null)
@@ -140,6 +148,8 @@ public class FeedPlacesCheckinFragment extends android.support.v4.app.Fragment i
         placeName.setText(event.getGroup().getName());
         currentPostId = String.valueOf(event.getPost().getId());
         currentPostIdPosition = -1;
+        currentUserId = event.getProfile().getId();
+        currentOwnerId = event.getPost().getOwnerId();
 
 
         Picasso.get().load(event.getPost().getAttachments().get(0).getPhoto780()).into(image);
@@ -150,15 +160,28 @@ public class FeedPlacesCheckinFragment extends android.support.v4.app.Fragment i
         likesCount.setText(String.valueOf(event.getPost().getLikes().getCount()));
         time.setText(Util.getDatePretty(event.getPost().getDate()));
 
-        if(event.getPost().getLikes().getUserLikes()==1){
-            likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart_black_18dp));
-            likeIcon.setColorFilter(getResources().getColor(R.color.colorAccentRed));
-            likesCount.setTextColor(getResources().getColor(R.color.colorAccentRed));
-        } else {
-            likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart_outline_grey600_18dp));
-            likeIcon.setColorFilter(getResources().getColor(R.color.grey600));
-            likesCount.setTextColor(getResources().getColor(R.color.black_67percent));
-        }
+        commentsCount.setText(String.valueOf(event.getPost().getComments().getCount()));
+
+
+        View.OnClickListener openUserListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventBus.getDefault().post(new EventBusMessages.OpenUser(currentUserId));
+            }
+        };
+        name.setOnClickListener(openUserListener);
+        photo.setOnClickListener(openUserListener);
+
+        commentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventBus.getDefault().post(new EventBusMessages.OpenComments(currentPostId, currentOwnerId));
+            }
+        });
+
+
+
+        setLiked(event.getPost().getLikes().getUserLikes()==1);
 
 
         LinearLayoutManager horizontalLayoutManager
@@ -166,8 +189,8 @@ public class FeedPlacesCheckinFragment extends android.support.v4.app.Fragment i
 
         recyclerView.setLayoutManager(horizontalLayoutManager);
         //recyclerView.addItemDecoration(new ImagesSpacesItemDecoration(3, App.dpToPx(getActivity(), 4), false));
-       // recyclerView.setLayoutManager(mLayoutManager);
-      //  recyclerView.setNestedScrollingEnabled(false);
+        // recyclerView.setLayoutManager(mLayoutManager);
+        // recyclerView.setNestedScrollingEnabled(false);
 
         adapter = new FeedPlacesCheckinRecyclerAdapter(postList);
        // adapter.setImageClickListener(this);
@@ -265,16 +288,12 @@ public class FeedPlacesCheckinFragment extends android.support.v4.app.Fragment i
         time.setText(Util.getDatePretty(postList.get(event.getPosition()).getDate()));
         likesCount.setText(String.valueOf(postList.get(event.getPosition()).getLikes().getCount()));
 
+        currentOwnerId = postList.get(event.getPosition()).getOwnerId();
+        currentPostId = postList.get(event.getPosition()).getId();
+        currentUserId = postList.get(event.getPosition()).getOwnerId();
 
-        if(postList.get(event.getPosition()).getLikes().getUserLikes()==1){
-            likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart_black_18dp));
-            likeIcon.setColorFilter(getResources().getColor(R.color.colorAccentRed));
-            likesCount.setTextColor(getResources().getColor(R.color.colorAccentRed));
-        } else {
-            likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart_outline_grey600_18dp));
-            likeIcon.setColorFilter(getResources().getColor(R.color.grey600));
-            likesCount.setTextColor(getResources().getColor(R.color.black_67percent));
-        }
+        setLiked(postList.get(event.getPosition()).getLikes().getUserLikes()==1);
+        commentsCount.setText(String.valueOf(postList.get(event.getPosition()).getComments().getCount()));
     }
 
     void setLiked(boolean b){
@@ -318,7 +337,6 @@ public class FeedPlacesCheckinFragment extends android.support.v4.app.Fragment i
                         likesCount.setText(String.valueOf(post.getLikes().getCount()));
                         setRightValue(post);
                     }
-
                 }
 
                 @Override

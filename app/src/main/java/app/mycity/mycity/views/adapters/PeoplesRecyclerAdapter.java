@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -49,6 +50,15 @@ public class PeoplesRecyclerAdapter extends RecyclerView.Adapter<PeoplesRecycler
 
         //holder.position.setText(String.valueOf(position+1));
 
+        holder.likesCount.setText(String.valueOf(userList.get(position).getCountLikes()));
+
+        if(userList.get(position).getPlace()!=null){
+            holder.placeName.setText(userList.get(position).getPlace().getName());
+        } else {
+            holder.placeName.setVisibility(View.GONE);
+            holder.imageMarker.setVisibility(View.GONE);
+        }
+
         Log.d("TAG21", "Bind FRIEND " + position);
         Log.i("TAG3","bind");
     }
@@ -69,6 +79,15 @@ public class PeoplesRecyclerAdapter extends RecyclerView.Adapter<PeoplesRecycler
         @Nullable
         @BindView(R.id.positionTopCount)
         TextView position;
+
+        @BindView(R.id.likesCount)
+        TextView likesCount;
+
+        @BindView(R.id.placeName)
+        TextView placeName;
+
+        @BindView(R.id.imageMarker)
+        ImageView imageMarker;
 
         ViewHolder(View itemView) {
             super(itemView);

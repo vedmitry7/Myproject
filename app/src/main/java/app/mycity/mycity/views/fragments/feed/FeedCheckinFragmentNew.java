@@ -53,7 +53,7 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment {
 
     boolean isLoading;
 
-    int totalCount;
+    int totalCount = 53 ;
 
     Storage storage;
 
@@ -96,13 +96,16 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment {
                 if (!isLoading) {
                     if ( lastVisibleItems >= totalItemCount -10 ) {
                         Log.d("TAG21", "ЗАГРУЗКА ДАННЫХ " + postList.size());
+                        Log.d("TAG21", "Total count " + totalCount);
                         isLoading = true;
                         // load if we don't load all
                         if(totalCount > postList.size()){
-                            Log.d("TAG21", "load feed ");
+                            Log.d("TAG21", "load feed FROM SCROLL");
                             loadFeed(postList.size());
                         }
                     }
+                } else {
+                    Log.d("TAG21", "did not load yet ");
                 }
             }
         };
@@ -110,14 +113,15 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
         recyclerView.addOnScrollListener(scrollListener);
-        loadFeed(postList.size());
+        Log.d("TAG21", "load feed FROM ON_CREATE");
+        loadFeed(0);
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         storage = (Storage) context;
-        Log.d("TAG21", "storage - " + String.valueOf(storage == null));
+        Log.d("TAG21", "storage - " + String.valueOf(storage == null) + totalCount);
 
 
         postList = (List<Post>) storage.getDate(getArguments().get("name")+ "_postList");
@@ -128,7 +132,9 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment {
             postList = new ArrayList<>();
             profiles = new HashMap();
             groups = new HashMap();
+            totalCount = 0;
         } else {
+            totalCount = (int) storage.getDate(getArguments().get("name")+ "_postListTotalCount");
             Log.d("TAG21", "Scroll position - " + storage.getDate(getArguments().get("name")+ "_scrollPosition"));
             scrollPos = (Integer) storage.getDate(getArguments().get("name")+ "_scrollPosition");
             mayRestore = true;
@@ -137,8 +143,10 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment {
     }
 
     private void loadFeed(int offset) {
-
+        Log.d("TAG21", "loadFeed - offset - " + offset);
         if(mayRestore){
+            Log.d("TAG21", "RESTORE date - ");
+            mayRestore = false;
             adapter.update(postList, profiles, groups);
             recyclerView.scrollToPosition(scrollPos);
         } else {
@@ -155,12 +163,12 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment {
 
                         for (Profile p: response.body().getResponse().getProfiles()
                                 ) {
-                            Log.d("TAG21", "P - " + p.getFirstName()+ " " + p.getLastName());
+                         //   Log.d("TAG21", "P - " + p.getFirstName()+ " " + p.getLastName());
                             profiles.put(p.getId(), p);
                         }
 
                         for (Group g: response.body().getResponse().getGroups()){
-                            Log.d("TAG21","G - " + g.getId() + " " + g.getName());
+                         //   Log.d("TAG21","G - " + g.getId() + " " + g.getName());
                             groups.put(g.getId(), g);
                         }
 
@@ -248,6 +256,7 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment {
     @Override
     public void onStop() {
         storage.setDate(getArguments().get("name") + "_postList", postList);
+        storage.setDate(getArguments().get("name") + "_postListTotalCount", totalCount);
         storage.setDate(getArguments().get("name") + "_profiles", profiles);
         storage.setDate(getArguments().get("name") + "_groups", groups);
         storage.setDate(getArguments().get("name") + "_scrollPosition", ((LinearLayoutManager)recyclerView.getLayoutManager()).findFirstVisibleItemPosition());

@@ -78,6 +78,30 @@ public class User {
     @Expose
     private Integer isSubscription;
 
+    @SerializedName("count_likes")
+    @Expose
+    private Integer countLikes;
+
+    @SerializedName("place")
+    @Expose
+    private Place place;
+
+    public Place getPlace() {
+        return place;
+    }
+
+    public void setPlace(Place place) {
+        this.place = place;
+    }
+
+    public Integer getCountLikes() {
+        return countLikes;
+    }
+
+    public void setCountLikes(Integer countLikes) {
+        this.countLikes = countLikes;
+    }
+
     public String getId() {
         return id;
     }

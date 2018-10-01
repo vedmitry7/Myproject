@@ -83,7 +83,7 @@ public class AllPeoplesFragment extends Fragment {
     private void getFriendsList(){
         Log.d("TAG", "getFriendsList " + this.getClass().getSimpleName());
 
-        ApiFactory.getApi().getTopUsers(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "photo_780", "top").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
+        ApiFactory.getApi().getTopUsers(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "photo_780,place,count_likes", "top").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<UsersContainer>> call, retrofit2.Response<ResponseContainer<UsersContainer>> response) {
                 UsersContainer users = response.body().getResponse();

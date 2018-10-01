@@ -8,7 +8,7 @@ import java.util.List;
 public class Post {
     @SerializedName("id")
     @Expose
-    private Integer id;
+    private String id;
     @SerializedName("from_id")
     @Expose
     private String fromId;
@@ -39,6 +39,9 @@ public class Post {
     @SerializedName("likes")
     @Expose
     private Likes likes;
+    @SerializedName("comments")
+    @Expose
+    private Comments comments;
     @SerializedName("visits")
     @Expose
     private Visits visits;
@@ -57,11 +60,11 @@ public class Post {
         this.placeId = placeId;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -159,5 +162,13 @@ public class Post {
 
     public void setVisits(Visits visits) {
         this.visits = visits;
+    }
+
+    public Comments getComments() {
+        return comments;
+    }
+
+    public void setComments(Comments comments) {
+        this.comments = comments;
     }
 }
