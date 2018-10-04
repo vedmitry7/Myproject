@@ -1,6 +1,5 @@
 package app.mycity.mycity.views.fragments.places;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -12,7 +11,6 @@ import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,28 +26,20 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.sql.Time;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.Place;
 import app.mycity.mycity.api.model.PlacesResponse;
-import app.mycity.mycity.api.model.Post;
-import app.mycity.mycity.api.model.ResponseContainer;
+import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
-import app.mycity.mycity.views.activities.MainActivity;
 import app.mycity.mycity.views.activities.MainActivity2;
 import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.adapters.PlacePagerAdapter;
-import app.mycity.mycity.views.fragments.profile.ProfileFragment;
-import app.mycity.mycity.views.fragments.profile.SomeoneProfileFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import fr.arnaudguyon.tabstacker.TabStacker;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -312,5 +302,17 @@ D: 0 = 0
     @Override
     public void onRestoreTabFragmentInstance(Bundle bundle) {
 
+    }
+
+    @OnClick(R.id.placeSubscribersCount)
+    public void openSubscribers(View v){
+        Log.d("TAG21", "Place : Sub...s " );
+        EventBus.getDefault().post(new EventBusMessages.OpenPlaceSubscribers(place.getId()));
+    }
+
+    @OnClick(R.id.usersInPlace)
+    public void openUsersInPlace(View v){
+        Log.d("TAG21", "Place : Sub...s " );
+        EventBus.getDefault().post(new EventBusMessages.OpenUsersInPlace(place.getId()));
     }
 }

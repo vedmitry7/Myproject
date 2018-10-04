@@ -70,10 +70,10 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if(hasFocus){
-                    loginString.setBackgroundColor(Color.WHITE);
+                    loginString.setBackgroundColor(getResources().getColor(R.color.black_30percent));
                 }
                 else {
-                    loginString.setBackgroundColor(getResources().getColor(R.color.white_50percent));
+                    loginString.setBackgroundColor(getResources().getColor(R.color.black_10percent));
                 }
             }
         });
@@ -81,10 +81,11 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if(hasFocus){
-                    passwordString.setBackgroundColor(Color.WHITE);
+                    passwordString.setBackgroundColor(getResources().getColor(R.color.black_30percent));
                 }
                 else {
-                    passwordString.setBackgroundColor(getResources().getColor(R.color.white_50percent));
+                    passwordString.setBackgroundColor(getResources().getColor(R.color.black_10percent));
+
                 }
             }
         });

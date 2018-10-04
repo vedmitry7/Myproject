@@ -1,4 +1,4 @@
-package app.mycity.mycity.views.fragments.subscribers;
+package app.mycity.mycity.views.fragments.places;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -15,18 +15,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import app.mycity.mycity.Constants;
-import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.R;
-import app.mycity.mycity.views.activities.Storage;
-import app.mycity.mycity.views.adapters.FriendsRecyclerAdapter;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.User;
 import app.mycity.mycity.api.model.UsersContainer;
+import app.mycity.mycity.util.SharedManager;
+import app.mycity.mycity.views.activities.Storage;
+import app.mycity.mycity.views.adapters.FriendsRecyclerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SubscribersListFragment extends Fragment {
+public class UsersInPlaceSubscribtionsListFragment extends Fragment {
 
     @BindView(R.id.myAllFriendsRecyclerAdapter)
     RecyclerView recyclerView;
@@ -72,12 +72,12 @@ public class SubscribersListFragment extends Fragment {
     }
 
 
-    public static SubscribersListFragment createInstance(String name, String userId) {
-        SubscribersListFragment fragment = new SubscribersListFragment();
-        Log.i("TAG21", "Create Subscribers LIST " + name + " " + userId);
+    public static UsersInPlaceSubscribtionsListFragment createInstance(String name, String groupId) {
+        UsersInPlaceSubscribtionsListFragment fragment = new UsersInPlaceSubscribtionsListFragment();
+        Log.i("TAG21", "Create Subscribers LIST " + name + " " + groupId);
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
-        bundle.putString("id", userId);
+        bundle.putString("id", groupId);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -100,7 +100,7 @@ public class SubscribersListFragment extends Fragment {
     }
 
     private void getFriendsList(){
-        Log.d("TAG21", "getFriendsList " + this.getClass().getSimpleName() + " user - " + getArguments().getString("id"));
+        Log.d("TAG21", "getPlaceSubscribersList " + this.getClass().getSimpleName() + " group - " + getArguments().getString("id"));
 
         if(mayRestore){
             Log.d("TAG21", "restore " + this.getClass().getSimpleName() + " " + userList.size());
@@ -108,7 +108,7 @@ public class SubscribersListFragment extends Fragment {
         } else {
             Log.d("TAG21" +
                     "", "Cant restore " + this.getClass().getSimpleName());
-            ApiFactory.getApi().getSubscribers(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("id"), 0, "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
+            ApiFactory.getApi().getUsersInPlace(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("id"),"photo_780", "1").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
                 @Override
                 public void onResponse(retrofit2.Call<ResponseContainer<UsersContainer>> call, retrofit2.Response<ResponseContainer<UsersContainer>> response) {
                     UsersContainer users = response.body().getResponse();

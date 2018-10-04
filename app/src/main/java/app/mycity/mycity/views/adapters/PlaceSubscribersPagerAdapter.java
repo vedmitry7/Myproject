@@ -7,21 +7,25 @@ import android.util.Log;
 
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.views.fragments.UniversalUserListFragment;
+import app.mycity.mycity.views.fragments.places.PlaceSubscribersListFragment;
+import app.mycity.mycity.views.fragments.places.PlaceSubscribersSubscriptionListFragment;
+import app.mycity.mycity.views.fragments.subscribers.SubscribersListFragment;
+import app.mycity.mycity.views.fragments.subscribers.SubscribersOnlineListFragment;
 
 
-public class SubscribersPagerAdapter extends FragmentStatePagerAdapter {
+public class PlaceSubscribersPagerAdapter extends FragmentStatePagerAdapter {
 
     private FragmentManager fm;
 
     String tabName;
-    String userId;
+    String groupId;
 
-    public SubscribersPagerAdapter(FragmentManager fm, String name, String userId) {
+    public PlaceSubscribersPagerAdapter(FragmentManager fm, String name, String groupId) {
         super(fm);
         Log.d("TAG", "Constructor " + this.getClass().getSimpleName());
         Log.i("TAG3","new Friends Pager created");
         tabName = name;
-        this.userId = userId;
+        this.groupId = groupId;
     }
 
     @Override
@@ -29,11 +33,10 @@ public class SubscribersPagerAdapter extends FragmentStatePagerAdapter {
         switch (position){
             case 0:
                 Log.d("TAG", "new MyFriendsAllFragment() " + this.getClass().getSimpleName());
-                return UniversalUserListFragment.createInstance(tabName, userId, Constants.KEY_SUBSCRIBERS);
+                return UniversalUserListFragment.createInstance(tabName, groupId, Constants.KEY_PLACE_SUBSCRIBERS);
             case 1:
                 Log.d("TAG", "new MyFriendsOnlineFragment() " + this.getClass().getSimpleName());
-                return UniversalUserListFragment.createInstance(tabName, userId, Constants.KEY_SUBSCRIBERS_ONLINE);
-
+                return UniversalUserListFragment.createInstance(tabName, groupId, Constants.KEY_PLACE_ONLINE_SUBSCRIBERS);
         }
         return null;
     }
@@ -46,7 +49,7 @@ public class SubscribersPagerAdapter extends FragmentStatePagerAdapter {
                 Log.d("TAG", "getPageTitle " + this.getClass().getSimpleName());
                 return "Все";
             case 1:
-                return "Online";
+                return "Мои подписки";
         }
         return null;
     }

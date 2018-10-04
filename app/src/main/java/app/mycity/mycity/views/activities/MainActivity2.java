@@ -32,6 +32,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import app.mycity.mycity.Constants;
+import app.mycity.mycity.LocationService;
 import app.mycity.mycity.R;
 import app.mycity.mycity.TestService;
 import app.mycity.mycity.api.ApiFactory;
@@ -44,6 +45,8 @@ import app.mycity.mycity.views.fragments.CommentsFragment;
 import app.mycity.mycity.views.fragments.DialogsFragment;
 import app.mycity.mycity.views.fragments.feed.FeedFragment;
 import app.mycity.mycity.views.fragments.feed.FeedPlacesCheckinFragment;
+import app.mycity.mycity.views.fragments.places.PlaceSubscribersFragment;
+import app.mycity.mycity.views.fragments.places.UsersInPlaceFragment;
 import app.mycity.mycity.views.fragments.subscribers.SubscribersFragment;
 import app.mycity.mycity.views.fragments.subscribers.SomeoneFriendsFragment;
 import app.mycity.mycity.views.fragments.subscribers.SubscriptionFragment;
@@ -135,6 +138,9 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
             public void run() {
                 Intent serviceIntent = new Intent(MainActivity2.this, TestService.class);
                 startService(serviceIntent);
+
+                Intent locServiceIntent = new Intent(MainActivity2.this, LocationService.class);
+                startService(locServiceIntent);
 
             }
         }, 500);
@@ -408,7 +414,27 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void startSubscribers(EventBusMessages.OpenSubscriptions event) {
+    public void startPlaceSubscribers(EventBusMessages.OpenPlaceSubscribers event) {
+        Log.d("TAG21", "start Place Sub...s " );
+        PlaceSubscribersFragment myFriendsFragment = PlaceSubscribersFragment.createInstance(
+                currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
+                getCurrentTabPosition(),
+                event.getGroupId());
+        mTabStacker.replaceFragment(myFriendsFragment, null);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void startUsersInPlace(EventBusMessages.OpenUsersInPlace event) {
+        Log.d("TAG21", "start Place Sub...s " );
+        UsersInPlaceFragment myFriendsFragment = UsersInPlaceFragment.createInstance(
+                currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
+                getCurrentTabPosition(),
+                event.getGroupId());
+        mTabStacker.replaceFragment(myFriendsFragment, null);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void startSubscription(EventBusMessages.OpenSubscriptions event) {
         SubscriptionFragment subscriptionFragment = SubscriptionFragment.createInstance(
                 currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
                 getCurrentTabPosition(),

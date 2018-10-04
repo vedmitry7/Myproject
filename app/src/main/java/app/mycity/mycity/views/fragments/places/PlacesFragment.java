@@ -40,6 +40,7 @@ import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.adapters.CheckinRecyclerAdapter;
 import app.mycity.mycity.views.adapters.FeedRecyclerAdapter;
+import app.mycity.mycity.views.adapters.MyRecyclerViewAdapter;
 import app.mycity.mycity.views.adapters.PlacesRecyclerAdapter;
 import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
 import butterknife.BindView;
@@ -58,6 +59,10 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
 
     @BindView(R.id.placesFragmentRecyclerView)
     RecyclerView recyclerView;
+
+    @BindView(R.id.horizontalRecyclerView)
+    RecyclerView horizontalRecyclerView;
+
     @BindView(R.id.toolBarTitle)
     TextView title;
 
@@ -121,6 +126,18 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
         recyclerView.setAdapter(adapter);
         recyclerView.addOnScrollListener(scrollListener);
         loadPlaces(placeList.size());
+
+
+        List<String> data = new ArrayList<>();
+        for (int i = 0; i < 25; i++) {
+            data.add("String " + i);
+        }
+        LinearLayoutManager horizontalLayoutManager
+                = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        horizontalRecyclerView.setLayoutManager(horizontalLayoutManager);
+        horizontalRecyclerView.setHasFixedSize(true);
+        MyRecyclerViewAdapter adapter = new MyRecyclerViewAdapter(data);
+        horizontalRecyclerView.setAdapter(adapter);
     }
 
     private void loadPlaces(int offset) {

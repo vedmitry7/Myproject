@@ -4,6 +4,8 @@
     <color name="colorPrimaryDark">#00796B</color>
     <color name="colorAccent">#009688
     </color>
+    <color name="colorAccent50perAlpha">#7f009688
+    </color>
     <color name="colorAccentRed">#ff5252</color>
     <color name="colorDefaultButton">#b0c1c9</color>
     <color name="deliver_color">#999999</color>

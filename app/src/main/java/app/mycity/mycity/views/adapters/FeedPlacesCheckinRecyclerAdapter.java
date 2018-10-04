@@ -48,7 +48,7 @@ public class FeedPlacesCheckinRecyclerAdapter extends RecyclerView.Adapter<FeedP
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Picasso.get()
-                .load(postList.get(position).getAttachments().get(0).getPhoto780())
+                .load(postList.get(position).getAttachments().get(0).getPhoto130())
                 .into(holder.photo);
     }
 

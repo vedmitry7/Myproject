@@ -3,7 +3,6 @@ package app.mycity.mycity.util;
 import app.mycity.mycity.api.model.Group;
 import app.mycity.mycity.api.model.Post;
 import app.mycity.mycity.api.model.Profile;
-import retrofit2.http.POST;
 
 public class EventBusMessages {
 
@@ -61,6 +60,31 @@ public class EventBusMessages {
         }
     }
 
+
+    public static class OpenPlaceSubscribers{
+        private final String groupId;
+
+        public OpenPlaceSubscribers(String groupId) {
+            this.groupId = groupId;
+        }
+
+        public String getGroupId() {
+            return groupId;
+        }
+    }
+
+
+    public static class OpenUsersInPlace{
+        private final String groupId;
+
+        public OpenUsersInPlace(String groupId) {
+            this.groupId = groupId;
+        }
+
+        public String getGroupId() {
+            return groupId;
+        }
+    }
 
     public static class OpenSubscribers{
         private final String userId;

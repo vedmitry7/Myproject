@@ -6,6 +6,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.Log;
 
+import app.mycity.mycity.Constants;
+import app.mycity.mycity.views.fragments.UniversalUserListFragment;
 import app.mycity.mycity.views.fragments.subscribers.SubscribersListFragment;
 import app.mycity.mycity.views.fragments.subscribers.SubscribersOnlineListFragment;
 import app.mycity.mycity.views.fragments.subscribers.SubscriptionListFragment;
@@ -34,10 +36,10 @@ public class SubscriptionsPagerAdapter extends FragmentStatePagerAdapter {
         switch (position){
             case 0:
                 Log.d("TAG", "new MyFriendsAllFragment() " + this.getClass().getSimpleName());
-                return SubscriptionListFragment.createInstance(tabName, userId);
+                return UniversalUserListFragment.createInstance(tabName, userId, Constants.KEY_SUBSCRIPTIONS);
             case 1:
                 Log.d("TAG", "new MyFriendsOnlineFragment() " + this.getClass().getSimpleName());
-                return SubscriptionsOnlineListFragment.createInstance(tabName, userId);
+                return UniversalUserListFragment.createInstance(tabName, userId, Constants.KEY_SUBSCRIPTIONS_ONLINE);
         }
         return null;
     }

@@ -44,7 +44,7 @@ public class FriendsRecyclerAdapter extends RecyclerView.Adapter<FriendsRecycler
 
         holder.name.setText(name);
 
-        Picasso.get().load(userList.get(position).getPhoto780()).into(holder.image);
+        Picasso.get().load(userList.get(position).getPhoto130()).into(holder.image);
 
         Log.d("TAG21", "Bind FRIEND " + position);
         Log.i("TAG3","bind");

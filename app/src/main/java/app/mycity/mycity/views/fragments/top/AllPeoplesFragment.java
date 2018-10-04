@@ -3,6 +3,7 @@ package app.mycity.mycity.views.fragments.top;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,6 +32,9 @@ public class AllPeoplesFragment extends Fragment {
 
     @BindView(R.id.myAllFriendsRecyclerAdapter)
     RecyclerView recyclerView;
+
+    @BindView(R.id.progressBarPlaceHolder)
+    ConstraintLayout progressBarPlaceHolder;
 
     PeoplesRecyclerAdapter adapter;
     List<User> userList;
@@ -63,6 +67,7 @@ public class AllPeoplesFragment extends Fragment {
         recyclerView.setAdapter(adapter);
         Log.d("TAG", "ViewCreated " + this.getClass().getSimpleName());
 
+        progressBarPlaceHolder.setVisibility(View.GONE);
 
         if(id!= null && !id.equals("")){
             getFriendsListById();
@@ -110,6 +115,7 @@ public class AllPeoplesFragment extends Fragment {
         ApiFactory.getApi().getUsersById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), id, "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<UsersContainer>> call, retrofit2.Response<ResponseContainer<UsersContainer>> response) {
+
 
 
                 UsersContainer users = response.body().getResponse();

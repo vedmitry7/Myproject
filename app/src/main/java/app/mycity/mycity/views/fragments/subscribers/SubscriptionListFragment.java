@@ -75,7 +75,7 @@ public class SubscriptionListFragment extends Fragment {
         Log.i("TAG21", "Create Subscribers " + name);
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
-        bundle.putString("userId", userId);
+        bundle.putString("id", userId);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -106,7 +106,7 @@ public class SubscriptionListFragment extends Fragment {
         } else {
             Log.d("TAG21" +
                     "", "Cant restore " + this.getClass().getSimpleName());
-            ApiFactory.getApi().getSubscriptions(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("userId"),0, "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
+            ApiFactory.getApi().getSubscriptions(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("id"),0, "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
                 @Override
                 public void onResponse(retrofit2.Call<ResponseContainer<UsersContainer>> call, retrofit2.Response<ResponseContainer<UsersContainer>> response) {
                     UsersContainer users = response.body().getResponse();

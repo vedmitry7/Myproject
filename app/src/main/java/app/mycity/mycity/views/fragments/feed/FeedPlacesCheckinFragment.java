@@ -132,12 +132,10 @@ public class FeedPlacesCheckinFragment extends android.support.v4.app.Fragment i
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 
-
         Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
         Util.setOnTabClick(view);
 
         event =  EventBus.getDefault().getStickyEvent((EventBusMessages.OpenPlacePhoto2.class));
-
 
         Log.d("TAG21", "Event " + event.getProfile().getPhoto130());
         if(event.getGroup()==null)
@@ -179,10 +177,7 @@ public class FeedPlacesCheckinFragment extends android.support.v4.app.Fragment i
             }
         });
 
-
-
         setLiked(event.getPost().getLikes().getUserLikes()==1);
-
 
         LinearLayoutManager horizontalLayoutManager
                 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);

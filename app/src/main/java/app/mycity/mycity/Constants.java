@@ -13,6 +13,20 @@ public class Constants {
     public static final String KEY_LOGIN = "key_login";
 
 
+
+    public static final String KEY_PLACE_SUBSCRIBERS = "key_place_subscribers";
+    public static final String KEY_PLACE_ONLINE_SUBSCRIBERS = "key_place_online_subscribers";
+    public static final String KEY_USER_IN_PLACE = "key_user_in_place";
+    public static final String KEY_USER_IN_PLACE_SUBSCRIPTION = "key_user_in_place_subscriptions";
+
+    public static final String KEY_SUBSCRIBERS = "key_subscribers";
+    public static final String KEY_SUBSCRIBERS_ONLINE = "key_subscribers_online";
+
+    public static final String KEY_SUBSCRIPTIONS = "key_subscriptions";
+    public static final String KEY_SUBSCRIPTIONS_ONLINE = "key_subscriptions_online";
+
+
+
     public static final int[] navButtons = {
             R.id.main_act_top_button_container,
             R.id.main_act_places_button_container,

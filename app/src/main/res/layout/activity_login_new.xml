@@ -5,15 +5,16 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".views.activities.LoginActivity"
-    android:background="@drawable/background_login">
+   >
 
     <TextView
+
         android:id="@+id/loginLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="136dp"
         android:text="MY CITY"
-        android:textColor="@android:color/white"
+        android:textColor="@color/colorAccent"
         android:textSize="36dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -31,7 +32,6 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:text="vedmitry7@gmail.com"
-        android:textColor="@android:color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -45,7 +45,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginStart="16dp"
-        android:background="#77ffffff"
+        android:background="@color/black_10percent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -65,7 +65,6 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:text="123456789"
-        android:textColor="@android:color/white"
         app:layout_constraintEnd_toStartOf="@+id/loginActForgetPasswordButtonTv"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/loginString" />
@@ -78,7 +77,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginStart="16dp"
-        android:background="#77ffffff"
+        android:background="@color/black_10percent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/loginActPasswordEt" />
@@ -90,7 +89,8 @@
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:text="Забыли пароль?"
-        android:textColor="@android:color/white"
+        android:textColor="@color/black_67percent"
+
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/passwordString"
         app:layout_constraintEnd_toEndOf="parent"
@@ -137,7 +137,8 @@
         android:layout_marginTop="32dp"
         android:onClick="onClick"
         android:text="Регистрация"
-        android:textColor="@android:color/white"
+        android:textColor="@color/colorAccent"
+
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -145,6 +146,7 @@
 
 
     <Button
+        android:visibility="visible"
         android:id="@+id/kolia"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -159,6 +161,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
+        android:visibility="visible"
         android:id="@+id/misha"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

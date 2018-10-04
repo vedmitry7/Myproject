@@ -60,6 +60,14 @@ public interface ApiInterface {
                                                         @Field("fields") String fields,
                                                         @Field("order") String order);
 
+    //TOP users
+    @FormUrlEncoded
+    @POST("users.getUsers")
+    Call<ResponseContainer<UsersContainer>> getTopUsersInPlaces(@Field("access_token") String accessToken,
+                                                        @Field("fields") String fields,
+                                                        @Field("order") String order,
+                                                        @Field("filter") String filter); //in_place
+
     //Subscribers
     @FormUrlEncoded
     @POST("subscribers.get")
@@ -363,5 +371,24 @@ public interface ApiInterface {
     Call<PlacesResponse> getPlaceByIds(@Field("access_token") String token,
                                        @Field("group_ids") String groupIds);
 
+    @FormUrlEncoded
+    @POST("groups.getMembers")
+    Call<ResponseContainer<UsersContainer>> getPlaceSubscribers(@Field("access_token") String token,
+                                                                @Field("group_id") String groupIds,
+                                                                @Field("fields") String fields,
+                                                                @Field("subscriptions_only") String subscriptions);
 
+    @FormUrlEncoded
+    @POST("groups.getMembersinplace")
+    Call<ResponseContainer<UsersContainer>> getUsersInPlace(@Field("access_token") String token,
+                                                                @Field("group_id") String groupIds,
+                                                                @Field("fields") String fields,
+                                                                @Field("subscriptions_only") String subscriptions);
+
+
+    @FormUrlEncoded
+    @POST("account.setCoordinates")
+    Call<ResponseContainer<UsersContainer>> setCoordinates(@Field("access_token") String token,
+                                                            @Field("latitude") Double latitude,
+                                                            @Field("longitude") Double longitude);
 }
