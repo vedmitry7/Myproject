@@ -26,11 +26,16 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.Place;
 import app.mycity.mycity.api.model.PlacesResponse;
+import app.mycity.mycity.api.model.ResponseContainer;
+import app.mycity.mycity.api.model.Success;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
@@ -66,8 +71,18 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
     @BindView(R.id.place_image)
     ImageView imageView;
 
+    @BindView(R.id.loinLeaveButton)
+    ImageView joinLeaveButton;
+
     @BindView(R.id.placeProgressBar)
     ConstraintLayout progressBar;
+
+
+    @BindView(R.id.placeSubscribersCount)
+    TextView placeSubscribersCount;
+
+    @BindView(R.id.usersInPlace)
+    TextView usersInPlace;
 
     private Place place;
 
@@ -169,6 +184,7 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
                     if (response.body().getResponse() != null) {
                         Log.d("TAG21", "PLACE LOADED - " + response.body().getResponse().get(0).getName());
                         place = response.body().getResponse().get(0);
+
                         EventBus.getDefault().postSticky(response.body().getResponse().get(0));
                         createPagerAdapter(response.body().getResponse().get(0));
                         showInfo(response.body().getResponse().get(0));
@@ -192,24 +208,63 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
         progressBar.setVisibility(View.GONE);
     }
 
-    /*
-    D: onCreateView
-D: onViewCreated
-D: STICK EVENT PLACE - Чайхана №1 HOUSE
-    Place pager Init
-D: PLACE INFO - Чайхана №1 HOUSE
-D: 0 = 0
-D: MAP READY
-D: RESPONSE FEED OK
-D: post size - 18
-    update Photo recycler [app.mycity.mycity.api.model.Post@feb3fd0, app.mycity.mycity.api.model.Post@f7bbbc9, app.mycity.mycity.api.model.Post@15c62ce, app.mycity.mycity.api.model.Post@3c505ef, app.mycity.mycity.api.model.Post@88c88fc, app.mycity.mycity.api.model.Post@47b4b85, app.mycity.mycity.api.model.Post@75fddda, app.mycity.mycity.api.model.Post@a06120b, app.mycity.mycity.api.model.Post@d9738e8, app.mycity.mycity.api.model.Post@82a1b01, app.mycity.mycity.api.model.Post@1edfda6, app.mycity.mycity.api.model.Post@a01c3e7, app.mycity.mycity.api.model.Post@81afb94, app.mycity.mycity.api.model.Post@49c663d, app.mycity.mycity.api.model.Post@dec4e32, app.mycity.mycity.api.model.Post@a1cb783, app.mycity.mycity.api.model.Post@763d00, app.mycity.mycity.api.model.Post@6ee2939]
-D: 0 = 0
-D: 0 = 0
-*/
-
     void showInfo(Place place){
         Picasso.get().load(place.getPhoto780()).into(imageView);
         title.setText(place.getName());
+        placeSubscribersCount.setText("" + place.getCountMembers());
+        usersInPlace.setText("Сейчас в заведении: " + place.getCountMembersInPlace());
+
+        if(place.getIsMember()==1){
+            Log.d("TAG21", "MEMBER " );
+            joinLeaveButton.setImageResource(R.drawable.ic_delete_subscription);
+        } else {
+            Log.d("TAG21", "NOT MEMBER " );
+            joinLeaveButton.setImageResource(R.drawable.ic_add_subscription);
+        }
+    }
+
+    @OnClick(R.id.loinLeaveButton)
+    public void dfkop(View v){
+        if(place.getIsMember()==1){
+            Log.d("TAG21", "LEAVE group " );
+            ApiFactory.getApi().leaveGroup(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), place.getId()).enqueue(new Callback<ResponseContainer<Success>>() {
+                @Override
+                public void onResponse(Call<ResponseContainer<Success>> call, Response<ResponseContainer<Success>> response) {
+                    if(response.body()!=null){
+                        if(response.body().getResponse().getSuccess()==1){
+                            place.setIsMember(0);
+                            place.setCountMembers(place.getCountMembers()-1);
+                            showInfo(place);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseContainer<Success>> call, Throwable t) {
+
+                }
+            });
+
+        } else {
+            Log.d("TAG21", "JOIN group " );
+            ApiFactory.getApi().joinToGroup(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), place.getId()).enqueue(new Callback<ResponseContainer<Success>>() {
+                @Override
+                public void onResponse(Call<ResponseContainer<Success>> call, Response<ResponseContainer<Success>> response) {
+                    if(response.body()!=null){
+                        if(response.body().getResponse().getSuccess()==1){
+                            place.setIsMember(1);
+                            place.setCountMembers(place.getCountMembers()+1);
+                            showInfo(place);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseContainer<Success>> call, Throwable t) {
+
+                }
+            });
+        }
     }
 
     @Override
@@ -228,9 +283,6 @@ D: 0 = 0
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
                 if (Math.abs(verticalOffset) == appBarLayout.getTotalScrollRange()) {
-                    // Collapsed
-              //      Log.d("TAG21", String.valueOf(verticalOffset));
-              //      Log.d("TAG21", String.valueOf(verticalOffset) + " collapsed");
                     title.setTextColor(Color.BLACK);
                     layout.setVisibility(View.VISIBLE);
                     delivery.setVisibility(View.GONE);
@@ -238,14 +290,10 @@ D: 0 = 0
 
                     backButton.setColorFilter(Color.parseColor("#000000"), PorterDuff.Mode.SRC_ATOP);
                 } else if (verticalOffset == 0) {
-               //     Log.d("TAG21", String.valueOf(verticalOffset) + " = 0");
                     layout.setVisibility(View.VISIBLE);
                     title.setTextColor(Color.WHITE);
                     backButton.setColorFilter(Color.parseColor("#FFFFFF"), PorterDuff.Mode.SRC_ATOP);
-                    // Expanded
                 } else {
-                    // Somewhere in between
-                   // Log.d("TAG21", String.valueOf(verticalOffset) + " between");
                     delivery.setVisibility(View.VISIBLE);
                     toolbar.setBackgroundColor(Color.TRANSPARENT);
                 }
@@ -281,16 +329,28 @@ D: 0 = 0
         }
 
         if(dismissReason == TabStacker.DismissReason.BACK){
-            storage.remove(getArguments().get("name")+ "_place");
 
-            storage.remove(getArguments().get("name")+ "_eventsPostList");
-            storage.remove(getArguments().get("name")+ "_eventsGroups");
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    storage.remove(getArguments().get("name")+ "_place");
 
-            storage.remove(getArguments().get("name")+ "_albumsList");
-            storage.remove(getArguments().get("name")+ "_mapAlbums");
+                    storage.remove(getArguments().get("name")+ "_eventsPostList");
+                    storage.remove(getArguments().get("name")+ "_eventsGroups");
 
-            storage.remove(getArguments().get("name")+ "_postList");
-            storage.remove(getArguments().get("name")+ "_profiles");
+                    storage.remove(getArguments().get("name")+ "_albumsList");
+                    storage.remove(getArguments().get("name")+ "_mapAlbums");
+
+                    storage.remove(getArguments().get("name")+ "_postList");
+                    storage.remove(getArguments().get("name")+ "_profiles");
+                    Log.d("TAG21", "!!!!!!!!!!  remove " + getArguments().get("name")+ "_postList");
+                    Log.d("TAG21", "!!!!!!!!!!  remove " + getArguments().get("name")+ "_profiles");
+                }
+            }, 200);
+
+
+
+
         }
     }
 

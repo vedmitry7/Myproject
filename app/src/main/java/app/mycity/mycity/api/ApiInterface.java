@@ -235,6 +235,11 @@ public interface ApiInterface {
                                                            @Field("offset") int offset);
 
     @FormUrlEncoded
+    @POST("photos.getAlbums")
+    Call<ResponseContainer<ResponseAlbums>> getAllGroupAlbums(@Field("access_token") String accessToken,
+                                                           @Field("offset") int offset);
+
+    @FormUrlEncoded
     @POST("photos.getAll")
     Call<ResponseContainer<PhotoContainer>> getAlbum(@Field("access_token") String accessToken,
                                                      @Field("group_id") String groupId,
@@ -385,6 +390,15 @@ public interface ApiInterface {
                                                                 @Field("fields") String fields,
                                                                 @Field("subscriptions_only") String subscriptions);
 
+    @FormUrlEncoded
+    @POST("groups.join")
+    Call<ResponseContainer<Success>> joinToGroup(@Field("access_token") String token,
+                                                            @Field("group_id") String groupIds);
+
+    @FormUrlEncoded
+    @POST("groups.leave")
+    Call<ResponseContainer<Success>>  leaveGroup(@Field("access_token") String token,
+                                                        @Field("group_id") String groupIds);
 
     @FormUrlEncoded
     @POST("account.setCoordinates")

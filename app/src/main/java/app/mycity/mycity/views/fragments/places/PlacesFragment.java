@@ -38,10 +38,12 @@ import app.mycity.mycity.api.model.ResponseWall;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
+import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.adapters.CheckinRecyclerAdapter;
 import app.mycity.mycity.views.adapters.FeedRecyclerAdapter;
 import app.mycity.mycity.views.adapters.MyRecyclerViewAdapter;
 import app.mycity.mycity.views.adapters.PlacesRecyclerAdapter;
+import app.mycity.mycity.views.adapters.PlacesTopBarAdapter;
 import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -74,6 +76,9 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
 
     int totalCount;
 
+    Storage storage;
+
+
     @OnClick(R.id.mainActAddBtn)
     public void photo(View v){
         Log.d("TAG21", "PHOTO - ");
@@ -91,6 +96,8 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.d("TAG23", "create ");
+
 
         Util.indicateTabImageView(getContext(), view, 1);
         Util.setOnTabClick(view);
@@ -129,14 +136,17 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
 
 
         List<String> data = new ArrayList<>();
-        for (int i = 0; i < 25; i++) {
-            data.add("String " + i);
-        }
+        data.add("Все");
+        data.add("Бары");
+        data.add("Рестораны");
+        data.add("Кино");
+        data.add("Ночные клубы");
+
         LinearLayoutManager horizontalLayoutManager
                 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         horizontalRecyclerView.setLayoutManager(horizontalLayoutManager);
         horizontalRecyclerView.setHasFixedSize(true);
-        MyRecyclerViewAdapter adapter = new MyRecyclerViewAdapter(data);
+        PlacesTopBarAdapter adapter = new PlacesTopBarAdapter(data);
         horizontalRecyclerView.setAdapter(adapter);
     }
 
@@ -163,6 +173,14 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        storage = (Storage) context;
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
     }
 
     @Override

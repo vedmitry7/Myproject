@@ -95,15 +95,16 @@
             tools:ignore="MissingConstraints" />
 
         <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/loinLeaveButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/placeSubscribersCount"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_subscribe_to" />
+            app:srcCompat="@drawable/ic_add_subscription" />
 
         <View
             android:layout_width="match_parent"

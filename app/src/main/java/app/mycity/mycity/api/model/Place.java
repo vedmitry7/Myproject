@@ -120,6 +120,18 @@ public class Place implements Serializable {
     @Expose
     private Object distance;
 
+    @SerializedName("count_members_in_place")
+    @Expose
+    private Integer countMembersInPlace;
+
+    public Integer getCountMembersInPlace() {
+        return countMembersInPlace;
+    }
+
+    public void setCountMembersInPlace(Integer countMembersInPlace) {
+        this.countMembersInPlace = countMembersInPlace;
+    }
+
     public String getId() {
         return id;
     }

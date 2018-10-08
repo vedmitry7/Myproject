@@ -45,6 +45,7 @@ import app.mycity.mycity.views.fragments.CommentsFragment;
 import app.mycity.mycity.views.fragments.DialogsFragment;
 import app.mycity.mycity.views.fragments.feed.FeedFragment;
 import app.mycity.mycity.views.fragments.feed.FeedPlacesCheckinFragment;
+import app.mycity.mycity.views.fragments.feed.PhotoReportFragment;
 import app.mycity.mycity.views.fragments.places.PlaceSubscribersFragment;
 import app.mycity.mycity.views.fragments.places.UsersInPlaceFragment;
 import app.mycity.mycity.views.fragments.subscribers.SubscribersFragment;
@@ -520,6 +521,15 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
                 getCurrentTabPosition(),
                 event.getPlaceId());
         mTabStacker.replaceFragment(placeFragment, null);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void asdfasdfdas(EventBusMessages.OpenPhotoReport event){
+        PhotoReportFragment photoReportFragment = PhotoReportFragment.createInstance(
+                currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
+                getCurrentTabPosition(),
+                event.getMessage());
+        mTabStacker.replaceFragment(photoReportFragment, null);
     }
 
 

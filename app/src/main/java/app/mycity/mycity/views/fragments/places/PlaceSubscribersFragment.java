@@ -13,10 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
+import app.mycity.mycity.api.model.User;
 import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.adapters.PlaceSubscribersPagerAdapter;
@@ -42,7 +45,7 @@ public class PlaceSubscribersFragment extends Fragment implements TabStacker.Tab
 
     public static PlaceSubscribersFragment createInstance(String name, int tabPos, String groupId) {
         PlaceSubscribersFragment fragment = new PlaceSubscribersFragment();
-        Log.i("TAG21", "Create Subscribers " + name + " " + groupId);
+        Log.i("TAG23", "Create Subscribers " + name + " " + groupId);
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
         bundle.putString("groupId", groupId);
@@ -72,7 +75,7 @@ public class PlaceSubscribersFragment extends Fragment implements TabStacker.Tab
 
         // Log.i("TAG21","Friends stack count - " + getActivity().getFragmentManager().getBackStackEntryCount());
      //   Log.i("TAG21","Friends Fragment - " + getActivity().getFragmentManager().getBackStackEntryCount());
-        Log.i("TAG","Place sub...s  on CreateView");
+        Log.i("TAG23","Place sub...s  on CreateView");
 
         Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
         Util.setOnTabClick(view);
@@ -148,29 +151,27 @@ public class PlaceSubscribersFragment extends Fragment implements TabStacker.Tab
 
     @Override
     public void onTabFragmentPresented(TabStacker.PresentReason presentReason) {
+        Log.d("TAG23", "REASON present- " + presentReason.name());
 
     }
 
     @Override
     public void onTabFragmentDismissed(TabStacker.DismissReason dismissReason) {
-        Log.d("TAG21", "REASON - " + dismissReason);
+
+        Log.d("TAG23", "REASON desmiss - " + dismissReason.name());
+
+
         if(dismissReason == TabStacker.DismissReason.BACK){
+
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    storage.setDate(getArguments().get("name") + "_userlist", null);
-                    storage.setDate(getArguments().get("name") + "_userListOnline", null);
+                    storage.remove(getArguments().get("name") + "_" + Constants.KEY_PLACE_SUBSCRIBERS + "_userlist");
+                    storage.remove(getArguments().get("name") + "_" + Constants.KEY_PLACE_ONLINE_SUBSCRIBERS + "_userlist");
+                    Log.d("TAG23", "delete data " + getArguments().get("name") + "_" + Constants.KEY_PLACE_SUBSCRIBERS + "_userlist");
+                    Log.d("TAG23", "delete data " + getArguments().get("name") + "_" + Constants.KEY_PLACE_ONLINE_SUBSCRIBERS + "_userlist");
                 }
-            }, 200);
-            Log.d("TAG21", "Delete - " + getArguments().get("name") + "_userlist");
-            Log.d("TAG21", "Delete - " + getArguments().get("name") + "_userListOnline");
-
-
-            if(storage.getDate(getArguments().get("name") + "_userlist")==null){
-                Log.d("TAG21", "Delete -_work");
-            } else {
-                Log.d("TAG21", "Delete - not _work");
-            }
+            },200);
         }
     }
 

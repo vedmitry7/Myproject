@@ -3,8 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-
-    android:background="@drawable/place_corner_bg"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -12,12 +10,6 @@
         android:id="@+id/photoRowImageView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="@dimen/photo_item_padding"
-        android:layout_marginEnd="@dimen/photo_item_padding"
-        android:layout_marginLeft="@dimen/photo_item_padding"
-        android:layout_marginRight="@dimen/photo_item_padding"
-        android:layout_marginStart="@dimen/photo_item_padding"
-        android:layout_marginTop="@dimen/photo_item_padding"
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="H,1:1"

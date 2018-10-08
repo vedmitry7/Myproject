@@ -1,4 +1,4 @@
-package app.mycity.mycity.views.fragments.places;
+package app.mycity.mycity.views.fragments.feed;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -21,37 +21,36 @@ import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
-import app.mycity.mycity.api.model.Place;
+import app.mycity.mycity.api.model.Photo;
+import app.mycity.mycity.api.model.PhotoContainer;
 import app.mycity.mycity.api.model.Post;
 import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponseWall;
 import app.mycity.mycity.util.SharedManager;
+import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.activities.Storage;
+import app.mycity.mycity.views.adapters.PhotoReportRecyclerAdapter;
 import app.mycity.mycity.views.adapters.PlacesCheckinRecyclerAdapter;
 import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import fr.arnaudguyon.tabstacker.TabStacker;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class PlacesCheckinFragment extends android.support.v4.app.Fragment {
+public class PhotoReportFragment extends android.support.v4.app.Fragment implements TabStacker.TabStackInterface {
 
     LinearLayoutManager mLayoutManager;
 
-    @BindView(R.id.placesFragmentCheckinRecyclerView)
+    @BindView(R.id.photoAlbumRecyclerView)
     RecyclerView recyclerView;
 
-    @BindView(R.id.placeCheckinPlaceHolder)
-    ConstraintLayout placeCheckinPlaceHolder;
+    List<Photo> postList;
+    PhotoReportRecyclerAdapter adapter;
 
-    List<Post> postList;
-    PlacesCheckinRecyclerAdapter adapter;
-    Map profiles = new HashMap<Long, Profile>();
-
-
-    String placeId;
+    String reportId;
 
     boolean isLoading;
     int totalCount;
@@ -60,11 +59,12 @@ public class PlacesCheckinFragment extends android.support.v4.app.Fragment {
     private boolean mayRestore;
 
 
-    public static PlacesCheckinFragment createInstance(String name, String placeId) {
-        PlacesCheckinFragment fragment = new PlacesCheckinFragment();
+    public static PhotoReportFragment createInstance(String name, int tabPos, String reportId) {
+        PhotoReportFragment fragment = new PhotoReportFragment();
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
-        bundle.putString("placeId", placeId);
+        bundle.putInt("tabPos", tabPos);
+        bundle.putString("id", reportId);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -72,9 +72,13 @@ public class PlacesCheckinFragment extends android.support.v4.app.Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_places_checkin, container, false);
+        View view = inflater.inflate(R.layout.photo_album_fragment, container, false);
 
-        placeId = getArguments().getString("placeId");
+
+        Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
+        Util.setOnTabClick(view);
+
+        reportId = getArguments().getString("id");
 
         ButterKnife.bind(this, view);
         return view;
@@ -88,7 +92,7 @@ public class PlacesCheckinFragment extends android.support.v4.app.Fragment {
         recyclerView.setLayoutManager(mLayoutManager);
       //  recyclerView.setNestedScrollingEnabled(false);
 
-        adapter = new PlacesCheckinRecyclerAdapter(postList);
+        adapter = new PhotoReportRecyclerAdapter(postList);
        // adapter.setImageClickListener(this);
         recyclerView.setAdapter(adapter);
 
@@ -120,49 +124,26 @@ public class PlacesCheckinFragment extends android.support.v4.app.Fragment {
     private void loadMedia(final int offset) {
 
         if(mayRestore){
-            Log.d("TAG21", "RESTORE PLACE CHECKIN - " + placeId);
+            Log.d("TAG24", "RESTORE PLACE CHECKIN - " );
             if(postList.size()==0){
-                placeCheckinPlaceHolder.setVisibility(View.VISIBLE);
+              //  placeCheckinPlaceHolder.setVisibility(View.VISIBLE);
             }
             adapter.update(postList);
         } else {
-            Log.d("TAG21", "Can not RESTORE PLACE CHECKIN " + placeId);
-            ApiFactory.getApi().getGroupWallById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), placeId, "checkin", "1","photo_130", offset).enqueue(new Callback<ResponseContainer<ResponseWall>>() {
+            Log.d("TAG24", "Can not RESTORE PLACE CHECKIN ");
+            ApiFactory.getApi().getAlbum(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),
+                    "1", getArguments().getString("id")).enqueue(new Callback<ResponseContainer<PhotoContainer>>() {
                 @Override
-                public void onResponse(Call<ResponseContainer<ResponseWall>> call, Response<ResponseContainer<ResponseWall>> response) {
-
-
+                public void onResponse(Call<ResponseContainer<PhotoContainer>> call, Response<ResponseContainer<PhotoContainer>> response) {
                     if(response.body().getResponse()!=null){
-                        Log.d("TAG21", "RESPONSE FEED OK");
-
-                        totalCount = response.body().getResponse().getCount();
-                        if(totalCount == 0){
-                            placeCheckinPlaceHolder.setVisibility(View.VISIBLE);
-                        }
-
-                        postList.addAll(response.body().getResponse().getItems());
-
-                        if(response.body().getResponse().getProfiles()!=null
-                                )
-                            for (Profile p: response.body().getResponse().getProfiles()
-                                    ) {
-                                profiles.put(p.getId(), p);
-                            }
-
-                        Log.d("TAG21", "post size - " + postList.size());
-
-                    } else {
-                        Log.d("TAG21", "RESPONSE ERROR ");
+                        Log.d("TAG24", "Album " + " size - " + response.body().getResponse().getPhotos().size());
+                        postList.addAll(response.body().getResponse().getPhotos());
+                        adapter.update(postList);
                     }
-
-                    adapter.update(postList);
-                    //   adapter.notifyDataSetChanged();
-
                 }
 
                 @Override
-                public void onFailure(Call<ResponseContainer<ResponseWall>> call, Throwable t) {
-
+                public void onFailure(Call<ResponseContainer<PhotoContainer>> call, Throwable t) {
                 }
             });
         }
@@ -174,14 +155,11 @@ public class PlacesCheckinFragment extends android.support.v4.app.Fragment {
         super.onAttach(context);
 
         storage = (Storage) context;
-
-        postList = (List<Post>) storage.getDate(getArguments().get("name")+ "_postList");
-        profiles = (Map) storage.getDate(getArguments().get("name")+ "_profiles");
+        postList = (List<Photo>) storage.getDate(getArguments().get("name")+ "_postList");
 
         if(postList==null){
             Log.d("TAG21", "restore null");
             postList = new ArrayList<>();
-            profiles = new HashMap();
         } else {
             Log.d("TAG21", "restore ok - " + postList.size());
             mayRestore = true;
@@ -195,7 +173,26 @@ public class PlacesCheckinFragment extends android.support.v4.app.Fragment {
         Log.d("TAG21", "Stop CHECKIN FRAGMENT Save " + getArguments().getString("name"));
         Log.d("TAG21", "!!!!!!!!!!  Save " + getArguments().get("name") + "_postList");
         Log.d("TAG21", "!!!!!!!!!!  Save " + getArguments().get("name") + "_profiles");
-        storage.setDate(getArguments().get("name") + "_postList", postList);
-        storage.setDate(getArguments().get("name") + "_profiles", profiles);
+     //   storage.setDate(getArguments().get("name") + "_postList", postList);
+    }
+
+    @Override
+    public void onTabFragmentPresented(TabStacker.PresentReason presentReason) {
+
+    }
+
+    @Override
+    public void onTabFragmentDismissed(TabStacker.DismissReason dismissReason) {
+
+    }
+
+    @Override
+    public View onSaveTabFragmentInstance(Bundle bundle) {
+        return null;
+    }
+
+    @Override
+    public void onRestoreTabFragmentInstance(Bundle bundle) {
+
     }
 }

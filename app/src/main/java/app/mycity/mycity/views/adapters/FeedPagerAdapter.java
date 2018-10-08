@@ -9,6 +9,7 @@ import app.mycity.mycity.views.fragments.SimpleFragment;
 import app.mycity.mycity.views.fragments.feed.FeedCheckinFragment;
 import app.mycity.mycity.views.fragments.feed.FeedCheckinFragmentNew;
 import app.mycity.mycity.views.fragments.feed.FeedEvents;
+import app.mycity.mycity.views.fragments.feed.FeedPhotoReportFragment;
 
 public class FeedPagerAdapter extends FragmentPagerAdapter {
 
@@ -27,7 +28,7 @@ public class FeedPagerAdapter extends FragmentPagerAdapter {
             case 0:
                 return FeedCheckinFragmentNew.createInstance(tabName);
             case 1:
-                return new SimpleFragment();
+                return FeedPhotoReportFragment.createInstance(tabName);
             case 2:
                 return new SimpleFragment();
 

@@ -18,6 +18,18 @@ public class EventBusMessages {
         }
     }
 
+    public static class OpenPhotoReport{
+        private final String message;
+
+        public OpenPhotoReport(String message) {
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+    }
+
     public static class OpenPlacePhoto {
         private String placeId;
         public OpenPlacePhoto(String placeId) {

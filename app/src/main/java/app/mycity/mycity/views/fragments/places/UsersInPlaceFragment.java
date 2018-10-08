@@ -13,10 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
+import app.mycity.mycity.api.model.User;
 import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.adapters.UsersInPlacePagerAdapter;
@@ -152,24 +155,26 @@ public class UsersInPlaceFragment extends Fragment implements TabStacker.TabStac
 
     @Override
     public void onTabFragmentDismissed(TabStacker.DismissReason dismissReason) {
-        Log.d("TAG21", "REASON - " + dismissReason);
+        Log.d("TAG23", "REASON - " + dismissReason);
         if(dismissReason == TabStacker.DismissReason.BACK){
+
+    /*
+            key_place_subscribers Save date - TAB_PLACES_2_key_place_subscribers_userlist
+            key_place_online_subscribers Save date - TAB_PLACES_2_key_place_online_subscribers_userlist
+    */
+
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    storage.setDate(getArguments().get("name") + "_userlist", null);
-                    storage.setDate(getArguments().get("name") + "_userListOnline", null);
+                    storage.remove(getArguments().get("name") + "_" + Constants.KEY_USER_IN_PLACE + "_userlist");
+                    storage.remove(getArguments().get("name") + "_" + Constants.KEY_USER_IN_PLACE_SUBSCRIPTION + "_userlist");
+
+                    Log.d("TAG23", "delete data " + getArguments().get("name") + "_" + Constants.KEY_USER_IN_PLACE + "_userlist");
+                    Log.d("TAG23", "delete data " + getArguments().get("name") + "_" + Constants.KEY_USER_IN_PLACE_SUBSCRIPTION);
                 }
-            }, 200);
-            Log.d("TAG21", "Delete - " + getArguments().get("name") + "_userlist");
-            Log.d("TAG21", "Delete - " + getArguments().get("name") + "_userListOnline");
+            },200);
 
 
-            if(storage.getDate(getArguments().get("name") + "_userlist")==null){
-                Log.d("TAG21", "Delete -_work");
-            } else {
-                Log.d("TAG21", "Delete - not _work");
-            }
         }
     }
 
