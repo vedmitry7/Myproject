@@ -43,11 +43,14 @@ import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.fragments.CommentsFragment;
 import app.mycity.mycity.views.fragments.DialogsFragment;
+import app.mycity.mycity.views.fragments.events.AllEvents;
 import app.mycity.mycity.views.fragments.feed.FeedFragment;
+import app.mycity.mycity.views.fragments.feed.FeedPhotoReportFragmentContent;
 import app.mycity.mycity.views.fragments.feed.FeedPlacesCheckinFragment;
 import app.mycity.mycity.views.fragments.feed.PhotoReportFragment;
 import app.mycity.mycity.views.fragments.places.PlaceSubscribersFragment;
 import app.mycity.mycity.views.fragments.places.UsersInPlaceFragment;
+import app.mycity.mycity.views.fragments.profile.UserPlacesFragment;
 import app.mycity.mycity.views.fragments.subscribers.SubscribersFragment;
 import app.mycity.mycity.views.fragments.subscribers.SomeoneFriendsFragment;
 import app.mycity.mycity.views.fragments.subscribers.SubscriptionFragment;
@@ -130,7 +133,7 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
         Window window = getWindow();
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.setStatusBarColor(ContextCompat.getColor(this,R.color.colorAccent));
+   //     window.setStatusBarColor(ContextCompat.getColor(this,R.color.colorAccent));
 
         updateTimestemp();
 
@@ -228,7 +231,7 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
                     fragment = ProfileFragment.createInstance(tabName + "_" + mTabStacker.getCurrentTabSize(), 2);
                     break;
                 case TAB_SEARCH:
-                    fragment = FeedFragment.createInstance(getFragmentName(), getCurrentTabPosition());
+                    fragment = AllEvents.createInstance(tabName + "_" + mTabStacker.getCurrentTabSize(), 3);
                     break;
                 case TAB_FEED:
                     fragment = FeedFragment.createInstance(getFragmentName(), getCurrentTabPosition());
@@ -443,6 +446,15 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
         mTabStacker.replaceFragment(subscriptionFragment, null);
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void startUserPlaces(EventBusMessages.OpenUserPlace event) {
+        UserPlacesFragment subscriptionFragment = UserPlacesFragment.createInstance(
+                currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
+                getCurrentTabPosition(),
+                event.getUserId());
+        mTabStacker.replaceFragment(subscriptionFragment, null);
+    }
+
 
 
     String getFragmentName(){
@@ -524,11 +536,26 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
+    public void openPhotoReportContent(EventBusMessages.OpenPhotoReportContent event){
+        FeedPhotoReportFragmentContent placeFragment = FeedPhotoReportFragmentContent.createInstance(
+                currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
+                getCurrentTabPosition(),
+                event.getPlaceId(),
+                event.getAlbumId(),
+                event.getAlbumName(),
+                event.getAlbumDate(),
+                event.getPosition());
+        mTabStacker.replaceFragment(placeFragment, null);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void asdfasdfdas(EventBusMessages.OpenPhotoReport event){
         PhotoReportFragment photoReportFragment = PhotoReportFragment.createInstance(
                 currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
                 getCurrentTabPosition(),
-                event.getMessage());
+                event.getAlbum().getId(),
+                event.getAlbum().getTitle(),
+                event.getAlbum().getDateCreated());
         mTabStacker.replaceFragment(photoReportFragment, null);
     }
 

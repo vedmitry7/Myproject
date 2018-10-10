@@ -166,6 +166,12 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
         return view;
     }
 
+    @OnClick(R.id.profilePlaces)
+    public void places(View v) {
+        Log.i("TAG24", "click place!");
+        EventBus.getDefault().post(new EventBusMessages.OpenUserPlace(SharedManager.getProperty(Constants.KEY_MY_ID)));
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);

@@ -1,5 +1,6 @@
 package app.mycity.mycity.util;
 
+import app.mycity.mycity.api.model.Album;
 import app.mycity.mycity.api.model.Group;
 import app.mycity.mycity.api.model.Post;
 import app.mycity.mycity.api.model.Profile;
@@ -18,15 +19,47 @@ public class EventBusMessages {
         }
     }
 
-    public static class OpenPhotoReport{
-        private final String message;
+    public static class OpenPhotoReportContent {
+        private final String albumName;
+        private long albumDate;
+        private String placeId;
+        private String albumId;
+        private int position;
 
-        public OpenPhotoReport(String message) {
-            this.message = message;
+        public OpenPhotoReportContent (String placeId, String albumId, String albumName, Long albumDate, int position) {
+            this.placeId = placeId;
+            this.albumId = albumId;
+            this.albumName = albumName;
+            this.albumDate = albumDate;
+            this.position = position;
         }
 
-        public String getMessage() {
-            return message;
+        public int getPosition() {
+            return position;
+        }
+        public String getAlbumId() {
+            return albumId;
+        }
+        public String getAlbumName() {
+            return albumName;
+        }
+        public long getAlbumDate() {
+            return albumDate;
+        }
+        public String getPlaceId() {
+            return placeId;
+        }
+    }
+
+    public static class OpenPhotoReport{
+        private Album album;
+
+        public Album getAlbum() {
+            return album;
+        }
+
+        public OpenPhotoReport(Album album) {
+            this.album = album;
         }
     }
 
@@ -213,6 +246,7 @@ public class EventBusMessages {
         }
     }
 
+    //newer used should delete
     public static class Message {
         private final String history;
 
@@ -272,19 +306,19 @@ public class EventBusMessages {
 
 
     public static class LoadAlbum{
-        long albumId;
+        String albumId;
         int adapterPosition;
 
-        public LoadAlbum(long albumId, int adapterPosition) {
+        public LoadAlbum(String albumId, int adapterPosition) {
             this.albumId = albumId;
             this.adapterPosition = adapterPosition;
         }
 
-        public long getAlbumId() {
+        public String getAlbumId() {
             return albumId;
         }
 
-        public void setAlbumId(long albumId) {
+        public void setAlbumId(String albumId) {
             this.albumId = albumId;
         }
 
@@ -310,5 +344,32 @@ public class EventBusMessages {
         public ShowImage(int position) {
             this.position = position;
         }
+    }
+
+    public static class PhotoReportPhotoClick {
+        int position;
+
+        public int getPosition() {
+            return position;
+        }
+
+        public PhotoReportPhotoClick(int position) {
+            this.position = position;
+        }
+    }
+
+    public static class OpenUserPlace {
+        private final String userId;
+
+        public OpenUserPlace(String userId) {
+            this.userId = userId;
+        }
+
+        public String getUserId() {
+            return userId;
+        }
+    }
+
+    public static class UpdateSocketConnection {
     }
 }

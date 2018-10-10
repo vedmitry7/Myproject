@@ -1,18 +1,20 @@
 package app.mycity.mycity.api.model;
 
+import android.location.Location;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Albume {
+public class Album {
     @SerializedName("id")
     @Expose
-    private Long id;
+    private String id;
     @SerializedName("title")
     @Expose
     private String title;
     @SerializedName("date_created")
     @Expose
-    private Integer dateCreated;
+    private Long dateCreated;
     @SerializedName("date_updated")
     @Expose
     private Integer dateUpdated;
@@ -38,11 +40,11 @@ public class Albume {
     @Expose
     private Integer countPhotos;
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -54,11 +56,11 @@ public class Albume {
         this.title = title;
     }
 
-    public Integer getDateCreated() {
+    public Long getDateCreated() {
         return dateCreated;
     }
 
-    public void setDateCreated(Integer dateCreated) {
+    public void setDateCreated(Long dateCreated) {
         this.dateCreated = dateCreated;
     }
 

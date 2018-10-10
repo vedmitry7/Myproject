@@ -97,6 +97,9 @@ public class CheckinRecyclerAdapter extends RecyclerView.Adapter<CheckinRecycler
         if(holder.likesCount!=null)
             holder.likesCount.setText(String.valueOf(postList.get(position).getLikes().getCount()));
 
+        if(holder.commentText!=null)
+        holder.commentText.setText(String.valueOf(postList.get(position).getComments().getCount()));
+
         if(holder.likeIcon!=null){
             if(postList.get(position).getLikes().getUserLikes()==1){
                 holder.likeIcon.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_heart_black_18dp));
@@ -124,12 +127,22 @@ public class CheckinRecyclerAdapter extends RecyclerView.Adapter<CheckinRecycler
         TextView place;
 
         @Nullable
+        @BindView(R.id.commentsCount)
+        TextView commentText;
+
+        @Nullable
+        @BindView(R.id.commentButton)
+        ImageView commentButton;
+
+        @Nullable
         @BindView(R.id.likeIcon)
         ImageView likeIcon;
 
         @Nullable
         @BindView(R.id.likesCount)
         TextView likesCount;
+
+
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -144,14 +157,25 @@ public class CheckinRecyclerAdapter extends RecyclerView.Adapter<CheckinRecycler
 
             }
 
+
+
             if(likeIcon != null){
-                itemView.setOnClickListener(new View.OnClickListener() {
+                likeIcon.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         EventBus.getDefault().post(new EventBusMessages.LikePost(
                                 postList.get(getAdapterPosition()).getId().toString(),
                                 postList.get(getAdapterPosition()).getOwnerId().toString(),
                                 getAdapterPosition()));
+                    }
+                });
+            }
+
+            if(commentButton!=null){
+                commentButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        EventBus.getDefault().post(new EventBusMessages.OpenComments(postList.get(getAdapterPosition()).getId(), postList.get(getAdapterPosition()).getOwnerId()));
                     }
                 });
             }

@@ -251,6 +251,7 @@
                         android:background="@color/black_10percent" />
 
                     <RelativeLayout
+                        android:id="@+id/profilePlaces"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -258,10 +259,10 @@
 
                         <TextView
 
-                            android:layout_below="@+id/profileFragPlacesTv"
                             android:id="@+id/profileFragLabelPlaces"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_below="@+id/profileFragPlacesTv"
                             android:layout_centerHorizontal="true"
                             android:text="Места" />
 
@@ -270,8 +271,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerHorizontal="true"
-                            android:textColor="@android:color/black"
-                            android:text="3" />
+                            android:text="3"
+                            android:textColor="@android:color/black" />
 
                     </RelativeLayout>
 

@@ -1,4 +1,4 @@
-package app.mycity.mycity.views.fragments.feed;
+package app.mycity.mycity.views.fragments.events;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -25,19 +26,21 @@ import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.Group;
 import app.mycity.mycity.api.model.Post;
-import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponseLike;
 import app.mycity.mycity.api.model.ResponseVisit;
 import app.mycity.mycity.api.model.ResponseWall;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
+import app.mycity.mycity.util.Util;
+import app.mycity.mycity.views.activities.Storage;
+import app.mycity.mycity.views.adapters.AllEventRecyclerAdapter;
 import app.mycity.mycity.views.adapters.PlacesEventRecyclerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import fr.arnaudguyon.tabstacker.TabStacker;
 
-public class FeedEvents extends android.support.v4.app.Fragment implements TabStacker.TabStackInterface {
+public class AllEvents extends android.support.v4.app.Fragment implements TabStacker.TabStackInterface {
 
 
     @BindView(R.id.placeEventsFragmentRecyclerView)
@@ -46,7 +49,10 @@ public class FeedEvents extends android.support.v4.app.Fragment implements TabSt
     @BindView(R.id.placeEventsPlaceHolder)
     RelativeLayout placeHolderNoEvents;
 
-    PlacesEventRecyclerAdapter adapter;
+    @BindView(R.id.toolBarTitle)
+    TextView title;
+
+    AllEventRecyclerAdapter adapter;
 
     List<Post> postList;
     Map groups = new HashMap<Long, Group>();
@@ -54,21 +60,38 @@ public class FeedEvents extends android.support.v4.app.Fragment implements TabSt
     boolean isLoading;
     int totalCount;
 
+    Storage storage;
+
+    boolean mayRestore;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.place_events_fragment, container, false);
+        View view = inflater.inflate(R.layout.all_events_fragment, container, false);
         ButterKnife.bind(this, view);
         return view;
+    }
+
+    public static AllEvents createInstance(String name, int tabPos) {
+        AllEvents fragment = new AllEvents();
+        Bundle bundle = new Bundle();
+        bundle.putString("name", name);
+        bundle.putInt("tabPos", tabPos);
+        fragment.setArguments(bundle);
+        return fragment;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        postList = new ArrayList<>();
-        groups = new HashMap();
-        adapter = new PlacesEventRecyclerAdapter(postList, groups);
+        Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
+        Util.setOnTabClick(view);
+
+        title.setText("События");
+
+
+        adapter = new AllEventRecyclerAdapter(postList, groups);
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
 
@@ -101,74 +124,48 @@ public class FeedEvents extends android.support.v4.app.Fragment implements TabSt
 
     private void loadFeed(int offset) {
 
-        ApiFactory.getApi().getAllEvents(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "1", 0).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
-            @Override
-            public void onResponse(retrofit2.Call<ResponseContainer<ResponseWall>> call, retrofit2.Response<ResponseContainer<ResponseWall>> response) {
+        if(mayRestore){
+            adapter.update(postList, groups);
+        } else {
+            ApiFactory.getApi().getAllEvents(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),"1", offset).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
+                @Override
+                public void onResponse(retrofit2.Call<ResponseContainer<ResponseWall>> call, retrofit2.Response<ResponseContainer<ResponseWall>> response) {
 
-                if(response!=null && response.body().getResponse()!=null){
-                    Log.d("TAG21", "RESPONSE Events OK");
+                    if(response!=null && response.body().getResponse()!=null){
+                        Log.d("TAG21", "RESPONSE Events OK");
 
-                    if(response.body().getResponse().getCount()==0){
-                        placeHolderNoEvents.setVisibility(View.VISIBLE);
+                        if(response.body().getResponse().getCount()==0){
+                            placeHolderNoEvents.setVisibility(View.VISIBLE);
+                        } else {
+                            placeHolderNoEvents.setVisibility(View.GONE);
+                        }
+
+                        totalCount = response.body().getResponse().getCount();
+                        if(totalCount>0){
+                            postList.addAll(response.body().getResponse().getItems());
+                            for (Group g: response.body().getResponse().getGroups()
+                                    ) {
+                                groups.put(g.getId(), g);
+                            }
+                        }
+
+                        Log.d("TAG21", "Events size - " + postList.size() + " total - " + totalCount);
+                        isLoading = false;
+
                     } else {
-                        placeHolderNoEvents.setVisibility(View.GONE);
+                        Log.d("TAG21", "RESPONSE ERROR ");
                     }
 
-                    totalCount = response.body().getResponse().getCount();
+                    adapter.notifyDataSetChanged();
 
-                    postList.addAll(response.body().getResponse().getItems());
-
-                    for (Group g: response.body().getResponse().getGroups()
-                            ) {
-                        groups.put(String.valueOf(g.getId()), g);
-                        Log.d("TAG21", "GGG - " + g.getName());
-                    }
-
-                    Log.d("TAG21", "Events size - " + postList.size() + " total - " + totalCount);
-                    isLoading = false;
-
-                } else {
-                    Log.d("TAG21", "RESPONSE ERROR ");
                 }
 
-               adapter.update(postList, groups);
-
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<ResponseContainer<ResponseWall>> call, Throwable t) {
-
-            }
-        });
-
-        /*RequestBody requestBody = new FormBody.Builder()
-                .add("access_token", SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN))
-                .add("extended", "1")
-                .build();
-
-        final Request request = new Request.Builder().url("http://192.168.0.104/api/feed.get")
-                .post(requestBody)
-                .build();
-
-        OkHttpClientFactory.getClient().newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.d("TAG21", "fail");
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                Log.d("TAG21", response.toString());
-            }
-        });*/
-
+                @Override
+                public void onFailure(retrofit2.Call<ResponseContainer<ResponseWall>> call, Throwable t) {
+                }
+            });
+        }
     }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(final EventBusMessages.LikePost event) {
@@ -280,6 +277,27 @@ public class FeedEvents extends android.support.v4.app.Fragment implements TabSt
 
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        storage = (Storage) context;
+
+        postList = (List<Post>) storage.getDate(getArguments().get("name")+ "_eventsPostList");
+        groups = (Map) storage.getDate(getArguments().get("name")+ "_eventsGroups");
+
+
+        if(postList==null){
+            Log.d("TAG21", "restore null");
+            postList = new ArrayList<>();
+            groups = new HashMap();
+        } else {
+            Log.d("TAG21", "restore ok - " + postList.size());
+            mayRestore = true;
+        }
+
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
@@ -288,6 +306,10 @@ public class FeedEvents extends android.support.v4.app.Fragment implements TabSt
     @Override
     public void onStop() {
         EventBus.getDefault().unregister(this);
+        Log.d("TAG21", "Stop EVENTS FRAGMENT Save " + getArguments().getString("name"));
+        storage.setDate(getArguments().get("name") + "_eventsPostList", postList);
+        storage.setDate(getArguments().get("name") + "_eventsGroups", groups);
+
         super.onStop();
     }
 

@@ -2,9 +2,7 @@ package app.mycity.mycity.views.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,24 +14,19 @@ import com.squareup.picasso.Picasso;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
-import java.util.Map;
 
-import app.mycity.mycity.App;
 import app.mycity.mycity.R;
-import app.mycity.mycity.api.model.Albume;
-import app.mycity.mycity.api.model.Group;
-import app.mycity.mycity.api.model.Post;
-import app.mycity.mycity.api.model.Profile;
+import app.mycity.mycity.api.model.Album;
 import app.mycity.mycity.util.EventBusMessages;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class FeedPhotoReportAdapter extends RecyclerView.Adapter<FeedPhotoReportAdapter.ViewHolder> {
 
-    List<Albume> albumsList;
+    List<Album> albumsList;
     Context context;
 
-    public FeedPhotoReportAdapter(List<Albume> albumsList){
+    public FeedPhotoReportAdapter(List<Album> albumsList){
         this.albumsList = albumsList;
     }
 
@@ -75,13 +68,13 @@ public class FeedPhotoReportAdapter extends RecyclerView.Adapter<FeedPhotoReport
             photo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    EventBus.getDefault().post(new EventBusMessages.OpenPhotoReport(String.valueOf(albumsList.get(getAdapterPosition()).getId())));
+                    EventBus.getDefault().post(new EventBusMessages.OpenPhotoReport(albumsList.get(getAdapterPosition())));
                 }
             });
         }
     }
 
-    public void update(List<Albume> albumsList){
+    public void update(List<Album> albumsList){
         this.albumsList = albumsList;
 
         notifyDataSetChanged();

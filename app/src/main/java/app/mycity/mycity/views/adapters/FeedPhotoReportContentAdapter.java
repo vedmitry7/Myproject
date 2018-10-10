@@ -19,23 +19,19 @@ import java.util.List;
 
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.model.Photo;
-import app.mycity.mycity.api.model.Post;
 import app.mycity.mycity.util.EventBusMessages;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class PhotoReportRecyclerAdapter extends RecyclerView.Adapter<PhotoReportRecyclerAdapter.ViewHolder> {
+public class FeedPhotoReportContentAdapter extends RecyclerView.Adapter<FeedPhotoReportContentAdapter.ViewHolder> {
 
     List<Photo> photoList;
 
     int layout;
     Context context;
 
-    String albumId;
-
-    public PhotoReportRecyclerAdapter(List<Photo> photoList, String albumId) {
+    public FeedPhotoReportContentAdapter(List<Photo> photoList) {
         this.photoList = photoList;
-        this.albumId = albumId;
     }
 
     public void setLayout(int layout){
@@ -45,7 +41,7 @@ public class PhotoReportRecyclerAdapter extends RecyclerView.Adapter<PhotoReport
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.photo_row_grid, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.feed_photo_row_grid, parent, false);
             return new ViewHolder(view);
     }
 
@@ -65,22 +61,36 @@ public class PhotoReportRecyclerAdapter extends RecyclerView.Adapter<PhotoReport
         @BindView(R.id.photoRowImageView)
         ImageView photo;
 
+        @Nullable
+        @BindView(R.id.placeLabel)
+        TextView place;
+
+        @Nullable
+        @BindView(R.id.likeIcon)
+        ImageView likeIcon;
+
+        @Nullable
+        @BindView(R.id.likesCount)
+        TextView likesCount;
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
-            photo.setOnClickListener(new View.OnClickListener() {
+            itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
-                    EventBus.getDefault().post(new EventBusMessages.PhotoReportPhotoClick(getAdapterPosition()));
+                    Log.d("TAG21", "open780 - " + photoList.get(getAdapterPosition()).getPhoto780());
+                    EventBus.getDefault().post(
+                            new EventBusMessages.ShowImage(getAdapterPosition()));
                 }
             });
+
         }
+
     }
 
-    public void update(List<Photo> posts){
-        photoList = posts;
+    public void update(List<Photo> photos){
+        photoList = photos;
         notifyDataSetChanged();
         Log.d("TAG21", "update Photo recycler " + photoList);
     }

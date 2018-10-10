@@ -11,33 +11,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
-import app.mycity.mycity.api.model.Albume;
-import app.mycity.mycity.api.model.Group;
-import app.mycity.mycity.api.model.Post;
-import app.mycity.mycity.api.model.Profile;
+import app.mycity.mycity.api.model.Album;
 import app.mycity.mycity.api.model.ResponseAlbums;
 import app.mycity.mycity.api.model.ResponseContainer;
-import app.mycity.mycity.api.model.ResponseLike;
-import app.mycity.mycity.api.model.ResponseWall;
-import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.adapters.FeedPhotoReportAdapter;
-import app.mycity.mycity.views.adapters.FeedRecyclerAdapter;
-import app.mycity.mycity.views.adapters.NewFeedRecyclerAdapter;
 import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -45,7 +31,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class FeedPhotoReportFragment extends android.support.v4.app.Fragment {
+public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment {
 
 
     @BindView(R.id.feedFragmentRecyclerView)
@@ -53,7 +39,7 @@ public class FeedPhotoReportFragment extends android.support.v4.app.Fragment {
 
     FeedPhotoReportAdapter adapter;
 
-    List<Albume> albumsList;
+    List<Album> albumsList;
 
     boolean isLoading;
 
@@ -73,8 +59,8 @@ public class FeedPhotoReportFragment extends android.support.v4.app.Fragment {
         return view;
     }
 
-    public static FeedPhotoReportFragment createInstance(String name) {
-        FeedPhotoReportFragment fragment = new FeedPhotoReportFragment();
+    public static FeedPhotoAlbumFragment createInstance(String name) {
+        FeedPhotoAlbumFragment fragment = new FeedPhotoAlbumFragment();
         Log.i("TAG24", "Create albums fr " + name);
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
@@ -128,7 +114,7 @@ public class FeedPhotoReportFragment extends android.support.v4.app.Fragment {
         Log.d("TAG24", "storage - " + String.valueOf(storage == null) + totalCount);
 
 
-       albumsList = (List<Albume>) storage.getDate(getArguments().get("name")+ "_albumsList");
+       albumsList = (List<Album>) storage.getDate(getArguments().get("name")+ "_albumsList");
 
         if(albumsList==null){
             albumsList = new ArrayList<>();

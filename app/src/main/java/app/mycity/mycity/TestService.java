@@ -14,21 +14,30 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
+import android.view.View;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import app.mycity.mycity.api.model.Message;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.activities.ChatActivity;
+import app.mycity.mycity.views.fragments.DialogsFragment;
+import app.mycity.mycity.views.fragments.subscribers.SubscribersFragment;
+import butterknife.OnClick;
 import io.realm.Realm;
 
 public class TestService extends Service {
@@ -38,6 +47,8 @@ public class TestService extends Service {
     Realm mRealm;
 
     private int second;
+
+    TimerTask timerTask;
 
     public TestService() {
         Log.i("Test", "Service: constructor");
@@ -63,7 +74,7 @@ public class TestService extends Service {
     @Override
     public void onCreate() {
         Log.i("Test", "Service: onCreate");
-
+        EventBus.getDefault().register(this);
       //  initRealm();
         mRealm = Realm.getDefaultInstance();
         initSocket();
@@ -77,13 +88,28 @@ public class TestService extends Service {
 
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void startSubscribers(EventBusMessages.UpdateSocketConnection event) {
+        Log.i("TAG25", "socket hand reconnect");
+        timerTask.cancel();
+        mSocket.off("history");
+        mSocket.disconnect();
+        mSocket.close();
+        initSocket();
+    }
+
+
     private void initSocket() {
+
+        Log.i("TAG25", "init socket");
+
+
         {
             try {
                 if(SharedManager.getProperty("socketServer")!=null)
                     mSocket = IO.socket("http://" + SharedManager.getProperty("socketServer"));
                 else
-                    Log.i("TAG21", "server null");
+                    Log.i("TAG25", "server null");
 
                 //   mSocket = IO.socket("http://192.168.0.104:8000");
             } catch (URISyntaxException e) {}
@@ -118,13 +144,41 @@ public class TestService extends Service {
             @Override
             public void call(Object... args) {
                 String history = "" + args[0];
-                Log.d("TAG21", "History - " + args[0]);
+                Log.d("TAG25", "History - " + args[0]);
                 chatResponse2(history);
                 //    EventBus.getDefault().post(new EventBusMessages.Message(history));
             }
         };
 
         mSocket.on("history", listener);
+
+        final boolean[] wasLost = new boolean[1];
+
+
+        timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                Log.i("TAG25", this + " socket connected - " + mSocket.connected());
+
+                if(!mSocket.connected()){
+                    Log.i("TAG25", "socket lost connection");
+                    wasLost[0] = true;
+                } else {
+                    if(wasLost[0]){
+                        Log.i("TAG25", "socket get connection after lost");
+                        wasLost[0] = false;
+                        mSocket.off("history");
+                        mSocket.disconnect();
+                        mSocket.close();
+                        this.cancel();
+                        initSocket();
+                    }
+                }
+            }
+        };
+
+        // check if socket lost connection and get it again. then init again, can be problem with
+        new Timer().schedule(timerTask, 5000, 10000);
     }
 
     void chatResponse2(String responseString){
@@ -158,13 +212,17 @@ public class TestService extends Service {
                     case 2: info = "was read      ";break;
                     case 5: info = "dialog update "; break;
                     case 6: info = "read dialog   "; break;
-                    case 7: info = "какаято хуйня   "; break;
+                    case 7: info = "общее кол-во непрочит. "; break;
                 }
-                Log.i("TAG21", info + array.length() + ": " + array.toString());
+
+                Log.i("TAG25", info + array.length() + ": " + array.toString());
                 int type = array.getInt(0);
-                final int messageId = array.getInt(4);
                 final long userId = array.getLong(2);
                 final long time = array.getLong(1);
+                int messageId = -1;
+                if(array.length()>3){
+                    messageId = array.getInt(4);
+                }
 
                 Message message;
 
@@ -177,7 +235,7 @@ public class TestService extends Service {
 
                         break;
                     case 2:
-                        Log.i("TAG21", "was read");
+                        Log.i("TAG25", "execute was read");
                         message = mRealm
                                 .where(Message.class).equalTo("id", messageId).findFirst();
                         mRealm.beginTransaction();
@@ -188,13 +246,14 @@ public class TestService extends Service {
                         EventBus.getDefault().post(new EventBusMessages.UpdateChat());
                         break;
                     case 5:
-                        Log.i("TAG21", "Add message to Realm");
+                        Log.i("TAG25", "execute dialog update");
+                        Log.i("TAG25", "Add message to Realm");
                         //new message
                         final String text = array.getString(5);
                         final int out = array.getInt(6);
 
                         if(mRealm.isClosed()){
-                            Log.i("TAG21", "Realm closed. Call another");
+                            Log.i("TAG25", "Realm closed. Call another");
                             mRealm = Realm.getDefaultInstance();
                         }
                         message = mRealm
@@ -222,7 +281,7 @@ public class TestService extends Service {
                                 generateNotification(text, String.valueOf(userId));
                             }
                         } else {
-                            Log.i("TAG21", "isForeground");
+                            Log.i("TAG25", "isForeground update chat");
                             EventBus.getDefault().post(new EventBusMessages.UpdateChat());
                         }
                         EventBus.getDefault().post(new EventBusMessages.UpdateDialog(userId, text));
@@ -235,6 +294,7 @@ public class TestService extends Service {
         } catch (JSONException e) {
             e.printStackTrace();
             Log.i("TAG21", "JSON GET RESPONSE ERROR");
+            Log.i("TAG25", "JSON GET RESPONSE ERROR");
             //     newRequest();
         }
 
@@ -376,6 +436,9 @@ public class TestService extends Service {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onDestroy() {
+
+        EventBus.getDefault().unregister(this);
+
         Intent intent = new Intent(this, getClass());
         intent.putExtra("data", "restart");
         PendingIntent pintent = PendingIntent.getService(this, 0, intent, 0);

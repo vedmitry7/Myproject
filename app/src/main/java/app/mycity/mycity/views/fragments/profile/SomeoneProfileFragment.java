@@ -193,7 +193,7 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
 
         getInfo();
-       // getFriendsCount();
+        // getFriendsCount();
         getSubscriberCount();
         getCheckins();
 
@@ -223,6 +223,7 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
             textView.setText("Скрыть");
         }
     }
+
 
     @OnClick(R.id.profileFragListRecyclerLayout)
     public void listView(View v) {
@@ -417,30 +418,30 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
         if(!mayRestore){
             Log.i("TAG21", "Cant restore checkins");
-        ApiFactory.getApi().getWallById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId).enqueue(new Callback<ResponseContainer<ResponseWall>>() {
-            @Override
-            public void onResponse(Call<ResponseContainer<ResponseWall>> call, Response<ResponseContainer<ResponseWall>> response) {
-                Log.d("TAG21", "resp = " + response.body().getResponse().getCount());
+            ApiFactory.getApi().getWallById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId).enqueue(new Callback<ResponseContainer<ResponseWall>>() {
+                @Override
+                public void onResponse(Call<ResponseContainer<ResponseWall>> call, Response<ResponseContainer<ResponseWall>> response) {
+                    Log.d("TAG21", "resp = " + response.body().getResponse().getCount());
 
-                postList.addAll(response.body().getResponse().getItems());
+                    postList.addAll(response.body().getResponse().getItems());
 
-                checkinCount.setText(String.valueOf(response.body().getResponse().getCount()));
+                    checkinCount.setText(String.valueOf(response.body().getResponse().getCount()));
 
            /*     for (Post p:response.body().getResponse().getItems()
                      ) {
                     photoList.add(p.getAttachments().get(0));
                     likeList.add(p.getLikes());
                 }*/
-                adapter.notifyDataSetChanged();
-                checkinLoad = true;
-                showContent();
-            }
+                    adapter.notifyDataSetChanged();
+                    checkinLoad = true;
+                    showContent();
+                }
 
-            @Override
-            public void onFailure(Call<ResponseContainer<ResponseWall>> call, Throwable t) {
-                Log.d("TAG21", "fail get wall");
-            }
-        });
+                @Override
+                public void onFailure(Call<ResponseContainer<ResponseWall>> call, Throwable t) {
+                    Log.d("TAG21", "fail get wall");
+                }
+            });
         } else {
             Log.i("TAG21", "Restore checkins ) ");
             adapter.notifyDataSetChanged();
@@ -473,23 +474,30 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
     @OnClick(R.id.someoneFragChat)
     public void settings(View v) {
         Log.d("TAG", "Chat ");
-       // activity.startSettings(0);
+        // activity.startSettings(0);
     }
 
 
     @OnClick(R.id.profileFragSubscribersButton)
     public void subscribers(View v){
-        Log.d("TAG21", "Start SUBSCRIBERS");
-     //   activity.startSubscribers();
+        Log.d("TAG24", "Start SUBSCRIBERS");
+        //   activity.startSubscribers();
         EventBus.getDefault().post(new EventBusMessages.OpenSubscribers(userId));
 
     }
 
     @OnClick(R.id.profileFragSubscriptionsButton)
     public void subscriptions(View v){
-        Log.d("TAG21", "Start SUBSCRIPTIONS");
+        Log.d("TAG24", "Start SUBSCRIPTIONS");
         EventBus.getDefault().post(new EventBusMessages.OpenSubscriptions(getArguments().getString("userId")));
     }
+
+    @OnClick(R.id.profilePlaces)
+    public void places(View v) {
+        Log.i("TAG24", "click place!");
+        EventBus.getDefault().post(new EventBusMessages.OpenUserPlace(userId));
+    }
+
 
     @Override
     public void onResume() {

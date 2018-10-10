@@ -12,7 +12,7 @@ public class ResponseAlbums {
     private Integer count;
     @SerializedName("items")
     @Expose
-    private List<Albume> items = null;
+    private List<Album> items = null;
 
     public Integer getCount() {
         return count;
@@ -22,11 +22,11 @@ public class ResponseAlbums {
         this.count = count;
     }
 
-    public List<Albume> getItems() {
+    public List<Album> getItems() {
         return items;
     }
 
-    public void setItems(List<Albume> items) {
+    public void setItems(List<Album> items) {
         this.items = items;
     }
 }

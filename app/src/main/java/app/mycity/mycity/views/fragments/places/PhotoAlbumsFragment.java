@@ -24,10 +24,9 @@ import java.util.Map;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
-import app.mycity.mycity.api.model.Albume;
+import app.mycity.mycity.api.model.Album;
 import app.mycity.mycity.api.model.Photo;
 import app.mycity.mycity.api.model.PhotoContainer;
-import app.mycity.mycity.api.model.Post;
 import app.mycity.mycity.api.model.ResponseAlbums;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.util.EventBusMessages;
@@ -52,7 +51,7 @@ public class PhotoAlbumsFragment extends android.support.v4.app.Fragment {
     ConstraintLayout progress;
 
 
-    List<Albume> albumsList;
+    List<Album> albumsList;
 
     Map albums =  new HashMap<Long, List<Photo>>();
     //Map albums =  new HashMap<Long, List<Photo>>();
@@ -114,7 +113,7 @@ public class PhotoAlbumsFragment extends android.support.v4.app.Fragment {
                                 albumsList = response.body().getResponse().getItems();
                                 Log.d("TAG21", "Albums size - " + albumsList.size());
 
-                                for (final Albume a:albumsList
+                                for (final Album a:albumsList
                                         ) {
                                 }
                                 adapter.update(albumsList, albums);
@@ -136,7 +135,7 @@ public class PhotoAlbumsFragment extends android.support.v4.app.Fragment {
             Log.d("TAG21", "Album loading.... position - " + event.getAdapterPosition());
             ApiFactory.getApi().getAlbum(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),
                     "1",
-                    String.valueOf(event.getAlbumId())).enqueue(new Callback<ResponseContainer<PhotoContainer>>() {
+                    String.valueOf(event.getAlbumId()), "0").enqueue(new Callback<ResponseContainer<PhotoContainer>>() {
                 @Override
                 public void onResponse(Call<ResponseContainer<PhotoContainer>> call, Response<ResponseContainer<PhotoContainer>> response) {
                     if(response.body().getResponse()!=null){
@@ -169,7 +168,7 @@ public class PhotoAlbumsFragment extends android.support.v4.app.Fragment {
         Log.d("TAG21", "storage - " + String.valueOf(storage == null));
 
 
-        albumsList = (List<Albume>) storage.getDate(getArguments().get("name")+ "_albumsList");
+        albumsList = (List<Album>) storage.getDate(getArguments().get("name")+ "_albumsList");
         albums = (Map) storage.getDate(getArguments().get("name")+ "_mapAlbums");
 
         if(albumsList==null){

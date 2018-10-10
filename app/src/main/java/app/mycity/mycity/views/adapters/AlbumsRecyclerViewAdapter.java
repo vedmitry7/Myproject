@@ -20,7 +20,7 @@ import java.util.Map;
 
 import app.mycity.mycity.App;
 import app.mycity.mycity.R;
-import app.mycity.mycity.api.model.Albume;
+import app.mycity.mycity.api.model.Album;
 import app.mycity.mycity.api.model.Photo;
 import app.mycity.mycity.filter_desc_post.ExpandableLayout;
 import app.mycity.mycity.util.EventBusMessages;
@@ -31,13 +31,13 @@ import butterknife.ButterKnife;
 
 public class AlbumsRecyclerViewAdapter extends RecyclerView.Adapter<AlbumsRecyclerViewAdapter.ViewHolder> {
 
-    private List<Albume>albumes;
+    private List<Album>albumes;
     Map map;
     Context context;
     boolean expend;
 
     // data is passed into the constructor
-    public AlbumsRecyclerViewAdapter(List<Albume> data, Map albums) {
+    public AlbumsRecyclerViewAdapter(List<Album> data, Map albums) {
         this.albumes = data;
         map = albums;
     }
@@ -148,7 +148,7 @@ public class AlbumsRecyclerViewAdapter extends RecyclerView.Adapter<AlbumsRecycl
     }
 
     boolean notFirst;
-    public void updatePosition(List<Albume> albumsList, Map albums, int adapterPosition) {
+    public void updatePosition(List<Album> albumsList, Map albums, int adapterPosition) {
         this.albumes = albumsList;
         this.map = albums;
         //notifyDataSetChanged();
@@ -158,7 +158,7 @@ public class AlbumsRecyclerViewAdapter extends RecyclerView.Adapter<AlbumsRecycl
         notifyItemChanged(adapterPosition);
     }
 
-    public void update(List<Albume> albumes, Map map){
+    public void update(List<Album> albumes, Map map){
         this.albumes = albumes;
         this.map = map;
         notifyDataSetChanged();

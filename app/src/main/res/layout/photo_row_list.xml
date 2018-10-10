@@ -31,25 +31,22 @@
 
     <TextView
         android:id="@+id/placeLabel"
-        android:textColor="@android:color/black"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginStart="4dp"
         android:text="НК Сахарок"
+        android:textColor="@android:color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageView5"
         app:layout_constraintTop_toBottomOf="@+id/photoRowImageView"
-        app:layout_constraintVertical_bias="0.0"
         tools:ignore="MissingConstraints" />
 
     <ImageView
         android:id="@+id/likeIcon"
         android:layout_width="48dp"
-        android:layout_height="0dp"
-        android:padding="5dp"
+        android:layout_height="48dp"
+        android:padding="10dp"
         android:src="@drawable/ic_heart_outline_grey600_18dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/likesCount"
@@ -57,19 +54,42 @@
         tools:ignore="MissingConstraints" />
 
     <TextView
-        android:textColor="@android:color/black"
         android:id="@+id/likesCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
-        android:layout_marginTop="8dp"
         android:text="45"
+        android:textColor="@android:color/black"
         android:textSize="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/photoRowImageView"
         tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:id="@+id/commentButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="@dimen/padding_10"
+        android:src="@drawable/ic_comments"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/commentsCount"
+        app:layout_constraintTop_toBottomOf="@+id/photoRowImageView"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/commentsCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="45"
+        android:textColor="@android:color/black"
+        android:textSize="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/likeIcon"
+        app:layout_constraintTop_toBottomOf="@+id/photoRowImageView"
+        app:layout_constraintVertical_bias="0.576"
+        tools:ignore="MissingConstraints" />
+
 
 </android.support.constraint.ConstraintLayout>

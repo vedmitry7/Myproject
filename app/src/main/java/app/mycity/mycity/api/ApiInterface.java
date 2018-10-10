@@ -243,7 +243,8 @@ public interface ApiInterface {
     @POST("photos.getAll")
     Call<ResponseContainer<PhotoContainer>> getAlbum(@Field("access_token") String accessToken,
                                                      @Field("group_id") String groupId,
-                                                     @Field("album_id") String albumId);
+                                                     @Field("album_id") String albumId,
+                                                     @Field("extended") String extended);
 
 
     @Multipart
@@ -303,7 +304,8 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("events.getAll")
     Call<ResponseContainer<ResponseWall>> getAllEvents(@Field("access_token") String token,
-                                                       @Field("extended") String type);
+                                                       @Field("extended") String type,
+                                                       @Field("offset") int offset);
 
     @FormUrlEncoded
     @POST("events.addVisit")
@@ -370,6 +372,14 @@ public interface ApiInterface {
     Call<ResponseContainer<ResponsePlaces>> getPlaces(@Field("access_token") String token,
                                                       @Field("offset") int offset,
                                                       @Field("city_id ") int cityId);
+
+    @FormUrlEncoded
+    @POST("groups.get")
+    Call<ResponseContainer<ResponsePlaces>> getPlacesByUserId(@Field("access_token") String token,
+                                                      @Field("offset") int offset,
+                                                      @Field("city_id ") int cityId,
+                                                      @Field("user_id") String user_id);
+
 
     @FormUrlEncoded
     @POST("groups.getbyId")
