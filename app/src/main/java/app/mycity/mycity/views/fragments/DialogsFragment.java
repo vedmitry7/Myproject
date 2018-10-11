@@ -72,7 +72,7 @@ public class DialogsFragment extends Fragment implements TabStacker.TabStackInte
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Log.i("TAG21","onViewCreated " + getArguments().getInt("tabPos"));
+        Log.i("TAG21","onViewCreated Dialogs" + getArguments().getInt("tabPos"));
 
         Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
         Util.setOnTabClick(view);
@@ -139,6 +139,7 @@ public class DialogsFragment extends Fragment implements TabStacker.TabStackInte
     public void onAttach(Context context) {
         super.onAttach(context);
         activity = (MainAct) context;
+        Log.i("TAG21", "attach DIALOGS " );
     }
 
 

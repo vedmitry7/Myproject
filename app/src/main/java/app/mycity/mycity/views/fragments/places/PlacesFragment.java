@@ -70,6 +70,8 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
 
     PlacesRecyclerAdapter adapter;
 
+    PlacesTopBarAdapter placesTopBarAdapter;
+
     List<Place> placeList;
 
     boolean isLoading;
@@ -146,8 +148,13 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
                 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         horizontalRecyclerView.setLayoutManager(horizontalLayoutManager);
         horizontalRecyclerView.setHasFixedSize(true);
-        PlacesTopBarAdapter adapter = new PlacesTopBarAdapter(data);
-        horizontalRecyclerView.setAdapter(adapter);
+        placesTopBarAdapter = new PlacesTopBarAdapter(data);
+        horizontalRecyclerView.setAdapter(placesTopBarAdapter);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void gfdsgsd(EventBusMessages.SortPlaces event){
+
     }
 
     private void loadPlaces(int offset) {
@@ -174,8 +181,15 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
     public void onAttach(Context context) {
         super.onAttach(context);
         storage = (Storage) context;
+        EventBus.getDefault().register(this);
+
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
 
     @Override
     public void onResume() {

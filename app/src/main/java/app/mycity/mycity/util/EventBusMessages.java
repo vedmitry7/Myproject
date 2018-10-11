@@ -372,4 +372,9 @@ public class EventBusMessages {
 
     public static class UpdateSocketConnection {
     }
+
+    public static class SortPlaces {
+        public SortPlaces(int adapterPosition) {
+        }
+    }
 }

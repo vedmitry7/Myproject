@@ -90,9 +90,6 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
     @BindView(R.id.someOneProfileFragRecyclerView)
     RecyclerView recyclerView;
 
-    @BindView(R.id.expandable_layout)
-    ExpandableLayout expandableLayout;
-
     @BindView(R.id.profilePlaceHolder)
     ConstraintLayout placeHolder;
 
@@ -207,21 +204,6 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
         Log.i("TAG21", "My profile - stack count - " + getActivity().getFragmentManager().getBackStackEntryCount());
         Log.i("TAG3", "Profile created");
-    }
-
-
-    @OnClick(R.id.expandable_layout)
-    public void onClick(View v) {
-        Log.i("TAG", "toggle ...");
-        expandableLayout.toggleExpansion();
-
-        TextView textView = v.findViewById(R.id.labelPersonalInfo);
-
-        if (expandableLayout.isExpanded()) {
-            textView.setText("Личная информация");
-        } else {
-            textView.setText("Скрыть");
-        }
     }
 
 

@@ -228,7 +228,7 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
                     fragment = new PlacesFragment();
                     break;
                 case TAB_PROFILE:
-                    fragment = ProfileFragment.createInstance(tabName + "_" + mTabStacker.getCurrentTabSize(), 2);
+                    fragment = ProfileFragment.createInstance(tabName + "_" + mTabStacker.getCurrentTabSize(),mTabStacker.getCurrentTabSize(), 2);
                     break;
                 case TAB_SEARCH:
                     fragment = AllEvents.createInstance(tabName + "_" + mTabStacker.getCurrentTabSize(), 3);
@@ -488,6 +488,7 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
         if(event.getMessage().equals(SharedManager.getProperty(Constants.KEY_MY_ID))){
             profileFragment = ProfileFragment.createInstance(
                     getFragmentName(),
+                    mTabStacker.getCurrentTabSize(),
                     getCurrentTabPosition());
             Log.d("TAG21", "Start my profile");
         } else {

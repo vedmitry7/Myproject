@@ -14,8 +14,6 @@ import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import app.mycity.mycity.R;
@@ -79,12 +77,12 @@ public class DialogsRecyclerAdapter extends RecyclerView.Adapter<DialogsRecycler
 
 
         if(SharedManager.getProperty("unread_" + dialogList.get(position).getId())!=null && !SharedManager.getProperty("unread_" + dialogList.get(position).getId()).equals("0")){
-            holder.unreadCound.setVisibility(View.VISIBLE);
-            holder.unreadCound.setText(SharedManager.getProperty("unread_" + dialogList.get(position).getId()));
+            holder.unreadCount.setVisibility(View.VISIBLE);
+            holder.unreadCount.setText(SharedManager.getProperty("unread_" + dialogList.get(position).getId()));
             Log.d("TAG21", name + " COUNT " + SharedManager.getProperty("unread_" + dialogList.get(position).getId()));
         }
         else {
-            holder.unreadCound.setVisibility(View.GONE);
+            holder.unreadCount.setVisibility(View.GONE);
         }
 
         Picasso.get().load(dialogList.get(position).getPhoto130()).into(holder.image);
@@ -101,7 +99,7 @@ public class DialogsRecyclerAdapter extends RecyclerView.Adapter<DialogsRecycler
         TextView name;
 
         @BindView(R.id.unreadCount)
-        TextView unreadCound;
+        TextView unreadCount;
 
         @BindView(R.id.dialogsRowImage)
         CircleImageView image;
@@ -118,6 +116,9 @@ public class DialogsRecyclerAdapter extends RecyclerView.Adapter<DialogsRecycler
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    SharedManager.addProperty("unread_" + dialogList.get(getAdapterPosition()).getId(), "0");
+                    notifyItemChanged(getAdapterPosition());
+
                     Intent intent = new Intent(context, ChatActivity.class);
                     intent.putExtra("user_id", dialogList.get(getAdapterPosition()).getId());
                     intent.putExtra("image", dialogList.get(getAdapterPosition()).getPhoto130());

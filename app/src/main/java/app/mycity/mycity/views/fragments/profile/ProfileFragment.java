@@ -83,6 +83,9 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
     @BindView(R.id.profileFragProgressBarContainer)
     ConstraintLayout progressBar;
 
+    @BindView(R.id.profileFragConstraintLayoutToolbarContainer)
+    ConstraintLayout toolBar;
+
     @BindView(R.id.profileFragToolbarTitle)
     TextView title;
 
@@ -103,8 +106,8 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
     @BindView(R.id.someOneProfileFragRecyclerView)
     RecyclerView recyclerView;
 
-    @BindView(R.id.expandable_layout)
-    ExpandableLayout expandableLayout;
+
+
 
     @BindView(R.id.profilePlaceHolder)
     ConstraintLayout placeHolder;
@@ -147,12 +150,13 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
         //setRetainInstance(true);
     }
 
-    public static ProfileFragment createInstance(String name, int tabPos) {
+    public static ProfileFragment createInstance(String name, int stackPos, int tabPos) {
         ProfileFragment fragment = new ProfileFragment();
-        Log.i("TAG21", "Create Profile " + name);
+        Log.i("TAG21", "Create Profile " + name + tabPos);
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
         bundle.putInt("tabPos", tabPos);
+        bundle.putInt("stackPos", stackPos);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -179,6 +183,10 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
 
         Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
         Util.setOnTabClick(view);
+
+        if(getArguments().getInt("stackPos")==0){
+            toolBar.setVisibility(View.GONE);
+        }
 
         //      imageView.setShadow(App.dpToPx(getActivity(),10));
 
@@ -215,22 +223,6 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
 
         Log.i("TAG21","My profile - stack count - " + getActivity().getFragmentManager().getBackStackEntryCount());
         Log.i("TAG3","Profile created");
-    }
-
-
-
-    @OnClick(R.id.expandable_layout)
-    public void onClick(View v){
-        Log.i("TAG","toggle ...");
-        expandableLayout.toggleExpansion();
-
-        TextView textView = v.findViewById(R.id.labelPersonalInfo);
-
-        if(expandableLayout.isExpanded()){
-            textView.setText("Личная информация");
-        } else {
-            textView.setText("Скрыть");
-        }
     }
 
     @OnClick(R.id.profileFragListRecyclerLayout)
