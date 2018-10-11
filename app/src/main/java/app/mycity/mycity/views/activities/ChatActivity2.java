@@ -2,7 +2,6 @@ package app.mycity.mycity.views.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,52 +12,33 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.IO;
-import com.github.nkzawa.socketio.client.Socket;
 import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Calendar;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
-import app.mycity.mycity.api.model.ResponseMarkAsRead;
-import app.mycity.mycity.util.EventBusMessages;
-import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.OkHttpClientFactory;
 import app.mycity.mycity.api.model.Message;
 import app.mycity.mycity.api.model.ResponseContainer;
+import app.mycity.mycity.api.model.ResponseMarkAsRead;
 import app.mycity.mycity.api.model.SendMessageResponse;
+import app.mycity.mycity.util.EventBusMessages;
+import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.adapters.ChatRecyclerAdapter;
-import app.mycity.mycity.views.fragments.profile.SomeoneProfileFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.realm.Realm;
-import io.realm.RealmList;
 import io.realm.RealmResults;
-import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.FormBody;
 import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
-public class ChatActivity extends AppCompatActivity {
+public class ChatActivity2 extends AppCompatActivity {
 
     @BindView(R.id.chatRecyclerView)
     RecyclerView recyclerView;
@@ -121,21 +101,16 @@ public class ChatActivity extends AppCompatActivity {
             nameText.setText(name);
 
         Picasso.get().load(imageUrl).into(imageView);
-
-        mRealm.beginTransaction();
-        results = mRealm.where(Message.class).equalTo("user", userId)
-                .findAll();
-        Log.d("TAG25", "Update chat List. Size - " + results.size());
-        mRealm.commitTransaction();
-
+        //possible error
+        updateList();
 
         Log.d("TAG21", "Size - " + results.size());
 
         adapter = new ChatRecyclerAdapter(results);
 
-     //   mLinearLayoutManager.setStackFromEnd(true);
-
+        mLinearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(mLinearLayoutManager);
+        recyclerView.scrollToPosition(results.size()-1);
         recyclerView.setAdapter(adapter);
         RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
             @Override
@@ -153,12 +128,12 @@ public class ChatActivity extends AppCompatActivity {
                 }
 
                 if(lastVisibleItems==totalItemCount-1){
-                    Log.d("TAG25", "scroll is down");
+                    Log.d("chat22", "scroll is down");
                     if(results.get(lastVisibleItems).getOut()==0 && !results.get(lastVisibleItems).isWasRead()){
                         if(newMessageIndicator.getVisibility() == View.VISIBLE){
                             newMessageIndicator.setVisibility(View.GONE);
                         }
-                       markAsRead();
+                        markAsRead();
                     }
                 }
             }
@@ -174,8 +149,8 @@ public class ChatActivity extends AppCompatActivity {
                 newMessageIndicator.setVisibility(View.GONE);
             }
         });
-        adapter.notifyDataSetChanged();
-        recyclerView.scrollToPosition(results.size()-1);
+
+
 
     }
 
@@ -203,41 +178,27 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     void updateList(){
-        Log.d("TAG25", "||||||||| notifyDataSetChanged" );
-        Log.d("TAG25", "list - " + results.size());
-
-        //not necessary action! it update on fly
         mRealm.beginTransaction();
         results = mRealm.where(Message.class).equalTo("user", userId)
                 .findAll();
         Log.d("TAG25", "Update chat List. Size - " + results.size());
         mRealm.commitTransaction();
 
-      //  adapter.notifyDataSetChanged();
-      //  recyclerView.scrollToPosition(results.size()-1);
-
         int totalItemCount = mLinearLayoutManager.getItemCount();
         int lastVisibleItems = mLinearLayoutManager.findLastVisibleItemPosition();
 
-        Log.d("TAG25", "total - " + totalItemCount);
-        Log.d("TAG25", "last pos+1- " + lastVisibleItems);
-        Log.d("TAG25", "list - " + results.size());
-
         if(adapter!=null){
             adapter.notifyDataSetChanged();
-
-            if(totalItemCount-lastVisibleItems<=2){
+            if(totalItemCount-lastVisibleItems==2){
                 recyclerView.scrollToPosition(results.size()-1);
                 Toast.makeText(this, "Scroll down", Toast.LENGTH_SHORT).show();
             } else {
-                //scroll if message is not our
+                //if message not our
                 if(results.get(results.size()-1).getOut()!=1){
-                  //  recyclerView.scrollToPosition(lastVisibleItems);
+                    recyclerView.scrollToPosition(lastVisibleItems);
                     newMessageIndicator.setVisibility(View.VISIBLE);
                 }
-
             }
-
         }
 
         // markAsRead();
@@ -300,6 +261,7 @@ public class ChatActivity extends AppCompatActivity {
             id = "1000000";
             SharedManager.addProperty("virtualId", id);
         }
+
         long longId = Long.parseLong(id);
 
         final long curId = longId;
@@ -352,14 +314,7 @@ public class ChatActivity extends AppCompatActivity {
     @OnClick(R.id.updateChat)
     public void updateChat(View v){
         Log.d("TAG21", "update chat...");
-
-        recyclerView.scrollToPosition(results.size()-1);
-
-      //  adapter.notifyDataSetChanged();
-
-        //   EventBus.getDefault().post(new EventBusMessages.UpdateSocketConnection());
-
-
+        EventBus.getDefault().post(new EventBusMessages.UpdateSocketConnection());
        // markAsRead();
       //  getChats();
     }

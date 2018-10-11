@@ -63,10 +63,15 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
 
         holder.message.setText(messages.get(position).getText());
         if(holder.indicator!=null && messages.get(position).getOut()==1){
-            if (messages.get(position).isWasRead()){
-                holder.indicator.setColorFilter(context.getResources().getColor(R.color.colorAccent));
+            if(!messages.get(position).isWasSended()){
+                holder.indicator.setImageResource(R.drawable.ic_was_sended);
             } else {
-                holder.indicator.setColorFilter(context.getResources().getColor(R.color.main_grey_color));
+                holder.indicator.setImageResource(R.drawable.ic_check_all_grey600_18dp);
+                if (messages.get(position).isWasRead()){
+                    holder.indicator.setColorFilter(context.getResources().getColor(R.color.colorAccent));
+                } else {
+                    holder.indicator.setColorFilter(context.getResources().getColor(R.color.main_grey_color));
+                }
             }
         }
 

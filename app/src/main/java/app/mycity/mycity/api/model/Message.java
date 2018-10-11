@@ -12,7 +12,16 @@ public class Message extends RealmObject {
     int out;
     long user;
     boolean wasRead;
+    boolean wasSended;
     boolean qw;
+
+    public boolean isWasSended() {
+        return wasSended;
+    }
+
+    public void setWasSended(boolean wasSended) {
+        this.wasSended = wasSended;
+    }
 
     public boolean isQw() {
         return qw;

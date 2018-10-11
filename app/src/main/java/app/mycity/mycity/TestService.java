@@ -39,6 +39,8 @@ import app.mycity.mycity.views.fragments.DialogsFragment;
 import app.mycity.mycity.views.fragments.subscribers.SubscribersFragment;
 import butterknife.OnClick;
 import io.realm.Realm;
+import io.realm.RealmList;
+import io.realm.RealmResults;
 
 public class TestService extends Service {
 
@@ -267,9 +269,12 @@ public class TestService extends Service {
                             message.setTime(time);
                             message.setText(text);
                             message.setOut(out);
+                            message.setWasSended(true);
                             message.setWasRead(false);
                         } else {
                             message.setTime(time);
+                            message.setText("cr from s - " + text);
+                            message.setWasSended(true);
                         }
                         mRealm.commitTransaction();
                         unreadCount(String.valueOf(userId));
