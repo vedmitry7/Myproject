@@ -30,19 +30,15 @@ import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.Comment;
 import app.mycity.mycity.api.model.Likes;
-import app.mycity.mycity.api.model.Post;
 import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.api.model.ResponseAddComment;
 import app.mycity.mycity.api.model.ResponseComments;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponseDeleteComment;
 import app.mycity.mycity.api.model.ResponseLike;
-import app.mycity.mycity.api.model.ResponseWall;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.adapters.CommentsRecyclerAdapter;
-import app.mycity.mycity.views.adapters.FeedRecyclerAdapter;
-import app.mycity.mycity.views.fragments.subscribers.SubscriptionFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -97,7 +93,7 @@ public class CommentsFragment extends android.support.v4.app.Fragment implements
     }
 
 
-    public static CommentsFragment createInstance(String fragmentId, int tabPos, String postId, String ownerId) {
+    public static CommentsFragment createInstance(String fragmentId, int tabPos, String postId, String ownerId, String type) {
         CommentsFragment fragment = new  CommentsFragment();
         Log.i("TAG21", "Create Comment Fragment " + fragmentId);
         Bundle bundle = new Bundle();
@@ -105,10 +101,15 @@ public class CommentsFragment extends android.support.v4.app.Fragment implements
         bundle.putInt("tabPos", tabPos);
         bundle.putString("postId", postId);
         bundle.putString("ownerId", ownerId);
+        bundle.putString("type", type);
         fragment.setArguments(bundle);
         return fragment;
     }
 
+    @OnClick(R.id.profileFragBackButtonContainer)
+    public void backButton(View v){
+        getActivity().onBackPressed();
+    }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -160,15 +161,7 @@ public class CommentsFragment extends android.support.v4.app.Fragment implements
 
     private void loadComments(final int offset) {
 
-        ApiFactory.getApi().getComment(
-                SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),
-                "1",
-                postId,
-                ownerId,
-                offset,
-                "1",
-                20,
-                "photo_130").enqueue(new Callback<ResponseContainer<ResponseComments>>() {
+        Callback callback = new Callback<ResponseContainer<ResponseComments>>() {
             @Override
             public void onResponse(Call<ResponseContainer<ResponseComments>> call, Response<ResponseContainer<ResponseComments>> response) {
                 Log.d("TAG21", "COMMENTS RESPONSE ");
@@ -205,7 +198,38 @@ public class CommentsFragment extends android.support.v4.app.Fragment implements
             public void onFailure(Call<ResponseContainer<ResponseComments>> call, Throwable t) {
 
             }
-        });
+        };
+
+        switch (getArguments().getString("type")){
+
+            case "post":
+
+                ApiFactory.getApi().getCommentsPost(
+                        SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),
+                        "1",
+                        postId,
+                        ownerId,
+                        offset,
+                        "1",
+                        20,
+                        "photo_130").enqueue(callback);
+                break;
+
+            case "photo":
+
+                ApiFactory.getApi().getCommentsPost(
+                        SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),
+                        "1",
+                        postId,
+                        ownerId,
+                        offset,
+                        "1",
+                        20,
+                        "photo_130").enqueue(callback);
+                break;
+        }
+
+
     }
 
     @OnClick(R.id.addComment)
@@ -213,7 +237,8 @@ public class CommentsFragment extends android.support.v4.app.Fragment implements
         progressBar.setVisibility(View.VISIBLE);
         commentText = editText.getText().toString();
         editText.setText("");
-        ApiFactory.getApi().addComment(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), postId, ownerId, commentText).enqueue(new Callback<ResponseContainer<ResponseAddComment>>() {
+
+        Callback callback = new Callback<ResponseContainer<ResponseAddComment>>() {
             @Override
             public void onResponse(Call<ResponseContainer<ResponseAddComment>> call, Response<ResponseContainer<ResponseAddComment>> response) {
                 Log.d("TAG21", "add comrent response " );
@@ -245,7 +270,23 @@ public class CommentsFragment extends android.support.v4.app.Fragment implements
             public void onFailure(Call<ResponseContainer<ResponseAddComment>> call, Throwable t) {
                 Log.d("TAG21", "add comrent fail " );
             }
-        });
+        };
+
+        switch (getArguments().getString("type")){
+
+            case "post":
+                Log.d("TAG21", "post photoId - " + postId + " owner id - " + ownerId );
+
+                ApiFactory.getApi().addComment(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), postId, ownerId, commentText).enqueue(callback);
+                break;
+
+            case "photo":
+                Log.d("TAG21", "photo photoId - " + postId + " owner id - " + ownerId );
+
+                ApiFactory.getApi().addCommentPhoto(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), postId, ownerId, commentText).enqueue(callback);
+
+                break;
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -308,23 +349,34 @@ public class CommentsFragment extends android.support.v4.app.Fragment implements
     @Override
     public void deleteComment(final int position) {
         Log.d("TAG21", "delete comments in act");
-        ApiFactory.getApi().deleteComment(
-                SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),
-                commentList.get(position).getId(),
-                ownerId).enqueue(new Callback<ResponseContainer<ResponseDeleteComment>>() {
+        Callback callback = new Callback<ResponseContainer<ResponseDeleteComment>>() {
             @Override
             public void onResponse(Call<ResponseContainer<ResponseDeleteComment>> call, Response<ResponseContainer<ResponseDeleteComment>> response) {
-
                 if(response!=null&&response.body().getResponse() != null && response.body().getResponse().getSuccess())
                     commentList.remove(position);
                 adapter.notifyItemRemoved(position);
             }
-
             @Override
             public void onFailure(Call<ResponseContainer<ResponseDeleteComment>> call, Throwable t) {
-
             }
-        });
+        };
+
+        switch (getArguments().getString("type")){
+            case "post":
+                Log.d("TAG21", "del post photoId - " + postId + " owner id - " + ownerId );
+                ApiFactory.getApi().deleteComment(
+                        SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),
+                        commentList.get(position).getId(),
+                        ownerId).enqueue(callback);
+                break;
+            case "photo":
+                Log.d("TAG21", "del photo photoId - " + postId + " owner id - " + ownerId );
+                ApiFactory.getApi().deleteCommentPhoto(
+                        SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),
+                        commentList.get(position).getId(),
+                        ownerId).enqueue(callback);
+                break;
+        }
     }
 
     @Override

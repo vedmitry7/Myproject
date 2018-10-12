@@ -175,7 +175,7 @@ public class CheckinRecyclerAdapter extends RecyclerView.Adapter<CheckinRecycler
                 commentButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        EventBus.getDefault().post(new EventBusMessages.OpenComments(postList.get(getAdapterPosition()).getId(), postList.get(getAdapterPosition()).getOwnerId()));
+                        EventBus.getDefault().post(new EventBusMessages.OpenComments(postList.get(getAdapterPosition()).getId(), postList.get(getAdapterPosition()).getOwnerId(), "post"));
                     }
                 });
             }

@@ -146,12 +146,8 @@ public class FeedPhotoReportFragmentContent extends android.support.v4.app.Fragm
                 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
 
         recyclerView.setLayoutManager(horizontalLayoutManager);
-        //recyclerView.addItemDecoration(new ImagesSpacesItemDecoration(3, App.dpToPx(getActivity(), 4), false));
-        // recyclerView.setLayoutManager(mLayoutManager);
-        // recyclerView.setNestedScrollingEnabled(false);
 
         adapter = new FeedPhotoReportContentAdapter(photoList);
-       // adapter.setImageClickListener(this);
         recyclerView.setAdapter(adapter);
 
         RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
@@ -176,7 +172,13 @@ public class FeedPhotoReportFragmentContent extends android.support.v4.app.Fragm
         };
         loadMedia(photoList.size());
 
-        //super.onViewCreated(view, savedInstanceState);
+
+        commentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventBus.getDefault().post(new EventBusMessages.OpenComments(currentPostId, photoList.get(currentPostIdPosition).getOwnerId(), "photo"));
+            }
+        });
     }
 
     private void loadMedia(final int offset) {
@@ -204,6 +206,10 @@ public class FeedPhotoReportFragmentContent extends android.support.v4.app.Fragm
                         } else {
                             Log.d("TAG24", "Groups NOT GET");
                         }
+
+
+                        setInfo(new EventBusMessages.ShowImage(getArguments().getInt("position")));
+
                     }
                 }
 
@@ -213,6 +219,67 @@ public class FeedPhotoReportFragmentContent extends android.support.v4.app.Fragm
             });
         }
 
+    }
+
+    @OnClick(R.id.likeIcon)
+    public void like(View v) {
+        Log.d("TAG21", "Like ");
+        final Photo photo = photoList.get(currentPostIdPosition);
+
+        if (photo.getLikes().getUserLikes() == 1) {
+            Log.d("TAG21", "unlike");
+            ApiFactory.getApi().unlike(
+                    SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),
+                    "photo",
+                    photo.getId().toString(),
+                    photo.getOwnerId().toString()
+            ).enqueue(new retrofit2.Callback<ResponseContainer<ResponseLike>>() {
+                @Override
+                public void onResponse(retrofit2.Call<ResponseContainer<ResponseLike>> call, retrofit2.Response<ResponseContainer<ResponseLike>> response) {
+                    Log.i("TAG21", "resp like - " + response.body().getResponse().getLikes());
+                    if (response != null && response.body() != null) {
+                        photo.getLikes().setCount(response.body().getResponse().getLikes());
+                        photo.getLikes().setUserLikes(0);
+                        setLiked(false);
+                        likesCount.setText(String.valueOf(photo.getLikes().getCount()));
+                     //   setRightValue(photo);
+                    }
+                }
+
+                @Override
+                public void onFailure(retrofit2.Call<ResponseContainer<ResponseLike>> call, Throwable t) {
+                    Log.i("TAG21", "fail");
+                }
+            });
+        }
+
+        if (photo.getLikes().getUserLikes() == 0) {
+            Log.d("TAG21", "Like");
+            ApiFactory.getApi().like(
+                    SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),
+                    "photo",
+                    photo.getId().toString(),
+                    photo.getOwnerId().toString()
+            ).enqueue(new retrofit2.Callback<ResponseContainer<ResponseLike>>() {
+                @Override
+                public void onResponse(retrofit2.Call<ResponseContainer<ResponseLike>> call, retrofit2.Response<ResponseContainer<ResponseLike>> response) {
+                    Log.i("TAG21", "resp like - " + response.body().getResponse().getLikes());
+                    if (response != null && response.body() != null) {
+                        photo.getLikes().setCount(response.body().getResponse().getLikes());
+                        photo.getLikes().setUserLikes(1);
+                        setLiked(true);
+                        likesCount.setText(String.valueOf(photo.getLikes().getCount()));
+                    //    setRightValue(photo);
+
+                    }
+                }
+
+                @Override
+                public void onFailure(retrofit2.Call<ResponseContainer<ResponseLike>> call, Throwable t) {
+                    Log.i("TAG21", "fail");
+                }
+            });
+        }
     }
 
     void setLiked(boolean b){
@@ -246,8 +313,21 @@ public class FeedPhotoReportFragmentContent extends android.support.v4.app.Fragm
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void openPlace(EventBusMessages.ShowImage event){
+    public void setInfo(EventBusMessages.ShowImage event){
+        currentPostId = photoList.get(event.getPosition()).getId();
        Picasso.get().load(photoList.get(event.getPosition()).getPhoto780()).into(image);
+        currentPostIdPosition = event.getPosition();
+       likesCount.setText(String.valueOf(photoList.get(event.getPosition()).getLikes().getCount()));
+       if(photoList.get(event.getPosition()).getLikes().getUserLikes()==1){
+           setLiked(true);
+       } else {
+           setLiked(false);
+       }
+
+       commentsCount.setText(String.valueOf(photoList.get(event.getPosition()).getComments().getCount()));
+
+
+
     }
 
     @Override

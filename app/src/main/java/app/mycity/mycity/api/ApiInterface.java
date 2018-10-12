@@ -280,7 +280,7 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("likes.add")
     Call<ResponseContainer<ResponseLike>> like(@Field("access_token") String token,
-                                               @Field("type") String type,
+                                               @Field("type") String type,//post,photo
                                                @Field("item_id") String itemId,
                                                @Field("owner_id") String ownerId);
 
@@ -340,14 +340,26 @@ public interface ApiInterface {
 
     @FormUrlEncoded
     @POST("wall.getComments")
-    Call<ResponseContainer<ResponseComments>> getComment(@Field("access_token") String token,
-                                                         @Field("sort") String sort,
-                                                         @Field("post_id") String postId,
-                                                         @Field("owner_id") String ownerId,
-                                                         @Field("offset") int offset,
-                                                         @Field("extended") String extended,
-                                                         @Field("count") int count,
-                                                         @Field("fields") String fields);
+    Call<ResponseContainer<ResponseComments>> getCommentsPost(@Field("access_token") String token,
+                                                              @Field("sort") String sort,
+                                                              @Field("post_id") String postId,
+                                                              @Field("owner_id") String ownerId,
+                                                              @Field("offset") int offset,
+                                                              @Field("extended") String extended,
+                                                              @Field("count") int count,
+                                                              @Field("fields") String fields);
+
+
+    @FormUrlEncoded
+    @POST("photos.getComments")
+    Call<ResponseContainer<ResponseComments>> getCommentsPhoto(@Field("access_token") String token,
+                                                               @Field("sort") String sort,
+                                                               @Field("photo_id") String postId,
+                                                               @Field("owner_id") String ownerId,
+                                                               @Field("offset") int offset,
+                                                               @Field("extended") String extended,
+                                                               @Field("count") int count,
+                                                               @Field("fields") String fields);
 
     //return comment id
     @FormUrlEncoded
@@ -357,9 +369,23 @@ public interface ApiInterface {
                                                            @Field("owner_id") String ownerId,
                                                            @Field("text") String text);
 
+    //return comment id
+    @FormUrlEncoded
+    @POST("photos.createComment")
+    Call<ResponseContainer<ResponseAddComment>> addCommentPhoto(@Field("access_token") String token,
+                                                           @Field("photo_id") String postId,
+                                                           @Field("owner_id") String ownerId,
+                                                           @Field("text") String text);
+
     @FormUrlEncoded
     @POST("wall.deleteComment")
     Call<ResponseContainer<ResponseDeleteComment>> deleteComment(@Field("access_token") String token,
+                                                                 @Field("comment_id") String postId,
+                                                                 @Field("owner_id") String ownerId);
+
+    @FormUrlEncoded
+    @POST("photos.deleteComment")
+    Call<ResponseContainer<ResponseDeleteComment>> deleteCommentPhoto(@Field("access_token") String token,
                                                                  @Field("comment_id") String postId,
                                                                  @Field("owner_id") String ownerId);
 

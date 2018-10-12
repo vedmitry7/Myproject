@@ -512,7 +512,8 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
                 getFragmentName(),
                 getCurrentTabPosition(),
                 event.getPostId(),
-                event.getOwnerId());
+                event.getOwnerId(),
+                event.getType());
         mTabStacker.replaceFragment(commentsFragment, null);
     }
 

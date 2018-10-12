@@ -124,6 +124,9 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
     Storage storage;
     boolean mayRestore;
 
+    boolean linearLayout;
+
+
     public void showContent() {
 
         if (friendLoad && checkinLoad && infoLoad) {
@@ -172,9 +175,10 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
         Util.setOnTabClick(view);
 
         //      imageView.setShadow(App.dpToPx(getActivity(),10));
+        spaceDecoration = new ImagesSpacesItemDecoration(3, App.dpToPx(getActivity(), 4), false);
 
         mLayoutManager = new GridLayoutManager(this.getActivity(), 3);
-        recyclerView.addItemDecoration(new ImagesSpacesItemDecoration(3, App.dpToPx(getActivity(), 4), false));
+        recyclerView.addItemDecoration(spaceDecoration);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setNestedScrollingEnabled(false);
 
@@ -184,23 +188,27 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
         adapter = new CheckinRecyclerAdapter(postList);
         adapter.setImageClickListener(this);
-        recyclerView.setAdapter(adapter);
 
-        spaceDecoration = new ImagesSpacesItemDecoration(3, App.dpToPx(getActivity(), 4), false);
+
+        if(linearLayout){
+            Log.i("TAG21","QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
+            mLayoutManager = new LinearLayoutManager(this.getActivity());
+            recyclerView.setLayoutManager(mLayoutManager);
+            if(recyclerView.getItemDecorationCount()==1)
+                recyclerView.removeItemDecorationAt(0);
+
+            adapter.setLayout(CheckinRecyclerAdapter.LINEAR_LAYOUT);
+            recyclerView.setAdapter(adapter);
+        } else {
+            Log.i("TAG21","NOT QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
+            recyclerView.setAdapter(adapter);
+        }
+
 
 
         getInfo();
-        // getFriendsCount();
         getSubscriberCount();
         getCheckins();
-
-
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-            }
-        }, 100);
-
 
         Log.i("TAG21", "My profile - stack count - " + getActivity().getFragmentManager().getBackStackEntryCount());
         Log.i("TAG3", "Profile created");
@@ -210,6 +218,7 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
     @OnClick(R.id.profileFragListRecyclerLayout)
     public void listView(View v) {
         Log.i("TAG", "list view");
+        linearLayout = true;
         mLayoutManager = new LinearLayoutManager(this.getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
         if (recyclerView.getItemDecorationCount() == 1)
@@ -223,6 +232,7 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
     @OnClick(R.id.profileFragGridRecyclerLayout)
     public void gridView(View v) {
         Log.i("TAG", "grid view");
+        linearLayout = false;
         mLayoutManager = new GridLayoutManager(this.getActivity(), 3);
         if (recyclerView.getItemDecorationCount() == 0) {
             recyclerView.addItemDecoration(spaceDecoration);
@@ -245,6 +255,7 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
         if(postList!=null) {
             Log.i("TAG21", "Post size " + postList.size());
             mayRestore = true;
+            linearLayout = (boolean) storage.getDate(getArguments().get("name") + "_recycler_layout");
         }
         else{
             Log.i("TAG21", "Post null ");
@@ -586,6 +597,7 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
             mass[2] = subscriptionsCount.getText().toString();
             mass[3] = String.valueOf(scrollView.getScrollY());
             storage.setDate((String) getArguments().get("name")+"_info", mass);
+            storage.setDate(getArguments().get("name")+"_recycler_layout", linearLayout);
         } else {
             Log.i("TAG21", "Profile Fragment Delete Data");
             storage.setDate((String) getArguments().get("name")+"_posts", null);

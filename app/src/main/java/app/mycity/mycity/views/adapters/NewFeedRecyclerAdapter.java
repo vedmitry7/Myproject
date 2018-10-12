@@ -71,8 +71,10 @@ public class NewFeedRecyclerAdapter extends RecyclerView.Adapter<NewFeedRecycler
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         Picasso.get()
                 .load(postList.get(position).getAttachments()
-                .get(0).getPhoto780()).resize(App.dpToPx(context, 360), App.dpToPx(context, 360))
-                .centerCrop()
+                .get(0).getPhoto780())
+              //  .resize(App.dpToPx(context, 360), App.dpToPx(context, 360))
+                .placeholder(R.drawable.logo)
+             //   .centerCrop()
                 .into(holder.photo);
 
         for (Map.Entry item : groups.entrySet())

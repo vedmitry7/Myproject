@@ -7,13 +7,13 @@ public class Photo {
 
     @SerializedName("id")
     @Expose
-    private Integer id;
+    private String id;
     @SerializedName("group_id")
     @Expose
     private Integer groupId;
     @SerializedName("owner_id")
     @Expose
-    private Integer ownerId;
+    private String ownerId;
     @SerializedName("user_id")
     @Expose
     private Integer userId;
@@ -50,12 +50,34 @@ public class Photo {
     @SerializedName("photo_orig")
     @Expose
     private String photoOrig;
+    @SerializedName("likes")
+    @Expose
+    private Likes likes;
+    @SerializedName("comments")
+    @Expose
+    private Comments comments;
 
-    public Integer getId() {
+    public Likes getLikes() {
+        return likes;
+    }
+
+    public void setLikes(Likes likes) {
+        this.likes = likes;
+    }
+
+    public Comments getComments() {
+        return comments;
+    }
+
+    public void setComments(Comments comments) {
+        this.comments = comments;
+    }
+
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -67,11 +89,11 @@ public class Photo {
         this.groupId = groupId;
     }
 
-    public Integer getOwnerId() {
+    public String getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(Integer ownerId) {
+    public void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
     }
 

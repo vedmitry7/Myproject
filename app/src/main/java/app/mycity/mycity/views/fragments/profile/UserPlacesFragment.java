@@ -41,9 +41,6 @@ public class UserPlacesFragment extends Fragment implements TabStacker.TabStackI
     @BindView(R.id.placesFragmentRecyclerView)
     RecyclerView recyclerView;
 
-    @BindView(R.id.toolBarTitle)
-    TextView title;
-
     PlacesRecyclerAdapter adapter;
 
     List<Place> placeList;
@@ -54,19 +51,17 @@ public class UserPlacesFragment extends Fragment implements TabStacker.TabStackI
 
     Storage storage;
 
-
-    @OnClick(R.id.mainActAddBtn)
-    public void photo(View v){
-        Log.d("TAG21", "PHOTO - ");
-        EventBus.getDefault().post(new EventBusMessages.MakeCheckin());
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.user_places_fragment, container, false);
         ButterKnife.bind(this, view);
         return view;
+    }
+
+    @OnClick(R.id.profileFragBackButtonContainer)
+    public void backButton(View v){
+        getActivity().onBackPressed();
     }
 
     public static UserPlacesFragment createInstance(String name, int tabPos, String userId) {
@@ -88,8 +83,6 @@ public class UserPlacesFragment extends Fragment implements TabStacker.TabStackI
 
         Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
         Util.setOnTabClick(view);
-
-        title.setText("Места");
 
         placeList = new ArrayList<>();
         adapter = new PlacesRecyclerAdapter(placeList);

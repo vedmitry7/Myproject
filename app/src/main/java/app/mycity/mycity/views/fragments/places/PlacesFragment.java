@@ -3,8 +3,8 @@ package app.mycity.mycity.views.fragments.places;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,44 +17,25 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
-import app.mycity.mycity.api.OkHttpClientFactory;
 import app.mycity.mycity.api.model.Place;
-import app.mycity.mycity.api.model.Post;
-import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.api.model.ResponseContainer;
-import app.mycity.mycity.api.model.ResponseLike;
 import app.mycity.mycity.api.model.ResponsePlaces;
-import app.mycity.mycity.api.model.ResponseWall;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.activities.Storage;
-import app.mycity.mycity.views.adapters.CheckinRecyclerAdapter;
-import app.mycity.mycity.views.adapters.FeedRecyclerAdapter;
-import app.mycity.mycity.views.adapters.MyRecyclerViewAdapter;
 import app.mycity.mycity.views.adapters.PlacesRecyclerAdapter;
 import app.mycity.mycity.views.adapters.PlacesTopBarAdapter;
-import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import fr.arnaudguyon.tabstacker.TabStacker;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class PlacesFragment extends Fragment implements TabStacker.TabStackInterface {
 
@@ -64,6 +45,10 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
 
     @BindView(R.id.horizontalRecyclerView)
     RecyclerView horizontalRecyclerView;
+
+    @BindView(R.id.placesProgressBar)
+    ConstraintLayout placesProgressBar;
+
 
     @BindView(R.id.toolBarTitle)
     TextView title;
@@ -163,6 +148,7 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
             public void onResponse(retrofit2.Call<ResponseContainer<ResponsePlaces>> call, retrofit2.Response<ResponseContainer<ResponsePlaces>> response) {
                 if(response.body()!=null){
 
+                    placesProgressBar.setVisibility(View.GONE);
                     placeList.addAll(response.body().getResponse().getItems());
                     Log.d("TAG21", "Places size" + response.body().getResponse().getItems().size());
                     adapter.update(placeList);

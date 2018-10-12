@@ -72,7 +72,6 @@ public class PhotoReportRecyclerAdapter extends RecyclerView.Adapter<PhotoReport
             photo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
                     EventBus.getDefault().post(new EventBusMessages.PhotoReportPhotoClick(getAdapterPosition()));
                 }
             });

@@ -18,7 +18,7 @@
         android:id="@+id/placesFragmentRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/navigationButtonsContainer"
+        app:layout_constraintBottom_toTopOf="@+id/includeNavigationButtonsContainer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/horizontalRecyclerView">
@@ -31,12 +31,13 @@
         android:layout_width="match_parent"
         android:layout_height="3dp"
         android:background="@drawable/toolbar_up_shadow"
-        app:layout_constraintBottom_toTopOf="@+id/navigationButtonsContainer"
+        app:layout_constraintBottom_toTopOf="@+id/includeNavigationButtonsContainer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="MissingConstraints" />
 
-    <include layout="@layout/navigation_bottom_buttons" />
+    <include layout="@layout/navigation_bottom_buttons"
+        android:id="@+id/includeNavigationButtonsContainer"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/horizontalRecyclerView"
@@ -47,5 +48,29 @@
         app:layout_constraintTop_toBottomOf="@+id/include">
 
     </android.support.v7.widget.RecyclerView>
+
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/placesProgressBar"
+        android:background="@android:color/white"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/include"
+        app:layout_constraintBottom_toTopOf="@+id/up_navbar_shadow"
+        tools:ignore="MissingConstraints">
+
+        <ProgressBar
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.25" />
+
+
+    </android.support.constraint.ConstraintLayout>
+
+
 
 </android.support.constraint.ConstraintLayout>

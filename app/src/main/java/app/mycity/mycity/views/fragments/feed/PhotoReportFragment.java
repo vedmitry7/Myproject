@@ -169,7 +169,7 @@ public class PhotoReportFragment extends android.support.v4.app.Fragment impleme
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void gfdsgsd(EventBusMessages.PhotoReportPhotoClick event){
+    public void photoClick(EventBusMessages.PhotoReportPhotoClick event){
         EventBus.getDefault().post(new EventBusMessages.OpenPhotoReportContent (
                 String.valueOf(photoList.get(event.getPosition()).getPlaceId()),
                 getArguments().getString("albumId"),

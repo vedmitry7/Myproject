@@ -166,7 +166,7 @@ public class FeedPlacesCheckinFragment extends android.support.v4.app.Fragment i
         commentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EventBus.getDefault().post(new EventBusMessages.OpenComments(currentPostId, currentOwnerId));
+                EventBus.getDefault().post(new EventBusMessages.OpenComments(currentPostId, currentOwnerId, "post"));
             }
         });
 
@@ -176,12 +176,8 @@ public class FeedPlacesCheckinFragment extends android.support.v4.app.Fragment i
                 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
 
         recyclerView.setLayoutManager(horizontalLayoutManager);
-        //recyclerView.addItemDecoration(new ImagesSpacesItemDecoration(3, App.dpToPx(getActivity(), 4), false));
-        // recyclerView.setLayoutManager(mLayoutManager);
-        // recyclerView.setNestedScrollingEnabled(false);
 
         adapter = new FeedPlacesCheckinRecyclerAdapter(postList);
-       // adapter.setImageClickListener(this);
         recyclerView.setAdapter(adapter);
 
         RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {

@@ -148,7 +148,7 @@ public class CommentActivity extends AppCompatActivity implements CommentsRecycl
 
     private void loadComments(final int offset) {
 
-        ApiFactory.getApi().getComment(
+        ApiFactory.getApi().getCommentsPost(
                 SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),
                 "1",
                 postId,

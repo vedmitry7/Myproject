@@ -231,10 +231,12 @@ public class EventBusMessages {
     public static class OpenComments {
         private final String postId;
         private final String ownerId;
+        private final String type;
 
-        public OpenComments(String postId, String ownerId) {
+        public OpenComments(String postId, String ownerId, String type) {
             this.postId = postId;
             this.ownerId = ownerId;
+            this.type = type;
         }
 
         public String getOwnerId() {
@@ -243,6 +245,10 @@ public class EventBusMessages {
 
         public String getPostId() {
             return postId;
+        }
+
+        public String getType() {
+            return type;
         }
     }
 

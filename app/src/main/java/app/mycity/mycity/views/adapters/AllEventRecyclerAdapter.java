@@ -188,7 +188,7 @@ public class AllEventRecyclerAdapter extends RecyclerView.Adapter<AllEventRecycl
                 public void onClick(View v) {
                     EventBus.getDefault().post(new EventBusMessages.OpenComments(
                             postList.get(getAdapterPosition()).getId().toString(),
-                            postList.get(getAdapterPosition()).getOwnerId().toString()));
+                            postList.get(getAdapterPosition()).getOwnerId().toString(), "post"));
                 }
             });
 
