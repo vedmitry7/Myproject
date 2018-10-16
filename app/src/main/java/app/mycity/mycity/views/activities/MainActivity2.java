@@ -33,6 +33,7 @@ import java.util.TimerTask;
 
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.LocationService;
+import app.mycity.mycity.NewTestService;
 import app.mycity.mycity.R;
 import app.mycity.mycity.TestService;
 import app.mycity.mycity.api.ApiFactory;
@@ -140,7 +141,7 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                Intent serviceIntent = new Intent(MainActivity2.this, TestService.class);
+                Intent serviceIntent = new Intent(MainActivity2.this, NewTestService.class);
                 startService(serviceIntent);
 
                 Intent locServiceIntent = new Intent(MainActivity2.this, LocationService.class);

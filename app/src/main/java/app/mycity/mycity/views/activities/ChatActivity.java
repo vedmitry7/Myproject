@@ -133,7 +133,7 @@ public class ChatActivity extends AppCompatActivity {
 
         adapter = new ChatRecyclerAdapter(results);
 
-     //   mLinearLayoutManager.setStackFromEnd(true);
+     //   layoutManager.setStackFromEnd(true);
 
         recyclerView.setLayoutManager(mLinearLayoutManager);
         recyclerView.setAdapter(adapter);
@@ -227,8 +227,8 @@ public class ChatActivity extends AppCompatActivity {
             adapter.notifyDataSetChanged();
 
             if(totalItemCount-lastVisibleItems<=2){
-                recyclerView.scrollToPosition(results.size()-1);
-                Toast.makeText(this, "Scroll down", Toast.LENGTH_SHORT).show();
+                    recyclerView.scrollToPosition(results.size() - 1);
+                    Toast.makeText(this, "Scroll down", Toast.LENGTH_SHORT).show();
             } else {
                 //scroll if message is not our
                 if(results.get(results.size()-1).getOut()!=1){

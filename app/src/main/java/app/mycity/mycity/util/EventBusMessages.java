@@ -268,6 +268,37 @@ public class EventBusMessages {
     public static class UpdateChat{
     }
 
+    public static class NewChatMessage{
+        app.mycity.mycity.api.model.Message message;
+        int out;
+
+
+        public NewChatMessage(app.mycity.mycity.api.model.Message message, int our) {
+          this.message = message;
+          this.out = our;
+        }
+
+        public app.mycity.mycity.api.model.Message getMessage() {
+            return message;
+        }
+
+        public int getOut() {
+            return out;
+        }
+    }
+
+    public static class MessageWasRead{
+        long messageId;
+
+        public MessageWasRead(long messageId) {
+            this.messageId = messageId;
+        }
+
+        public long getMessageId() {
+            return messageId;
+        }
+    }
+
     public static class UpdateDialog {
         private String message;
         private long id;

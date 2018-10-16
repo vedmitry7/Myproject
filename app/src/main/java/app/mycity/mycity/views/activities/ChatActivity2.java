@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -18,11 +17,15 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
-import app.mycity.mycity.api.OkHttpClientFactory;
 import app.mycity.mycity.api.model.Message;
+import app.mycity.mycity.api.model.MessageFromApi;
+import app.mycity.mycity.api.model.MessageResponse;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponseMarkAsRead;
 import app.mycity.mycity.api.model.SendMessageResponse;
@@ -35,8 +38,9 @@ import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.realm.Realm;
 import io.realm.RealmResults;
-import okhttp3.Callback;
-import okhttp3.Request;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ChatActivity2 extends AppCompatActivity {
 
@@ -55,22 +59,21 @@ public class ChatActivity2 extends AppCompatActivity {
     @BindView(R.id.newMessageIndicator)
     CardView newMessageIndicator;
 
-    final LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(this);
+    final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 
     ChatRecyclerAdapter adapter;
 
+    int totalCount;
+
     private Realm mRealm;
-
-    Callback callback;
-    Request request;
-
-    RealmResults<Message> results;
-
-    long userId = 1;
-    public static String imageUrl;
 
     long lastMyMessageId;
 
+
+    List<Message> results = new ArrayList<>();
+    long userId = 1;
+    public static String imageUrl;
+    private boolean isLoading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +82,7 @@ public class ChatActivity2 extends AppCompatActivity {
         ButterKnife.bind(this);
 
         mRealm = Realm.getDefaultInstance();
-        // initSocket();
+
         userId = getIntent().getLongExtra("user_id", 0);
         imageUrl = getIntent().getStringExtra("image");
 
@@ -92,67 +95,135 @@ public class ChatActivity2 extends AppCompatActivity {
         String name =  getIntent().getStringExtra("name");
 
         if(getIntent().getStringExtra("name")==null){
-            name = "hui";
+            name = "...";
         }
 
         Log.d("TAG21", "Chat open - " + name + userId + imageUrl);
 
         if(name!=null)
             nameText.setText(name);
-
         Picasso.get().load(imageUrl).into(imageView);
-        //possible error
-        updateList();
-
-        Log.d("TAG21", "Size - " + results.size());
 
         adapter = new ChatRecyclerAdapter(results);
 
-        mLinearLayoutManager.setStackFromEnd(true);
-        recyclerView.setLayoutManager(mLinearLayoutManager);
-        recyclerView.scrollToPosition(results.size()-1);
-        recyclerView.setAdapter(adapter);
+        layoutManager.setReverseLayout(true);
+        layoutManager.setStackFromEnd(true);
+
+
         RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                int totalItemCount = mLinearLayoutManager.getItemCount();
-                int lastVisibleItems = mLinearLayoutManager.findLastVisibleItemPosition();
-                Log.d("chat22", "total " + (totalItemCount));
-                Log.d("chat22", "last visible " + (lastVisibleItems));
-                Log.d("chat22", "get " + (lastVisibleItems));
-                Log.d("chat22", "message " + results.get(lastVisibleItems).getText() + " my - " + results.get(lastVisibleItems).getOut() + " was read " + results.get(lastVisibleItems).isWasRead());
+                int totalItemCount = layoutManager.getItemCount();
+                int lastVisibleItems = layoutManager.findLastVisibleItemPosition();
 
-                if(results.get(lastVisibleItems).getOut()==1){
-                    lastMyMessageId = results.get(lastVisibleItems).getId();
-                }
-
-                if(lastVisibleItems==totalItemCount-1){
-                    Log.d("chat22", "scroll is down");
-                    if(results.get(lastVisibleItems).getOut()==0 && !results.get(lastVisibleItems).isWasRead()){
-                        if(newMessageIndicator.getVisibility() == View.VISIBLE){
-                            newMessageIndicator.setVisibility(View.GONE);
+                if (!isLoading) {
+                    if ( lastVisibleItems >= totalItemCount -10 ) {
+                        Log.d("TAG25", "ЗАГРУЗКА ДАННЫХ " + results.size());
+                        isLoading = true;
+                        // load if we don't load all
+                        if(totalCount > results.size()){
+                            Log.d("TAG25", "load more ");
+                            loadMessages(results.size());
                         }
-                        markAsRead();
                     }
                 }
             }
         };
 
+        RecyclerView.OnScrollListener scrollListener2 = new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int totalItemCount = layoutManager.getItemCount();
+                int lastVisibleItems = layoutManager.findLastVisibleItemPosition();
+                int firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
+                Log.d("chat22", "total " + (totalItemCount));
+                Log.d("chat22", "last visible " + (lastVisibleItems));
+                Log.d("chat22", "first visible " + (firstVisibleItem));
+                Log.d("chat22", "get " + (lastVisibleItems));
+                Log.d("chat22", "message " + results.get(firstVisibleItem).getText() + " my - " + results.get(firstVisibleItem).getOut() + " was read " + results.get(firstVisibleItem).isWasRead());
+
+                if(results.get(firstVisibleItem).getOut()==1){
+                    lastMyMessageId = results.get(firstVisibleItem).getId();
+                }
+
+                    Log.d("chat22", "scroll is down");
+                    if(results.get(firstVisibleItem).getOut()==0 && !results.get(firstVisibleItem).isWasRead()){
+                        if(newMessageIndicator.getVisibility() == View.VISIBLE){
+                            newMessageIndicator.setVisibility(View.GONE);
+                        }
+                        //markAsRead();
+                        Log.d("chat22", "MARk as read message " + results.get(firstVisibleItem).getText() +  "id  " + results.get(firstVisibleItem).getId());
+                        markAsReadMessage(results.get(firstVisibleItem).getId());
+                        results.get(firstVisibleItem).setWasRead(true);
+                    } else {
+                        Log.d("chat22", "not my or already read " + results.get(firstVisibleItem).isWasRead());
+                    }
+
+            }
+        };
+
         recyclerView.addOnScrollListener(scrollListener);
+        recyclerView.addOnScrollListener(scrollListener2);
+
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
+
         newMessageIndicator.setVisibility(View.GONE);
         newMessageIndicator.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //recyclerView.scrollToPosition(messages.size());
-                recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+               // recyclerView.smoothScrollToPosition(0);l;kl
+                recyclerView.scrollToPosition(0);
                 newMessageIndicator.setVisibility(View.GONE);
             }
         });
+        adapter.notifyDataSetChanged();
+        recyclerView.scrollToPosition(results.size()-1);
 
-
+        loadMessages(0);
 
     }
+
+
+    private void loadMessages(int offset) {
+        Log.d("TAG25", "Try to load. Offset - " + offset);
+
+        ApiFactory.getApi().getMessages(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId, offset).enqueue(new retrofit2.Callback<ResponseContainer<MessageResponse>>() {
+            @Override
+            public void onResponse(Call<ResponseContainer<MessageResponse>> call, Response<ResponseContainer<MessageResponse>> response) {
+                if(response.body()!=null && response.body().getResponse()!=null){
+                    Log.d("TAG25", "Messages size - " + response.body().getResponse().getItems().size());
+
+                    totalCount = response.body().getResponse().getCount();
+
+                    for (MessageFromApi m: response.body().getResponse().getItems()){
+                        Message message = new Message();
+                        message.setOut(m.getOut());
+                        message.setText(m.getText());
+                        message.setId(m.getId());
+                        message.setTime(m.getDate());
+                        message.setWasSended(true);
+                        message.setWasRead(m.getRead()==1);
+                        Log.d("TAG25", "Message text - " + message.getText());
+                        results.add(message);
+                    }
+
+                    isLoading = false;
+                    adapter.update(results);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseContainer<MessageResponse>> call, Throwable t) {
+
+            }
+        });
+    }
+
+
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(EventBusMessages.UpdateChat event){
@@ -160,52 +231,142 @@ public class ChatActivity2 extends AppCompatActivity {
         updateList();
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(EventBusMessages.NewChatMessage event){
+        Log.d("TAG25", "Chat update Activity");
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
-    }
 
-    @OnClick(R.id.chatBackButtonContainer)
-    public void back(View v){
-        this.finish();
-    }
+        if(event.getOut()==0){
+            //add message
+            results.add(0, event.getMessage());
+            adapter.notifyItemInserted(0);
+            //scroll down or show indicator
+            if(layoutManager.findFirstVisibleItemPosition()==0){
+                recyclerView.scrollToPosition(0);
+                markAsReadMessage(event.getMessage().getId());
+            }
+            else {
+                newMessageIndicator.setVisibility(View.VISIBLE);
+            }
+        }
 
-    void updateList(){
-        mRealm.beginTransaction();
-        results = mRealm.where(Message.class).equalTo("user", userId)
-                .findAll();
-        Log.d("TAG25", "Update chat List. Size - " + results.size());
-        mRealm.commitTransaction();
-
-        int totalItemCount = mLinearLayoutManager.getItemCount();
-        int lastVisibleItems = mLinearLayoutManager.findLastVisibleItemPosition();
-
-        if(adapter!=null){
-            adapter.notifyDataSetChanged();
-            if(totalItemCount-lastVisibleItems==2){
-                recyclerView.scrollToPosition(results.size()-1);
-                Toast.makeText(this, "Scroll down", Toast.LENGTH_SHORT).show();
-            } else {
-                //if message not our
-                if(results.get(results.size()-1).getOut()!=1){
-                    recyclerView.scrollToPosition(lastVisibleItems);
-                    newMessageIndicator.setVisibility(View.VISIBLE);
+        if(event.getOut()==1) {
+            //change Time
+            for (int i = 0; i < results.size(); i++) {
+                if (results.get(i).getId() == event.getMessage().getId()) {
+                    results.get(i).setTime(event.getMessage().getTime());
+                    adapter.notifyItemChanged(i);
+                    break;
                 }
             }
         }
 
-        // markAsRead();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(EventBusMessages.MessageWasRead event){
+        Log.d("TAG25", "message was read update Activity");
+
+    /*    for (Message m:results
+             ) {
+            if(m.getId()==event.getMessageId()){
+                Log.d("TAG25", "found - " + m.getText());
+                m.setWasRead(true);
+            }
+        }
+        adapter.notifyDataSetChanged();*/
+
+        for (int i = 0; i < results.size(); i++) {
+            if(results.get(i).getId()==event.getMessageId()){
+                results.get(i).setWasRead(true);
+                adapter.notifyItemChanged(i);
+                break;
+            }
+        }
+        //adapter.update(results);
+    }
+
+    @OnClick(R.id.sendMessageButton)
+    public void sendMessage(View v){
+
+        final String messageText = editText.getText().toString();
+        editText.setText("");
+
+        String id = SharedManager.getProperty("virtualId");
+        if(id==null||id.equals("")){
+            id = "1000000";
+            SharedManager.addProperty("virtualId", id);
+        }
+        long longId = Long.parseLong(id);
+
+        final long curId = longId;
+
+        synchronized (mRealm){
+            mRealm.beginTransaction();
+            Message realmMessage = mRealm.createObject(Message.class, longId);
+            //message.setId(messageId);
+            realmMessage.setUser(userId);
+            realmMessage.setTime(23423423);
+            realmMessage.setText("create before r - " + messageText);
+            realmMessage.setOut(1);
+            realmMessage.setWasRead(false);
+            mRealm.commitTransaction();
+        }
+
+        updateList();
+        longId++;
+        SharedManager.addProperty("virtualId", String.valueOf(longId));
+
+        final Message message = new Message();
+        message.setId(curId);
+        message.setUser(userId);
+        message.setTime(23423423);
+        message.setText("create before r - " + messageText);
+        message.setOut(1);
+        message.setWasRead(false);
+
+
+        results.add(0, message);
+        adapter.notifyItemInserted(0);
+        recyclerView.scrollToPosition(0);
+
+        if(!messageText.equals(""))
+            ApiFactory.getApi().sendMessage(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId, 0, messageText).enqueue(new retrofit2.Callback<ResponseContainer<SendMessageResponse>>() {
+                @Override
+                public void onResponse(retrofit2.Call<ResponseContainer<SendMessageResponse>> call, retrofit2.Response<ResponseContainer<SendMessageResponse>> response) {
+                    final SendMessageResponse sendMessageResponse = response.body().getResponse();
+                    Log.d("TAG25", "RESULT " + sendMessageResponse.getMessageId() + " " + sendMessageResponse.getSuccess() );
+
+
+                    synchronized (mRealm){
+                        mRealm.beginTransaction();
+                        Message result = mRealm.where(Message.class).equalTo("id", curId).findFirst();
+                        Log.d("TAG25", "delete old - " + result.getText() + ", create new" );
+                        result.deleteFromRealm();
+                        mRealm.commitTransaction();
+                    }
+
+                    for (Message m: results
+                         ) {
+                        if(m.getId()==curId){
+                            m.setId(response.body().getResponse().getMessageId());
+                            m.setWasSended(true);
+                            m.setText("after resp - " + messageText);
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onFailure(retrofit2.Call<ResponseContainer<SendMessageResponse>> call, Throwable t) {
+
+                }
+            });
     }
 
     private void markAsRead() {
         Log.d("TAG25", "Mark as READ");
+        Log.d("chat22", "Mark as READ");
         ApiFactory.getApi().markAsRead(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId).enqueue(new retrofit2.Callback<ResponseContainer<ResponseMarkAsRead>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<ResponseMarkAsRead>> call, retrofit2.Response<ResponseContainer<ResponseMarkAsRead>> response) {
@@ -236,9 +397,54 @@ public class ChatActivity2 extends AppCompatActivity {
         });
     }
 
+        private void markAsReadMessage(final long messageId) {
+            Log.d("TAG25", "Mark as READ");
+            Log.d("chat22", "Mark as READ message - " + messageId);
+            ApiFactory.getApi().markAsReadMessages(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), messageId).enqueue(new Callback<ResponseContainer<ResponseMarkAsRead>>() {
+                @Override
+                public void onResponse(Call<ResponseContainer<ResponseMarkAsRead>> call, Response<ResponseContainer<ResponseMarkAsRead>> response) {
+                    Log.d("chat22", "resp - " + messageId);
+                    if(response.body().getResponse().getSuccess()){
+                        for (Message m:results
+                             ) {
+                            if(m.getId()==messageId){
+                                Log.d("chat22", "Mark MESSAGE with id " + messageId + " as read");
+                                m.setWasRead(true);
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseContainer<ResponseMarkAsRead>> call, Throwable t) {
+                    Log.d("chat22", "fail - " + messageId);
+                }
+            });
+        }
+
+    private void updateList() {
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @OnClick(R.id.chatBackButtonContainer)
+    public void back(View v){
+        this.finish();
+    }
+
     @Override
     public void onDestroy() {
-        mRealm.close();
         Log.d("TAG21", "Realm close");
         super.onDestroy();
     }
@@ -249,79 +455,11 @@ public class ChatActivity2 extends AppCompatActivity {
         super.onNewIntent(intent);
     }
 
-    @OnClick(R.id.sendMessageButton)
-    public void sendMessage(View v){
-
-        final String messageText = editText.getText().toString();
-        editText.setText("");
-
-
-        String id = SharedManager.getProperty("virtualId");
-        if(id==null||id.equals("")){
-            id = "1000000";
-            SharedManager.addProperty("virtualId", id);
-        }
-
-        long longId = Long.parseLong(id);
-
-        final long curId = longId;
-
-        mRealm.beginTransaction();
-        final Message message = mRealm.createObject(Message.class, longId);
-            //message.setId(messageId);
-            message.setUser(userId);
-            message.setTime(23423423);
-            message.setText("create before r - " + messageText);
-            message.setOut(1);
-            message.setWasRead(false);
-        mRealm.commitTransaction();
-        updateList();
-
-        longId++;
-        SharedManager.addProperty("virtualId", String.valueOf(longId));
-
-        if(!messageText.equals(""))
-        ApiFactory.getApi().sendMessage(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId, 0, messageText).enqueue(new retrofit2.Callback<ResponseContainer<SendMessageResponse>>() {
-            @Override
-            public void onResponse(retrofit2.Call<ResponseContainer<SendMessageResponse>> call, retrofit2.Response<ResponseContainer<SendMessageResponse>> response) {
-                final SendMessageResponse sendMessageResponse = response.body().getResponse();
-                Log.d("TAG25", "RESULT " + sendMessageResponse.getMessageId() + " " + sendMessageResponse.getSuccess() );
-
-
-                mRealm.beginTransaction();
-                Message result = mRealm.where(Message.class).equalTo("id", curId).findFirst();
-                Log.d("TAG25", "delete old - " + result.getText() + ", create new" );
-                result.deleteFromRealm();
-
-                Message message = mRealm.createObject(Message.class, response.body().getResponse().getMessageId());
-                //message.setId(messageId);
-                message.setUser(userId);
-                message.setTime(23423423);
-                message.setText("create from r - " + messageText);
-                message.setOut(1);
-                message.setWasRead(false);
-                mRealm.commitTransaction();
-                updateList();
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<ResponseContainer<SendMessageResponse>> call, Throwable t) {
-
-            }
-        });
-    }
-
     @OnClick(R.id.updateChat)
     public void updateChat(View v){
         Log.d("TAG21", "update chat...");
-        EventBus.getDefault().post(new EventBusMessages.UpdateSocketConnection());
-       // markAsRead();
-      //  getChats();
-    }
-
-    private void newRequest() {
-        Log.i("TAG21", "new request...");
-        OkHttpClientFactory.getClient().newCall(request).enqueue(callback);
+        markAsRead();
+       // recyclerView.scrollToPosition(results.size()-1);
     }
 
 }

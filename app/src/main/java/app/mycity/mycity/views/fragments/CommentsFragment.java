@@ -276,15 +276,12 @@ public class CommentsFragment extends android.support.v4.app.Fragment implements
 
             case "post":
                 Log.d("TAG21", "post photoId - " + postId + " owner id - " + ownerId );
-
                 ApiFactory.getApi().addComment(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), postId, ownerId, commentText).enqueue(callback);
                 break;
 
             case "photo":
                 Log.d("TAG21", "photo photoId - " + postId + " owner id - " + ownerId );
-
                 ApiFactory.getApi().addCommentPhoto(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), postId, ownerId, commentText).enqueue(callback);
-
                 break;
         }
     }

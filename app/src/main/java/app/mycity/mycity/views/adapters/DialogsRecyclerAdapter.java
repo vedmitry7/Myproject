@@ -22,6 +22,7 @@ import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.activities.ChatActivity;
+import app.mycity.mycity.views.activities.ChatActivity2;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -119,7 +120,7 @@ public class DialogsRecyclerAdapter extends RecyclerView.Adapter<DialogsRecycler
                     SharedManager.addProperty("unread_" + dialogList.get(getAdapterPosition()).getId(), "0");
                     notifyItemChanged(getAdapterPosition());
 
-                    Intent intent = new Intent(context, ChatActivity.class);
+                    Intent intent = new Intent(context, ChatActivity2.class);
                     intent.putExtra("user_id", dialogList.get(getAdapterPosition()).getId());
                     intent.putExtra("image", dialogList.get(getAdapterPosition()).getPhoto130());
                     intent.putExtra("name", dialogList.get(getAdapterPosition()).getTitle());

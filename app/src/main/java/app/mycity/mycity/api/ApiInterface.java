@@ -3,6 +3,7 @@ package app.mycity.mycity.api;
 import com.google.gson.JsonObject;
 
 import app.mycity.mycity.api.model.DialogsContainer;
+import app.mycity.mycity.api.model.MessageResponse;
 import app.mycity.mycity.api.model.PlacesResponse;
 import app.mycity.mycity.api.model.ResponseAddComment;
 import app.mycity.mycity.api.model.ResponseAlbums;
@@ -170,8 +171,22 @@ public interface ApiInterface {
 
     @FormUrlEncoded
     @POST("messages.markAsRead")
-    Call<ResponseContainer<SendMessageResponse>> markAsReadMessages(@Field("access_token") String accessToken,
+    Call<ResponseContainer<ResponseMarkAsRead>> markAsReadMessages(@Field("access_token") String accessToken,
                                                                     @Field("message_ids") long message_ids);
+
+    @FormUrlEncoded
+    @POST("messages.getHistory")
+    Call<ResponseContainer<MessageResponse>> getMessages(@Field("access_token") String accessToken,
+                                                         @Field("peer_id") long peer_id,
+                                                         @Field("offset") int offset);
+    @FormUrlEncoded
+    @POST("messages.getHistory")
+    Call<ResponseContainer<SendMessageResponse>> getMessagesFromId(@Field("access_token") String accessToken,
+                                                                    @Field("peer_id") long peerId,
+                                                                    @Field("start_message_id") long startMessageId,
+                                                                    @Field("offset") int offset);
+
+
 
 /*    @FormUrlEncoded
     @POST("auth.signUp")
