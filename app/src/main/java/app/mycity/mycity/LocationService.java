@@ -142,6 +142,10 @@ public class LocationService extends Service  implements GoogleApiClient.Connect
         Log.d("TAG23", "Location Location Changed ");
         Log.d("TAG23", "Long - " + location.getLongitude() + " lat - " + location.getLatitude());
 
+
+        SharedManager.addProperty("latitude", String.valueOf(location.getLatitude()));
+        SharedManager.addProperty("longitude", String.valueOf(location.getLongitude()));
+
         ApiFactory.getApi().setCoordinates(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), location.getLatitude(), location.getLongitude() ).enqueue(new Callback<ResponseContainer<UsersContainer>>() {
             @Override
             public void onResponse(Call<ResponseContainer<UsersContainer>> call, Response<ResponseContainer<UsersContainer>> response) {

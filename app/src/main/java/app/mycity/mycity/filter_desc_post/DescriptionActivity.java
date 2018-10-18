@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -36,6 +37,7 @@ import app.mycity.mycity.api.model.ResponseUploading;
 import app.mycity.mycity.util.SharedManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -67,10 +69,10 @@ public class DescriptionActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+    /*    Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Описание");
+        getSupportActionBar().setTitle("Описание");*/
 
         path = getIntent().getStringExtra("path");
         file = new File(path);
@@ -101,6 +103,16 @@ public class DescriptionActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    @OnClick(R.id.uploadPost)
+    public void post(View v){
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Публикация");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        getUploadServer();
     }
 
     void getUploadServer(){
@@ -164,7 +176,8 @@ public class DescriptionActivity extends AppCompatActivity {
 
     void savePhoto(String string, String server){
 
-        ApiFactory.getApi().savePost(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), string, "1", server).enqueue(new Callback<ResponseContainer<ResponseSavePhoto>>() {
+        ApiFactory.getApi().savePost(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), string, "1", server)
+                .enqueue(new Callback<ResponseContainer<ResponseSavePhoto>>() {
             @Override
             public void onResponse(Call<ResponseContainer<ResponseSavePhoto>> call, Response<ResponseContainer<ResponseSavePhoto>> response) {
 
@@ -198,13 +211,13 @@ public class DescriptionActivity extends AppCompatActivity {
                 MediaType.parse("text/plain"), "1");
 
         RequestBody placeId = create(
-                MediaType.parse("text/plain"), "45");
+                MediaType.parse("text/plain"), SharedManager.getProperty("currentPlace"));
         RequestBody message = create(
                 MediaType.parse("text/plain"), photoDescription.getText().toString());
-        RequestBody latitude = create(
-                MediaType.parse("text/plain"), "123");
+/*        RequestBody latitude = create(
+                MediaType.parse("text/plain"), SharedManager.getProperty("latitude"));
         RequestBody longitude = create(
-                MediaType.parse("text/plain"), "456");
+                MediaType.parse("text/plain"), SharedManager.getProperty("longitude"));*/
         RequestBody att = create(
                 MediaType.parse("text/plain"), attachment);
 
@@ -214,7 +227,7 @@ public class DescriptionActivity extends AppCompatActivity {
         Log.d("TAG21", "api - ");
 
         try {
-            ApiFactory.getApi().postPicture(token, placeId, message, latitude, longitude, att).enqueue(new Callback<ResponseContainer<ResponsePostPhoto>>() {
+            ApiFactory.getApi().postPicture(token, placeId, message, att).enqueue(new Callback<ResponseContainer<ResponsePostPhoto>>() {
                 @Override
                 public void onResponse(Call<ResponseContainer<ResponsePostPhoto>> call, Response<ResponseContainer<ResponsePostPhoto>> response) {
                     Log.d("TAG21", "response - ");

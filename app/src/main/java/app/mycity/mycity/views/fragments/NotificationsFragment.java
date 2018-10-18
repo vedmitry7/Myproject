@@ -21,17 +21,18 @@ import java.util.List;
 import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
-import app.mycity.mycity.api.model.SuccessResponceNumber;
-import app.mycity.mycity.util.EventBusMessages;
-import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.Dialog;
 import app.mycity.mycity.api.model.DialogsContainer;
+import app.mycity.mycity.api.model.Notification;
+import app.mycity.mycity.api.model.NotificationResponce;
 import app.mycity.mycity.api.model.ResponseContainer;
+import app.mycity.mycity.api.model.SuccessResponceNumber;
+import app.mycity.mycity.util.EventBusMessages;
+import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.activities.MainAct;
-import app.mycity.mycity.views.adapters.DialogsRecyclerAdapter;
-import app.mycity.mycity.views.fragments.profile.ProfileFragment;
+import app.mycity.mycity.views.adapters.NotificationRecyclerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -41,14 +42,14 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class DialogsFragment extends Fragment implements TabStacker.TabStackInterface {
+public class NotificationsFragment extends Fragment implements TabStacker.TabStackInterface {
 
     @BindView(R.id.dialogsFragRecyclerView)
     RecyclerView recyclerView;
 
-    DialogsRecyclerAdapter adapter;
+    NotificationRecyclerAdapter adapter;
 
-    List<Dialog> dialogList;
+    List<Notification> notificationList;
 
     MainAct activity;
 
@@ -60,8 +61,8 @@ public class DialogsFragment extends Fragment implements TabStacker.TabStackInte
         return view;
     }
 
-    public static DialogsFragment createInstance(String name, int tabPos) {
-        DialogsFragment fragment = new DialogsFragment();
+    public static NotificationsFragment createInstance(String name, int tabPos) {
+        NotificationsFragment fragment = new NotificationsFragment();
         Log.i("TAG21", "Create DIALOGS " + name);
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
@@ -79,9 +80,9 @@ public class DialogsFragment extends Fragment implements TabStacker.TabStackInte
         Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
         Util.setOnTabClick(view);
 
-        dialogList = new ArrayList<>();
+        notificationList = new ArrayList<>();
 
-        adapter = new DialogsRecyclerAdapter(dialogList);
+        adapter = new NotificationRecyclerAdapter(notificationList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
 
@@ -101,66 +102,35 @@ public class DialogsFragment extends Fragment implements TabStacker.TabStackInte
     }
 
     private void loadDialogs() {
-        ApiFactory.getApi().getDialogs(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), 0).enqueue(new Callback<ResponseContainer<DialogsContainer>>() {
+        ApiFactory.getApi().getNotifications(App.accessToken()).enqueue(new Callback<ResponseContainer<NotificationResponce>>() {
             @Override
-            public void onResponse(Call<ResponseContainer<DialogsContainer>> call, Response<ResponseContainer<DialogsContainer>> response) {
-
-                // !!!!!!!!!
-                // NullPointerException: Attempt to invoke virtual method 'java.lang.Object app.mycity.mycity.api.model.ResponseContainer.getResponse()' on a null object reference
-
-                DialogsContainer dialogs = response.body().getResponse();
-
+            public void onResponse(Call<ResponseContainer<NotificationResponce>> call, Response<ResponseContainer<NotificationResponce>> response) {
                 if(response != null && response.body().getResponse() != null){
-                    dialogList = dialogs.getDialogs();
-                    Log.d("TAG", "Size list = " + dialogList.size());
-                    adapter.update(dialogList);
+                    notificationList = response.body().getResponse().getItems();
+                    Log.d("TAG21", "Size list = " + notificationList.size());
+                    adapter.update(notificationList);
                 }
             }
 
             @Override
-            public void onFailure(Call<ResponseContainer<DialogsContainer>> call, Throwable t) {
+            public void onFailure(Call<ResponseContainer<NotificationResponce>> call, Throwable t) {
 
             }
         });
+
+
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(final EventBusMessages.DeleteDialog event){
         Log.d("TAG25", "message delete");
 
-        ApiFactory.getApi().deleteDialogs(App.accessToken(), event.getId()).enqueue(new Callback<ResponseContainer<SuccessResponceNumber>>() {
-            @Override
-            public void onResponse(Call<ResponseContainer<SuccessResponceNumber>> call, Response<ResponseContainer<SuccessResponceNumber>> response) {
-                if(response.body()!=null && response.body().getResponse()!=null){
-                    if(response.body().getResponse().getSuccess()==1){
-                        for (int i = 0; i < dialogList.size(); i++) {
-                            if(dialogList.get(i).getId() == event.getId()){
-                                dialogList.remove(i);
-                                adapter.notifyItemRemoved(i);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseContainer<SuccessResponceNumber>> call, Throwable t) {
-
-            }
-        });
         //adapter.update(results);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(EventBusMessages.UpdateDialog event){
         Log.d("TAG21", "Update dialog");
-        for (Dialog dialog: dialogList
-             ) {
-            if(dialog.getId()==event.getId()){
-                dialog.setText(event.getMessage());
-            }
-        }
 
         adapter.notifyDataSetChanged();
     }

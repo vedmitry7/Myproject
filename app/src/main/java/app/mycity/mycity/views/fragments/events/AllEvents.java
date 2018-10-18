@@ -49,9 +49,6 @@ public class AllEvents extends android.support.v4.app.Fragment implements TabSta
     @BindView(R.id.placeEventsPlaceHolder)
     RelativeLayout placeHolderNoEvents;
 
-    @BindView(R.id.toolBarTitle)
-    TextView title;
-
     AllEventRecyclerAdapter adapter;
 
     List<Post> postList;
@@ -85,12 +82,6 @@ public class AllEvents extends android.support.v4.app.Fragment implements TabSta
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
-        Util.setOnTabClick(view);
-
-        title.setText("События");
-
-
         adapter = new AllEventRecyclerAdapter(postList, groups);
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -123,6 +114,7 @@ public class AllEvents extends android.support.v4.app.Fragment implements TabSta
     }
 
     private void loadFeed(int offset) {
+        Log.d("TAG21", "LOAD EVENTS");
 
         if(mayRestore){
             adapter.update(postList, groups);
@@ -130,7 +122,7 @@ public class AllEvents extends android.support.v4.app.Fragment implements TabSta
             ApiFactory.getApi().getAllEvents(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),"1", offset).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
                 @Override
                 public void onResponse(retrofit2.Call<ResponseContainer<ResponseWall>> call, retrofit2.Response<ResponseContainer<ResponseWall>> response) {
-
+                    Log.d("TAG21", "RESPONSE EVENTS");
                     if(response!=null && response.body().getResponse()!=null){
                         Log.d("TAG21", "RESPONSE Events OK");
 
@@ -162,6 +154,8 @@ public class AllEvents extends android.support.v4.app.Fragment implements TabSta
 
                 @Override
                 public void onFailure(retrofit2.Call<ResponseContainer<ResponseWall>> call, Throwable t) {
+                    Log.d("TAG21", "RESPONSE EVENTS " + t.getLocalizedMessage());
+
                 }
             });
         }

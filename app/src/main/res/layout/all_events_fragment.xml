@@ -5,27 +5,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include
-        android:id="@+id/include"
-        layout="@layout/toolbar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/placeEventsFragmentRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/include5"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/include" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <RelativeLayout
         android:id="@+id/placeEventsPlaceHolder"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
@@ -33,7 +27,7 @@
         android:layout_marginTop="8dp"
         android:background="@android:color/white"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/include5"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -48,20 +42,5 @@
             android:textSize="16sp" />
 
     </RelativeLayout>
-
-
-    <View
-        android:id="@+id/up_shadow"
-        android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:background="@drawable/toolbar_up_shadow"
-        app:layout_constraintBottom_toTopOf="@+id/include5"
-        tools:ignore="MissingConstraints" />
-
-    <include
-        android:id="@+id/include5"
-        layout="@layout/navigation_bottom_buttons"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteY="519dp" />
 
 </android.support.constraint.ConstraintLayout>

@@ -13,16 +13,17 @@ import org.greenrobot.eventbus.EventBus;
 import java.util.List;
 
 import app.mycity.mycity.R;
+import app.mycity.mycity.api.model.PlaceCategory;
 import app.mycity.mycity.util.EventBusMessages;
 
 public class PlacesTopBarAdapter extends RecyclerView.Adapter<PlacesTopBarAdapter.ViewHolder> {
 
-    private List<String> mData;
-    int choosenItem = 0;
+    private List<PlaceCategory> placeCategoties;
+    int selectedItem = 0;
 
     // data is passed into the constructor
-    public PlacesTopBarAdapter(List<String> data) {
-        this.mData = data;
+    public PlacesTopBarAdapter(List<PlaceCategory> data) {
+        this.placeCategoties = data;
     }
 
     // inflates the row layout from xml when needed
@@ -36,10 +37,10 @@ public class PlacesTopBarAdapter extends RecyclerView.Adapter<PlacesTopBarAdapte
     @SuppressLint("ResourceAsColor")
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String animal = mData.get(position);
-        holder.myTextView.setText(animal);
+        PlaceCategory placeCategoty = placeCategoties.get(position);
+        holder.myTextView.setText(placeCategoty.getTitle());
 
-        if(position == choosenItem){
+        if(position == selectedItem){
             holder.myTextView.setBackgroundResource(R.drawable.places_top_bar_bg_choosen);
             holder.myTextView.setTextColor(Color.WHITE);
         } else {
@@ -51,7 +52,11 @@ public class PlacesTopBarAdapter extends RecyclerView.Adapter<PlacesTopBarAdapte
     // total number of rows
     @Override
     public int getItemCount() {
-        return mData.size();
+        return placeCategoties.size();
+    }
+
+    public int getCategoryId() {
+        return placeCategoties.get(selectedItem).getId();
     }
 
 
@@ -65,12 +70,18 @@ public class PlacesTopBarAdapter extends RecyclerView.Adapter<PlacesTopBarAdapte
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    choosenItem = getAdapterPosition();
+                    selectedItem = getAdapterPosition();
                     notifyDataSetChanged();
-                    EventBus.getDefault().post(new EventBusMessages.SortPlaces(getAdapterPosition()));
+                    EventBus.getDefault().post(new EventBusMessages.SortPlaces(selectedItem));
                 }
             });
         }
 
+    }
+
+
+    public void update(List<PlaceCategory> categoties){
+        placeCategoties = categoties;
+        notifyDataSetChanged();
     }
 }

@@ -28,17 +28,17 @@ public class Constants {
 
 
     public static final int[] navButtons = {
+            R.id.main_act_profile_button_container,
+            R.id.main_act_feed_button_container,
             R.id.main_act_top_button_container,
             R.id.main_act_places_button_container,
-            R.id.main_act_profile_button_container,
-            R.id.main_act_search_button_container,
-            R.id.main_act_feed_button_container};
+    };
 
     public static final int[] navButtonsIcons = {
-            R.id.main_act_top_button,
-            R.id.main_act_places_button,
             R.id.main_act_profile_button,
-            R.id.main_act_search_button,
-            R.id.main_act_feed_button};
+            R.id.main_act_feed_button,
+            R.id.main_act_top_button,
+            R.id.main_act_places_button
+    };
 
 }

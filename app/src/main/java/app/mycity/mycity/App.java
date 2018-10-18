@@ -104,4 +104,8 @@ public class App extends Application implements Application.ActivityLifecycleCal
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
 
     }
+
+    public static String accessToken() {
+        return SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN);
+    }
 }

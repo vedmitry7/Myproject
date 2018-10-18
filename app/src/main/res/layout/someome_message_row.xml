@@ -33,6 +33,7 @@
 
 
     <android.support.v7.widget.CardView
+        android:id="@+id/messageContent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
@@ -42,12 +43,11 @@
         android:maxWidth="200dp"
         app:cardBackgroundColor="@color/colorAccent"
         app:cardCornerRadius="15dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/messageContentBottomPadding"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/icon"
-        app:layout_constraintTop_toBottomOf="@+id/messageTime"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintTop_toBottomOf="@+id/messageTime">
 
         <TextView
             android:id="@+id/message_text"
@@ -65,5 +65,24 @@
 
     </android.support.v7.widget.CardView>
 
+
+    <View
+        android:id="@+id/messageContentBottomPadding"
+        android:layout_width="match_parent"
+        android:layout_height="12dp"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/dateDeliver"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="12.06.17"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/messageContent" />
 
 </android.support.constraint.ConstraintLayout>

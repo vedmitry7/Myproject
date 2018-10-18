@@ -411,7 +411,35 @@ public class EventBusMessages {
     }
 
     public static class SortPlaces {
+        int position;
         public SortPlaces(int adapterPosition) {
+            position = adapterPosition;
+        }
+
+        public int getPosition() {
+            return position;
+        }
+    }
+
+    public static class DeleteChatMessage {
+        long id;
+
+        public DeleteChatMessage(long id) {
+            this.id = id;
+        }
+
+        public long getId() {
+            return id;
+        }
+    }
+
+    public static class DeleteDialog {
+        long id;
+        public DeleteDialog(long id) {
+            this.id = id;
+        }
+        public long getId() {
+            return id;
         }
     }
 }

@@ -120,7 +120,7 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment {
             albumsList = new ArrayList<>();
             totalCount = 0;
         } else {
-            //totalCount = (int) storage.getDate(getArguments().get("name")+ "_postListTotalCount");
+            //totalCount = (int) storage.getDate_ddMMyyyy(getArguments().get("name")+ "_postListTotalCount");
             Log.d("TAG24", "Scroll position - " + storage.getDate(getArguments().get("name")+ "_scrollPosition"));
             scrollPos = (Integer) storage.getDate(getArguments().get("name")+ "_scrollPosition");
             mayRestore = true;

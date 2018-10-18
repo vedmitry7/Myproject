@@ -39,13 +39,29 @@
     <include layout="@layout/navigation_bottom_buttons"
         android:id="@+id/includeNavigationButtonsContainer"/>
 
+    <Spinner
+        android:id="@+id/placesSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/include"
+        tools:ignore="MissingConstraints">
+
+    </Spinner>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/horizontalRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/include">
+        app:layout_constraintTop_toBottomOf="@+id/placesSpinner">
 
     </android.support.v7.widget.RecyclerView>
 
@@ -55,7 +71,7 @@
         android:background="@android:color/white"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/include"
+        app:layout_constraintTop_toBottomOf="@+id/horizontalRecyclerView"
         app:layout_constraintBottom_toTopOf="@+id/up_navbar_shadow"
         tools:ignore="MissingConstraints">
 
@@ -71,6 +87,22 @@
 
     </android.support.constraint.ConstraintLayout>
 
+    <TextView
+        android:visibility="gone"
+        android:gravity="center"
+        android:id="@+id/placesFragmentMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Заведения отсутствуют"
+        android:textColor="@android:color/black"
+        android:textSize="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/up_navbar_shadow"
+        app:layout_constraintTop_toBottomOf="@+id/horizontalRecyclerView"
+        app:layout_constraintVertical_bias="0.100000024"
+        tools:layout_editor_absoluteX="0dp"
+        tools:ignore="MissingConstraints" />
 
 
 </android.support.constraint.ConstraintLayout>

@@ -300,7 +300,7 @@ public class FeedPhotoReportFragmentContent extends android.support.v4.app.Fragm
 
         storage = (Storage) context;
 
-        photoList = (List<Photo>) storage.getDate(getArguments().get("name")+ "_postList");
+       // photoList = (List<Photo>) storage.getDate(getArguments().get("name")+ "_postList");
 
         if(photoList ==null){
             Log.d("TAG21", "restore null");
@@ -325,9 +325,6 @@ public class FeedPhotoReportFragmentContent extends android.support.v4.app.Fragm
        }
 
        commentsCount.setText(String.valueOf(photoList.get(event.getPosition()).getComments().getCount()));
-
-
-
     }
 
     @Override
@@ -354,6 +351,7 @@ public class FeedPhotoReportFragmentContent extends android.support.v4.app.Fragm
         }
         if(dismissReason == TabStacker.DismissReason.BACK){
         // delete shit
+
         }
 
     }

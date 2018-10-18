@@ -26,12 +26,6 @@ public class Photo {
     @SerializedName("text")
     @Expose
     private String text;
-    @SerializedName("latitude")
-    @Expose
-    private Integer latitude;
-    @SerializedName("longitude")
-    @Expose
-    private Integer longitude;
     @SerializedName("can_edit")
     @Expose
     private Integer canEdit;
@@ -127,22 +121,6 @@ public class Photo {
 
     public void setText(String text) {
         this.text = text;
-    }
-
-    public Integer getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Integer latitude) {
-        this.latitude = latitude;
-    }
-
-    public Integer getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Integer longitude) {
-        this.longitude = longitude;
     }
 
     public Integer getCanEdit() {

@@ -1,7 +1,5 @@
 package app.mycity.mycity.views.adapters;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -22,21 +20,21 @@ import java.util.List;
 
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.model.Dialog;
+import app.mycity.mycity.api.model.Notification;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
-import app.mycity.mycity.views.activities.ChatActivity;
 import app.mycity.mycity.views.activities.ChatActivity2;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class DialogsRecyclerAdapter extends RecyclerView.Adapter<DialogsRecyclerAdapter.ViewHolder> {
+public class NotificationRecyclerAdapter extends RecyclerView.Adapter<NotificationRecyclerAdapter.ViewHolder> {
 
-    List<Dialog> dialogList;
+    List<Notification> dialogList;
     private Context context;
 
-    public DialogsRecyclerAdapter(List<Dialog> dialogList) {
+    public NotificationRecyclerAdapter(List<Notification> dialogList) {
         this.dialogList = dialogList;
         Log.d("TAG", "rec created");
     }
@@ -54,13 +52,13 @@ public class DialogsRecyclerAdapter extends RecyclerView.Adapter<DialogsRecycler
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String name = dialogList.get(position).getTitle();
+/*        String name = dialogList.get(position).getTitle();
 
-     /*   try {
+     *//*   try {
             holder.time.setText((CharSequence) format.parse(dialogList.get(position).getDate_ddMMyyyy().toString()));
         } catch (ParseException e) {
             e.printStackTrace();
-        }*/
+        }*//*
 
         holder.name.setText(name);
         holder.lastMessage.setText(dialogList.get(position).getText());
@@ -90,7 +88,7 @@ public class DialogsRecyclerAdapter extends RecyclerView.Adapter<DialogsRecycler
             holder.unreadCount.setVisibility(View.GONE);
         }
 
-        Picasso.get().load(dialogList.get(position).getPhoto130()).into(holder.image);
+        Picasso.get().load(dialogList.get(position).getPhoto130()).into(holder.image);*/
     }
 
     @Override
@@ -121,14 +119,7 @@ public class DialogsRecyclerAdapter extends RecyclerView.Adapter<DialogsRecycler
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    SharedManager.addProperty("unread_" + dialogList.get(getAdapterPosition()).getId(), "0");
-                    notifyItemChanged(getAdapterPosition());
 
-                    Intent intent = new Intent(context, ChatActivity2.class);
-                    intent.putExtra("user_id", dialogList.get(getAdapterPosition()).getId());
-                    intent.putExtra("image", dialogList.get(getAdapterPosition()).getPhoto130());
-                    intent.putExtra("name", dialogList.get(getAdapterPosition()).getTitle());
-                    context.startActivity(intent);
                 }
             });
 
@@ -138,38 +129,12 @@ public class DialogsRecyclerAdapter extends RecyclerView.Adapter<DialogsRecycler
                     EventBus.getDefault().post(new EventBusMessages.OpenUser("1"));
                 }
             });
-
-            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    Log.d("TAG25", "loooooooooooooooooong click");
-                    final PopupMenu popupMenu = new PopupMenu(itemView.getContext(), v);
-                    popupMenu.getMenuInflater().inflate(R.menu.popupmenu_dialog, popupMenu.getMenu());
-
-                    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem menuItem) {
-                            switch (menuItem.getItemId()) {
-                                // Handle the non group menu items here
-
-                                case R.id.deleteDialog:
-                                    EventBus.getDefault().post(new EventBusMessages.DeleteDialog(dialogList.get(getAdapterPosition()).getId()));
-                                    break;
-                            }
-                            return true;
-                        }
-                    });
-
-                    popupMenu.show();
-                    return true;
-                }
-            });
         }
 
 
     }
 
-    public void update(List<Dialog> dialogs){
+    public void update(List<Notification> dialogs){
         dialogList = dialogs;
         notifyDataSetChanged();
         Log.d("TAG", "update rec");

@@ -154,8 +154,8 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment {
                 @Override
                 public void onResponse(retrofit2.Call<ResponseContainer<ResponseWall>> call, retrofit2.Response<ResponseContainer<ResponseWall>> response) {
 
-                    if(response!=null && response.body().getResponse()!=null){
-                        Log.d("TAG21", "RESPONSE FEED OK");
+                    if(response.body().getResponse()!=null && response.body().getResponse().getCount()!=0){
+                        Log.d("TAG21", "RESPONSE FEED OK !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
                         totalCount = response.body().getResponse().getCount();
 
@@ -167,9 +167,11 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment {
                             profiles.put(p.getId(), p);
                         }
 
-                        for (Group g: response.body().getResponse().getGroups()){
-                         //   Log.d("TAG21","G - " + g.getId() + " " + g.getName());
-                            groups.put(g.getId(), g);
+                        if(response.body().getResponse().getGroups()!=null){
+                            for (Group g: response.body().getResponse().getGroups()){
+                                //   Log.d("TAG21","G - " + g.getId() + " " + g.getName());
+                                groups.put(g.getId(), g);
+                            }
                         }
 
                         Log.d("TAG21", "post size - " + postList.size() + " total - " + totalCount);
@@ -183,6 +185,8 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment {
                 }
                 @Override
                 public void onFailure(retrofit2.Call<ResponseContainer<ResponseWall>> call, Throwable t) {
+                    Log.d("TAG21", "FAIL FEED OK !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " + t.getCause());
+                    Log.d("TAG21", "FAIL FEED OK !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " + t.getLocalizedMessage());
                 }
             });
 

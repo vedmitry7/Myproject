@@ -5,19 +5,23 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class Post {
+public class Parent {
+
     @SerializedName("id")
     @Expose
-    private String id;
+    private Integer id;
+    @SerializedName("type")
+    @Expose
+    private String type;
     @SerializedName("from_id")
     @Expose
-    private String fromId;
+    private Integer fromId;
     @SerializedName("owner_id")
     @Expose
-    private String ownerId;
+    private Integer ownerId;
     @SerializedName("group_id")
     @Expose
-    private String groupId;
+    private Integer groupId;
     @SerializedName("from_group")
     @Expose
     private Integer fromGroup;
@@ -30,59 +34,53 @@ public class Post {
     @SerializedName("friends_only")
     @Expose
     private Integer friendsOnly;
-    @SerializedName("likes")
+    @SerializedName("latitude")
     @Expose
-    private Likes likes;
-    @SerializedName("comments")
+    private Integer latitude;
+    @SerializedName("longitude")
     @Expose
-    private Comments comments;
-    @SerializedName("visits")
-    @Expose
-    private Visits visits;
+    private Integer longitude;
     @SerializedName("attachments")
     @Expose
     private List<Photo> attachments = null;
-    @SerializedName("place_id")
-    @Expose
-    private String placeId;
 
-    public String getPlaceId() {
-        return placeId;
-    }
-
-    public void setPlaceId(String placeId) {
-        this.placeId = placeId;
-    }
-
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public String getFromId() {
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Integer getFromId() {
         return fromId;
     }
 
-    public void setFromId(String fromId) {
+    public void setFromId(Integer fromId) {
         this.fromId = fromId;
     }
 
-    public String getOwnerId() {
+    public Integer getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(String ownerId) {
+    public void setOwnerId(Integer ownerId) {
         this.ownerId = ownerId;
     }
 
-    public String getGroupId() {
+    public Integer getGroupId() {
         return groupId;
     }
 
-    public void setGroupId(String groupId) {
+    public void setGroupId(Integer groupId) {
         this.groupId = groupId;
     }
 
@@ -118,35 +116,27 @@ public class Post {
         this.friendsOnly = friendsOnly;
     }
 
+    public Integer getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Integer latitude) {
+        this.latitude = latitude;
+    }
+
+    public Integer getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Integer longitude) {
+        this.longitude = longitude;
+    }
+
     public List<Photo> getAttachments() {
         return attachments;
     }
 
     public void setAttachments(List<Photo> attachments) {
         this.attachments = attachments;
-    }
-
-    public Likes getLikes() {
-        return likes;
-    }
-
-    public void setLikes(Likes likes) {
-        this.likes = likes;
-    }
-
-    public Visits getVisits() {
-        return visits;
-    }
-
-    public void setVisits(Visits visits) {
-        this.visits = visits;
-    }
-
-    public Comments getComments() {
-        return comments;
-    }
-
-    public void setComments(Comments comments) {
-        this.comments = comments;
     }
 }

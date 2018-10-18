@@ -43,6 +43,7 @@ import app.mycity.mycity.filter_desc_post.ExpandableLayout;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
+import app.mycity.mycity.views.activities.ChatActivity2;
 import app.mycity.mycity.views.activities.FullViewActivity;
 import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
@@ -125,6 +126,8 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
     boolean mayRestore;
 
     boolean linearLayout;
+
+    User user;
 
 
     public void showContent() {
@@ -335,7 +338,7 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
         ApiFactory.getApi().getUserById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId, "photo_780,photo_130,is_subscription,is_subscriber").enqueue(new retrofit2.Callback<ResponseContainer<User>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<User>> call, retrofit2.Response<ResponseContainer<User>> response) {
-                User user = response.body().getResponse();
+                user = response.body().getResponse();
                 if (user != null) {
                     Log.i("TAG21", user.getFirstName());
                     Log.i("TAG21", user.getLastName());
@@ -467,7 +470,11 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
     @OnClick(R.id.someoneFragChat)
     public void settings(View v) {
         Log.d("TAG", "Chat ");
-        // activity.startSettings(0);
+        Intent intent = new Intent(getContext(), ChatActivity2.class);
+        intent.putExtra("user_id", userId);
+        intent.putExtra("image", user.getPhoto130());
+        intent.putExtra("name", user.getFirstName() + " " + user.getLastName());
+        getContext().startActivity(intent);
     }
 
 

@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
 
 import app.mycity.mycity.views.fragments.SimpleFragment;
+import app.mycity.mycity.views.fragments.events.AllEvents;
 import app.mycity.mycity.views.fragments.feed.FeedCheckinFragmentNew;
 import app.mycity.mycity.views.fragments.feed.FeedPhotoAlbumFragment;
 
@@ -28,7 +29,7 @@ public class FeedPagerAdapter extends FragmentPagerAdapter {
             case 1:
                 return FeedPhotoAlbumFragment.createInstance(tabName);
             case 2:
-                return new SimpleFragment();
+                return AllEvents.createInstance(tabName, 4);
 
         }
         return null;
@@ -45,9 +46,9 @@ public class FeedPagerAdapter extends FragmentPagerAdapter {
             case 0:
                 return "Чекины";
             case 1:
-                return "Фотоотчеты";
+                return "Хроники";
             case 2:
-                return "Видеоотчеты";
+                return "События";
         }
         return null;
     }

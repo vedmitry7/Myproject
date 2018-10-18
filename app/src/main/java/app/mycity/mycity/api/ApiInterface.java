@@ -4,6 +4,8 @@ import com.google.gson.JsonObject;
 
 import app.mycity.mycity.api.model.DialogsContainer;
 import app.mycity.mycity.api.model.MessageResponse;
+import app.mycity.mycity.api.model.NotificationResponce;
+import app.mycity.mycity.api.model.PlaceCategoryResponce;
 import app.mycity.mycity.api.model.PlacesResponse;
 import app.mycity.mycity.api.model.ResponseAddComment;
 import app.mycity.mycity.api.model.ResponseAlbums;
@@ -24,6 +26,7 @@ import app.mycity.mycity.api.model.ResponseVisit;
 import app.mycity.mycity.api.model.ResponseWall;
 import app.mycity.mycity.api.model.SendMessageResponse;
 import app.mycity.mycity.api.model.Success;
+import app.mycity.mycity.api.model.SuccessResponceNumber;
 import app.mycity.mycity.api.model.User;
 import app.mycity.mycity.api.model.UsersContainer;
 import okhttp3.MultipartBody;
@@ -155,6 +158,11 @@ public interface ApiInterface {
                                                          @Field("offset") int count);
 
 
+    @FormUrlEncoded
+    @POST("messages.deleteDialog")
+    Call<ResponseContainer<SuccessResponceNumber>> deleteDialogs(@Field("access_token") String accessToken,
+                                                         @Field("peer_id") long id);
+
     //send message
     @FormUrlEncoded
     @POST("messages.send")
@@ -166,13 +174,19 @@ public interface ApiInterface {
 
     @FormUrlEncoded
     @POST("messages.markAsRead")
-    Call<ResponseContainer<ResponseMarkAsRead>> markAsRead(@Field("access_token") String accessToken,
+    Call<ResponseContainer<SuccessResponceNumber>> markAsRead(@Field("access_token") String accessToken,
                                                            @Field("peer_id") long user_id);
 
     @FormUrlEncoded
     @POST("messages.markAsRead")
-    Call<ResponseContainer<ResponseMarkAsRead>> markAsReadMessages(@Field("access_token") String accessToken,
+    Call<ResponseContainer<SuccessResponceNumber>> markAsReadMessages(@Field("access_token") String accessToken,
                                                                     @Field("message_ids") long message_ids);
+
+
+    @FormUrlEncoded
+    @POST("messages.delete")
+    Call<ResponseContainer<SuccessResponceNumber>> deleteMessages(@Field("access_token") String accessToken,
+                                                                  @Field("message_ids") long message_ids);
 
     @FormUrlEncoded
     @POST("messages.getHistory")
@@ -267,8 +281,6 @@ public interface ApiInterface {
     Call<ResponseContainer<ResponsePostPhoto>> postPicture(@Part("access_token") RequestBody action,
                                                            @Part("place_id") RequestBody placeId,
                                                            @Part("message") RequestBody message,
-                                                           @Part("latitude") RequestBody latitude,
-                                                           @Part("longitude") RequestBody longitude,
                                                            @Part("attachments") RequestBody attachments);
 
 
@@ -412,7 +424,8 @@ public interface ApiInterface {
     @POST("groups.getAll")
     Call<ResponseContainer<ResponsePlaces>> getPlaces(@Field("access_token") String token,
                                                       @Field("offset") int offset,
-                                                      @Field("city_id ") int cityId);
+                                                      @Field("city_id ") int cityId,
+                                                      @Field("category_id") int categoryId);
 
     @FormUrlEncoded
     @POST("groups.get")
@@ -452,8 +465,23 @@ public interface ApiInterface {
                                                         @Field("group_id") String groupIds);
 
     @FormUrlEncoded
+    @POST("groups.getNearby")
+    Call<ResponseContainer<ResponsePlaces>> getPlaceByCoordinates(@Field("access_token") String token,
+                                                                  @Field("latitude") String latitude,
+                                                                  @Field("longitude") String longitude,
+                                                                  @Field("radius") int radius);
+
+    @FormUrlEncoded
     @POST("account.setCoordinates")
     Call<ResponseContainer<UsersContainer>> setCoordinates(@Field("access_token") String token,
                                                             @Field("latitude") Double latitude,
                                                             @Field("longitude") Double longitude);
+
+    @FormUrlEncoded
+    @POST("database.getCategories")
+    Call<PlaceCategoryResponce> getPlaceCategories(@Field("access_token") String token);
+
+    @FormUrlEncoded
+    @POST("notifications.get")
+    Call<ResponseContainer<NotificationResponce>> getNotifications(@Field("access_token") String token);
 }

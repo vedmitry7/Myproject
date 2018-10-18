@@ -33,7 +33,7 @@ public class Util {
 
     public static void indicateTabImageView(Context context, View v, int pos){
         ImageView imageView;
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 4; i++) {
             imageView = v.findViewById(Constants.navButtonsIcons[i]);
             if(i==pos){
                 imageView.setColorFilter(context.getResources().getColor(R.color.colorAccent));
@@ -46,7 +46,7 @@ public class Util {
 
     public static void setOnTabClick(View v){
         RelativeLayout layout;
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 4; i++) {
             layout = v.findViewById(Constants.navButtons[i]);
             final int finalI = i;
             layout.setOnClickListener(new View.OnClickListener() {
@@ -127,10 +127,10 @@ public class Util {
     }
 
 
-    public static String getDate(long time) {
+    public static String getDate_ddMMyyyy(long time) {
         Date date = new Date(time*1000L); // *1000 is to convert seconds to milliseconds
        // SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm"); // the format of your date
-       SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy"); // the format of your date
+       SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy"); // the format of your date
         //sdf.setTimeZone(TimeZone.getTimeZone("GMT-2"));
 
         return sdf.format(date);

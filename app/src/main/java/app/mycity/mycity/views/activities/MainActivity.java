@@ -158,58 +158,7 @@ public class MainActivity extends AppCompatActivity implements MainAct {
 
     }
 
-    @OnClick(R.id.main_act_top_button_container)
-    public void top(View v){
-        setIndicator(topButton);
-    }
 
-    @OnClick(R.id.main_act_places_button_container)
-    public void places(View v){
-        setIndicator(placesButton);
-        PlacesFragment placesFragment = new PlacesFragment();
-        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
-      //  transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
-        transaction.add(R.id.main_act_fragment_container, placesFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
-    }
-
-
-    @OnClick(R.id.main_act_search_button_container)
-    public void search(View v){
-        setIndicator(searchButton);
-        LongListFragment myFriendsFragment = new LongListFragment();
-        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
-        transaction.replace(R.id.main_act_fragment_container, myFriendsFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
-    }
-
-    @OnClick(R.id.main_act_feed_button_container)
-    public void feed(View v){
-        setIndicator(feedButton);
-        FeedCheckinFragment feedFragment = new FeedCheckinFragment();
-        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
-       // transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
-        transaction.replace(R.id.main_act_fragment_container, feedFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
-    }
-
-
-    @OnClick(R.id.main_act_profile_button_container)
-    public void profile(View v){
-        profileFragment = new ProfileFragment();
-
-        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
-        transaction.add(R.id.main_act_fragment_container, profileFragment);
-        transaction.addToBackStack("myProfile");
-        transaction.commit();
-
-        clearFragmentStack();
-    }
     void clearFragmentStack(){
         FragmentManager fm = getFragmentManager(); // or 'getSupportFragmentManager();'
         int count = fm.getBackStackEntryCount();

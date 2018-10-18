@@ -87,7 +87,7 @@ public class TopPlacesFragment extends Fragment implements TabStacker.TabStackIn
     }
 
     private void loadPlaces(int offset) {
-        ApiFactory.getApi().getPlaces(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), offset, 552).enqueue(new retrofit2.Callback<ResponseContainer<ResponsePlaces>>() {
+        ApiFactory.getApi().getPlaces(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), offset, 552, 0).enqueue(new retrofit2.Callback<ResponseContainer<ResponsePlaces>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<ResponsePlaces>> call, retrofit2.Response<ResponseContainer<ResponsePlaces>> response) {
                 if(response.body()!=null){

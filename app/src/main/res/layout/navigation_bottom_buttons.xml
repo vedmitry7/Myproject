@@ -9,6 +9,57 @@
     app:layout_constraintStart_toStartOf="parent">
 
     <RelativeLayout
+        android:id="@+id/main_act_profile_button_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/main_act_profile_button"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_centerInParent="true"
+            android:background="@android:color/transparent"
+            android:clickable="false"
+            android:src="@drawable/ic_account_black_24dp" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/main_act_feed_button_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/main_act_feed_button"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_centerInParent="true"
+            android:background="@android:color/transparent"
+            android:clickable="false"
+            android:src="@drawable/ic_library_books_black_24dp" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/mainActAddBtn"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/main_act_search_button"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_centerInParent="true"
+            android:background="@android:color/transparent"
+            android:clickable="false"
+            android:src="@drawable/ic_photo" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
         android:id="@+id/main_act_top_button_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -37,57 +88,6 @@
             android:background="@android:color/transparent"
             android:clickable="false"
             android:src="@drawable/ic_map_marker_multiple_black_24dp" />
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/main_act_profile_button_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
-
-        <ImageView
-            android:id="@+id/main_act_profile_button"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_centerInParent="true"
-            android:background="@android:color/transparent"
-            android:clickable="false"
-            android:src="@drawable/ic_account_black_24dp" />
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/main_act_search_button_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
-
-        <ImageView
-            android:id="@+id/main_act_search_button"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_centerInParent="true"
-            android:background="@android:color/transparent"
-            android:clickable="false"
-            android:src="@drawable/ic_poster3" />
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/main_act_feed_button_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
-
-        <ImageView
-            android:id="@+id/main_act_feed_button"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_centerInParent="true"
-            android:background="@android:color/transparent"
-            android:clickable="false"
-            android:src="@drawable/ic_library_books_black_24dp" />
 
     </RelativeLayout>
 

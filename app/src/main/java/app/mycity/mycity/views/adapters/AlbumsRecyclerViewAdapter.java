@@ -57,7 +57,7 @@ public class AlbumsRecyclerViewAdapter extends RecyclerView.Adapter<AlbumsRecycl
     public void onBindViewHolder(ViewHolder holder, int position) {
         Log.d("TAG21", position + " Albums BIND - " +  albumes.get(position).getTitle() + "expend - " + expend);
         holder.name.setText(albumes.get(position).getTitle());
-        holder.date.setText(Util.getDate(albumes.get(position).getDateCreated()));
+        holder.date.setText(Util.getDate_ddMMyyyy(albumes.get(position).getDateCreated()));
 
         Picasso.get().load(albumes.get(position).getPhotoOrig()).into(holder.preview);
 

@@ -20,6 +20,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
@@ -29,8 +30,10 @@ import app.mycity.mycity.api.model.MessageResponse;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponseMarkAsRead;
 import app.mycity.mycity.api.model.SendMessageResponse;
+import app.mycity.mycity.api.model.SuccessResponceNumber;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
+import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.adapters.ChatRecyclerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -58,6 +61,10 @@ public class ChatActivity2 extends AppCompatActivity {
 
     @BindView(R.id.newMessageIndicator)
     CardView newMessageIndicator;
+
+
+    @BindView(R.id.dateIndicatorLabel)
+    TextView dateIndicatorLabel;
 
     final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 
@@ -144,6 +151,8 @@ public class ChatActivity2 extends AppCompatActivity {
                 Log.d("chat22", "get " + (lastVisibleItems));
                 Log.d("chat22", "message " + results.get(firstVisibleItem).getText() + " my - " + results.get(firstVisibleItem).getOut() + " was read " + results.get(firstVisibleItem).isWasRead());
 
+                dateIndicatorLabel.setText(Util.getDate_ddMMyyyy(results.get(lastVisibleItems).getTime()));
+
                 if(results.get(firstVisibleItem).getOut()==1){
                     lastMyMessageId = results.get(firstVisibleItem).getId();
                 }
@@ -194,7 +203,7 @@ public class ChatActivity2 extends AppCompatActivity {
         ApiFactory.getApi().getMessages(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId, offset).enqueue(new retrofit2.Callback<ResponseContainer<MessageResponse>>() {
             @Override
             public void onResponse(Call<ResponseContainer<MessageResponse>> call, Response<ResponseContainer<MessageResponse>> response) {
-                if(response.body()!=null && response.body().getResponse()!=null){
+                if(response.body()!=null && response.body().getResponse().getItems()!=null){
                     Log.d("TAG25", "Messages size - " + response.body().getResponse().getItems().size());
 
                     totalCount = response.body().getResponse().getCount();
@@ -367,11 +376,11 @@ public class ChatActivity2 extends AppCompatActivity {
     private void markAsRead() {
         Log.d("TAG25", "Mark as READ");
         Log.d("chat22", "Mark as READ");
-        ApiFactory.getApi().markAsRead(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId).enqueue(new retrofit2.Callback<ResponseContainer<ResponseMarkAsRead>>() {
+        ApiFactory.getApi().markAsRead(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId).enqueue(new retrofit2.Callback<ResponseContainer<SuccessResponceNumber>>() {
             @Override
-            public void onResponse(retrofit2.Call<ResponseContainer<ResponseMarkAsRead>> call, retrofit2.Response<ResponseContainer<ResponseMarkAsRead>> response) {
+            public void onResponse(retrofit2.Call<ResponseContainer<SuccessResponceNumber>> call, retrofit2.Response<ResponseContainer<SuccessResponceNumber>> response) {
                 Log.d("TAG21", "Mark SOME response ");
-                if(response!=null && response.isSuccessful()){
+                if(response.body().getResponse().getSuccess()==1){
                     Log.d("TAG25", "Mark response - success");
 
                     RealmResults<Message> results = mRealm.where(Message.class)
@@ -391,7 +400,7 @@ public class ChatActivity2 extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(retrofit2.Call<ResponseContainer<ResponseMarkAsRead>> call, Throwable t) {
+            public void onFailure(retrofit2.Call<ResponseContainer<SuccessResponceNumber>> call, Throwable t) {
                 Log.d("TAG21", "Mark failure - " + t.getLocalizedMessage());
             }
         });
@@ -400,11 +409,11 @@ public class ChatActivity2 extends AppCompatActivity {
         private void markAsReadMessage(final long messageId) {
             Log.d("TAG25", "Mark as READ");
             Log.d("chat22", "Mark as READ message - " + messageId);
-            ApiFactory.getApi().markAsReadMessages(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), messageId).enqueue(new Callback<ResponseContainer<ResponseMarkAsRead>>() {
+            ApiFactory.getApi().markAsReadMessages(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), messageId).enqueue(new Callback<ResponseContainer<SuccessResponceNumber>>() {
                 @Override
-                public void onResponse(Call<ResponseContainer<ResponseMarkAsRead>> call, Response<ResponseContainer<ResponseMarkAsRead>> response) {
+                public void onResponse(Call<ResponseContainer<SuccessResponceNumber>> call, Response<ResponseContainer<SuccessResponceNumber>> response) {
                     Log.d("chat22", "resp - " + messageId);
-                    if(response.body().getResponse().getSuccess()){
+                    if(response.body().getResponse().getSuccess()==1){
                         for (Message m:results
                              ) {
                             if(m.getId()==messageId){
@@ -416,11 +425,43 @@ public class ChatActivity2 extends AppCompatActivity {
                 }
 
                 @Override
-                public void onFailure(Call<ResponseContainer<ResponseMarkAsRead>> call, Throwable t) {
+                public void onFailure(Call<ResponseContainer<SuccessResponceNumber>> call, Throwable t) {
                     Log.d("chat22", "fail - " + messageId);
                 }
             });
         }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(final EventBusMessages.DeleteChatMessage event){
+          Log.d("TAG25", "message delete");
+
+
+
+
+        ApiFactory.getApi().deleteMessages(App.accessToken(), event.getId()).enqueue(new Callback<ResponseContainer<SuccessResponceNumber>>() {
+            @Override
+            public void onResponse(Call<ResponseContainer<SuccessResponceNumber>> call, Response<ResponseContainer<SuccessResponceNumber>> response) {
+                if(response.body()!=null && response.body().getResponse()!=null){
+                    if(response.body().getResponse().getSuccess()==1){
+                        for (int i = 0; i < results.size(); i++) {
+                            if(results.get(i).getId() == event.getId()){
+                                results.remove(i);
+                                adapter.notifyItemRemoved(i);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseContainer<SuccessResponceNumber>> call, Throwable t) {
+
+            }
+        });
+        //adapter.update(results);
+    }
 
     private void updateList() {
 
@@ -458,7 +499,7 @@ public class ChatActivity2 extends AppCompatActivity {
     @OnClick(R.id.updateChat)
     public void updateChat(View v){
         Log.d("TAG21", "update chat...");
-        markAsRead();
+      //  markAsRead();
        // recyclerView.scrollToPosition(results.size()-1);
     }
 

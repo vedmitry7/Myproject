@@ -35,6 +35,7 @@ import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.model.ResponseMarkAsRead;
+import app.mycity.mycity.api.model.SuccessResponceNumber;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.api.ApiFactory;
@@ -245,11 +246,12 @@ public class ChatActivity extends AppCompatActivity {
 
     private void markAsRead() {
         Log.d("TAG25", "Mark as READ");
-        ApiFactory.getApi().markAsRead(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId).enqueue(new retrofit2.Callback<ResponseContainer<ResponseMarkAsRead>>() {
+        Log.d("chat22", "Mark as READ");
+        ApiFactory.getApi().markAsRead(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId).enqueue(new retrofit2.Callback<ResponseContainer<SuccessResponceNumber>>() {
             @Override
-            public void onResponse(retrofit2.Call<ResponseContainer<ResponseMarkAsRead>> call, retrofit2.Response<ResponseContainer<ResponseMarkAsRead>> response) {
+            public void onResponse(retrofit2.Call<ResponseContainer<SuccessResponceNumber>> call, retrofit2.Response<ResponseContainer<SuccessResponceNumber>> response) {
                 Log.d("TAG21", "Mark SOME response ");
-                if(response!=null && response.isSuccessful()){
+                if(response.body().getResponse().getSuccess()==1){
                     Log.d("TAG25", "Mark response - success");
 
                     RealmResults<Message> results = mRealm.where(Message.class)
@@ -269,7 +271,7 @@ public class ChatActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(retrofit2.Call<ResponseContainer<ResponseMarkAsRead>> call, Throwable t) {
+            public void onFailure(retrofit2.Call<ResponseContainer<SuccessResponceNumber>> call, Throwable t) {
                 Log.d("TAG21", "Mark failure - " + t.getLocalizedMessage());
             }
         });

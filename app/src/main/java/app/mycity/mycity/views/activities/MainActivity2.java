@@ -3,17 +3,24 @@ package app.mycity.mycity.views.activities;
 import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
-import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.karumi.dexter.Dexter;
@@ -26,6 +33,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
@@ -35,16 +43,16 @@ import app.mycity.mycity.Constants;
 import app.mycity.mycity.LocationService;
 import app.mycity.mycity.NewTestService;
 import app.mycity.mycity.R;
-import app.mycity.mycity.TestService;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.ResponseContainer;
+import app.mycity.mycity.api.model.ResponsePlaces;
 import app.mycity.mycity.api.model.ResponseSocketServer;
 import app.mycity.mycity.filter_desc_post.FilterImageActivity;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
+import app.mycity.mycity.views.adapters.PlacesByCoordinatesRecyclerAdapter;
 import app.mycity.mycity.views.fragments.CommentsFragment;
 import app.mycity.mycity.views.fragments.DialogsFragment;
-import app.mycity.mycity.views.fragments.events.AllEvents;
 import app.mycity.mycity.views.fragments.feed.FeedFragment;
 import app.mycity.mycity.views.fragments.feed.FeedPhotoReportFragmentContent;
 import app.mycity.mycity.views.fragments.feed.FeedPlacesCheckinFragment;
@@ -110,11 +118,10 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
     }
 
     private enum Tab {
-        TAB_TOP(0),
-        TAB_PLACES(1),
-        TAB_PROFILE(2),
-        TAB_SEARCH(3),
-        TAB_FEED(4);
+        TAB_PROFILE(0),
+        TAB_FEED(1),
+        TAB_PEOPLE(2),
+        TAB_PLACES(3);
 
         private int mButtonResId;
 
@@ -164,6 +171,8 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
         } else {
             // restoring Activity: restore the TabStacker, and select the saved selected tab
             mTabStacker.restoreInstance(savedInstanceState);
+            Log.i("TAG21", "Clicked on Tab " + mTabStacker.getCurrentTabName());
+
             Tab selectedTab = Tab.valueOf(mTabStacker.getCurrentTabName());
             selectTab(selectedTab);
 
@@ -222,17 +231,14 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
             android.support.v4.app.Fragment fragment = null;
 
             switch (clickedTab){
-                case TAB_TOP:
+                case TAB_PEOPLE:
                     fragment = new PeoplesFragment();
                     break;
                 case TAB_PLACES:
                     fragment = new PlacesFragment();
                     break;
                 case TAB_PROFILE:
-                    fragment = ProfileFragment.createInstance(tabName + "_" + mTabStacker.getCurrentTabSize(),mTabStacker.getCurrentTabSize(), 2);
-                    break;
-                case TAB_SEARCH:
-                    fragment = AllEvents.createInstance(tabName + "_" + mTabStacker.getCurrentTabSize(), 3);
+                    fragment = ProfileFragment.createInstance(tabName + "_" + mTabStacker.getCurrentTabSize(),mTabStacker.getCurrentTabSize(), 0);
                     break;
                 case TAB_FEED:
                     fragment = FeedFragment.createInstance(getFragmentName(), getCurrentTabPosition());
@@ -294,24 +300,87 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(EventBusMessages.MakeCheckin event){
-        Log.d("TAG21", "PHOTO - ");
-        Dexter.withActivity(this).withPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                .withListener(new MultiplePermissionsListener() {
-                    @Override
-                    public void onPermissionsChecked(MultiplePermissionsReport report) {
-                        if (report.areAllPermissionsGranted()) {
-                            Intent intent = new Intent(MainActivity2.this, FilterImageActivity.class);
-                            startActivity(intent);
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Permissions are not granted!", Toast.LENGTH_SHORT).show();
-                        }
-                    }
 
-                    @Override
-                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
-                        token.continuePermissionRequest();
+        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        dialogBuilder.setTitle("Определение местоположения");
+
+        LayoutInflater inflater = (LayoutInflater) this.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+        final View dialogView = inflater.inflate(R.layout.asking_place_dialog, null);
+        final RecyclerView recyclerView = dialogView.findViewById(R.id.placesRecyclerView);
+        final List placeList = new ArrayList<>();
+
+        final PlacesByCoordinatesRecyclerAdapter adapter = new PlacesByCoordinatesRecyclerAdapter(placeList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+
+        final ProgressBar progress = dialogView.findViewById(R.id.placesDialogProgress);
+        final TextView message = dialogView.findViewById(R.id.placeDialogMessage);
+
+
+        ApiFactory.getApi().getPlaceByCoordinates(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), SharedManager.getProperty("latitude"), SharedManager.getProperty("longitude"), 300).enqueue(new retrofit2.Callback<ResponseContainer<ResponsePlaces>>() {
+            @Override
+            public void onResponse(retrofit2.Call<ResponseContainer<ResponsePlaces>> call, retrofit2.Response<ResponseContainer<ResponsePlaces>> response) {
+                if(response.body()!=null){
+                    progress.setVisibility(View.GONE);
+                    if(response.body().getResponse().getCount()==0){
+                        message.setVisibility(View.VISIBLE);
+                    } else {
+                        recyclerView.setVisibility(View.VISIBLE);
                     }
-                }).check();
+                    placeList.addAll(response.body().getResponse().getItems());
+                    Log.d("TAG21", "Places size" + response.body().getResponse().getItems().size());
+                    adapter.update(placeList);
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<ResponseContainer<ResponsePlaces>> call, Throwable t) {
+
+            }
+        });
+
+
+        dialogBuilder.setView(dialogView);
+        dialogBuilder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+            }
+        });
+        dialogBuilder.setPositiveButton("Ок", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                SharedManager.addProperty("currentPlace", adapter.getSelectedPlaceId());
+
+                if(placeList.size()>0){
+                    Dexter.withActivity(MainActivity2.this).withPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            .withListener(new MultiplePermissionsListener() {
+                                @Override
+                                public void onPermissionsChecked(MultiplePermissionsReport report) {
+                                    if (report.areAllPermissionsGranted()) {
+                                        Intent intent = new Intent(MainActivity2.this, FilterImageActivity.class);
+                                        startActivity(intent);
+                                    } else {
+                                        Toast.makeText(getApplicationContext(), "Permissions are not granted!", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                    token.continuePermissionRequest();
+                                }
+                            }).check();
+
+                }
+                dialog.dismiss();
+            }
+        });
+        AlertDialog b = dialogBuilder.create();
+        b.show();
+
+
+
+
+        Log.d("TAG21", "PHOTO - ");
+
 
     }
 
