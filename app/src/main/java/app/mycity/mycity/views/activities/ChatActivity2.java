@@ -78,9 +78,10 @@ public class ChatActivity2 extends AppCompatActivity {
 
 
     List<Message> results = new ArrayList<>();
-    long userId = 1;
+    String userId;
     public static String imageUrl;
     private boolean isLoading;
+    private boolean wasStop;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +91,7 @@ public class ChatActivity2 extends AppCompatActivity {
 
         mRealm = Realm.getDefaultInstance();
 
-        userId = getIntent().getLongExtra("user_id", 0);
+        userId = getIntent().getStringExtra("user_id");
         imageUrl = getIntent().getStringExtra("image");
 
         if(getIntent().getStringExtra("image")==null){
@@ -105,7 +106,7 @@ public class ChatActivity2 extends AppCompatActivity {
             name = "...";
         }
 
-        Log.d("TAG21", "Chat open - " + name + userId + imageUrl);
+        Log.d("TAG21", "CREATE ACTIVITY Chat open - " + name + userId + imageUrl);
 
         if(name!=null)
             nameText.setText(name);
@@ -190,7 +191,7 @@ public class ChatActivity2 extends AppCompatActivity {
             }
         });
         adapter.notifyDataSetChanged();
-        recyclerView.scrollToPosition(results.size()-1);
+        recyclerView.scrollToPosition(0);
 
         loadMessages(0);
 
@@ -203,7 +204,7 @@ public class ChatActivity2 extends AppCompatActivity {
         ApiFactory.getApi().getMessages(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId, offset).enqueue(new retrofit2.Callback<ResponseContainer<MessageResponse>>() {
             @Override
             public void onResponse(Call<ResponseContainer<MessageResponse>> call, Response<ResponseContainer<MessageResponse>> response) {
-                if(response.body()!=null && response.body().getResponse().getItems()!=null){
+                if(response.body()!=null && response.body().getResponse()!=null && response.body().getResponse().getItems()!=null){
                     Log.d("TAG25", "Messages size - " + response.body().getResponse().getItems().size());
 
                     totalCount = response.body().getResponse().getCount();
@@ -219,9 +220,14 @@ public class ChatActivity2 extends AppCompatActivity {
                         Log.d("TAG25", "Message text - " + message.getText());
                         results.add(message);
                     }
-
                     isLoading = false;
                     adapter.update(results);
+                    if(results.size() == response.body().getResponse().getItems().size()){
+                        recyclerView.scrollToPosition(0);
+                    }
+                    markAsRead();
+                } else {
+                    Log.d("TAG25", "SOMETHING NULL ");
                 }
             }
 
@@ -246,6 +252,7 @@ public class ChatActivity2 extends AppCompatActivity {
 
 
         if(event.getOut()==0){
+            Log.d("TAG25", "NEW message from someone");
             //add message
             results.add(0, event.getMessage());
             adapter.notifyItemInserted(0);
@@ -260,11 +267,13 @@ public class ChatActivity2 extends AppCompatActivity {
         }
 
         if(event.getOut()==1) {
+            Log.d("TAG25", "NEW message from ME - id - " + event.getMessage().getId());
             //change Time
             for (int i = 0; i < results.size(); i++) {
                 if (results.get(i).getId() == event.getMessage().getId()) {
                     results.get(i).setTime(event.getMessage().getTime());
                     adapter.notifyItemChanged(i);
+                    Log.d("TAG25", results.get(i) + " with text");
                     break;
                 }
             }
@@ -314,7 +323,7 @@ public class ChatActivity2 extends AppCompatActivity {
             mRealm.beginTransaction();
             Message realmMessage = mRealm.createObject(Message.class, longId);
             //message.setId(messageId);
-            realmMessage.setUser(userId);
+            //realmMessage.setUser(userId);
             realmMessage.setTime(23423423);
             realmMessage.setText("create before r - " + messageText);
             realmMessage.setOut(1);
@@ -328,8 +337,8 @@ public class ChatActivity2 extends AppCompatActivity {
 
         final Message message = new Message();
         message.setId(curId);
-        message.setUser(userId);
-        message.setTime(23423423);
+        //message.setUser(userId);
+        message.setTime(System.currentTimeMillis()/1000);
         message.setText("create before r - " + messageText);
         message.setOut(1);
         message.setWasRead(false);
@@ -360,7 +369,8 @@ public class ChatActivity2 extends AppCompatActivity {
                         if(m.getId()==curId){
                             m.setId(response.body().getResponse().getMessageId());
                             m.setWasSended(true);
-                            m.setText("after resp - " + messageText);
+                            Log.d("TAG25", "SET ID for response message");
+                            m.setText("after resp - id: " + m.getId() + " " + messageText);
                         }
                     }
                     adapter.notifyDataSetChanged();
@@ -383,18 +393,10 @@ public class ChatActivity2 extends AppCompatActivity {
                 if(response.body().getResponse().getSuccess()==1){
                     Log.d("TAG25", "Mark response - success");
 
-                    RealmResults<Message> results = mRealm.where(Message.class)
-                            .equalTo("user", userId)
-                            .greaterThan("id", lastMyMessageId)
-                            .findAll();
-
-                    mRealm.beginTransaction();
-                    for (Message m : results
-                            ) {
-                        Log.d("TAG25", m.getText() + " - was read");
+                    for (Message m:results
+                         ) {
                         m.setWasRead(true);
                     }
-                    mRealm.commitTransaction();
                 }
 
             }
@@ -434,10 +436,7 @@ public class ChatActivity2 extends AppCompatActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(final EventBusMessages.DeleteChatMessage event){
-          Log.d("TAG25", "message delete");
-
-
-
+        Log.d("TAG25", "message delete");
 
         ApiFactory.getApi().deleteMessages(App.accessToken(), event.getId()).enqueue(new Callback<ResponseContainer<SuccessResponceNumber>>() {
             @Override
@@ -469,14 +468,28 @@ public class ChatActivity2 extends AppCompatActivity {
 
     @Override
     public void onStart() {
+        Log.d("TAG25", "Start chat - wasStop - " + wasStop);
         super.onStart();
+
+        if(wasStop){
+            results = new ArrayList<>();
+            loadMessages(0);
+        }
         EventBus.getDefault().register(this);
     }
 
     @Override
     public void onStop() {
+        Log.d("TAG25", "Stop chat");
+        wasStop = true;
         super.onStop();
         EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d("TAG25", "Resume chat");
+        super.onResume();
     }
 
     @OnClick(R.id.chatBackButtonContainer)

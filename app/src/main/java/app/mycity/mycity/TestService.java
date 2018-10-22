@@ -289,7 +289,7 @@ public class TestService extends Service {
                             Log.i("TAG25", "isForeground update chat");
                             EventBus.getDefault().post(new EventBusMessages.UpdateChat());
                         }
-                        EventBus.getDefault().post(new EventBusMessages.UpdateDialog(userId, text));
+                        EventBus.getDefault().post(new EventBusMessages.UpdateDialog(String.valueOf(userId), text));
 
                         break;
                 }

@@ -183,8 +183,8 @@ public class NewTestService extends Service {
 
                 String info = null;
                 switch (array.getInt(0)){
-                    case 1: info = "new message   ";break;
-                    case 2: info = "was read      ";break;
+                    case 1: info = "new message   "; break;
+                    case 2: info = "was read      "; break;
                     case 5: info = "dialog update "; break;
                     case 6: info = "read dialog   "; break;
                     case 7: info = "общее кол-во непрочит. "; break;
@@ -236,6 +236,16 @@ public class NewTestService extends Service {
                             message.setWasSended(true);
                             message.setWasRead(false);
                             EventBus.getDefault().post(new EventBusMessages.NewChatMessage(message, out));
+
+
+                        if(!((App) getApplicationContext()).isAppForeground()){
+                            Log.i("TAG21", "isNotForeground");
+                            if(out == 0){
+                                Log.i("TAG21", "send Notification");
+                                //   sendNotification(text, String.valueOf(userId));
+                                generateNotification(text, String.valueOf(userId));
+                            }
+                        }
 
                         break;
                 }

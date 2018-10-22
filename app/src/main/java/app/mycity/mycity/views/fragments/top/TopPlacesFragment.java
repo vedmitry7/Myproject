@@ -73,7 +73,7 @@ public class TopPlacesFragment extends Fragment implements TabStacker.TabStackIn
                         // load if we don't load all
                         if(totalCount >= placeList.size()){
                             Log.d("TAG21", "load feed ");
-                            loadPlaces(placeList.size());
+                            loadPlaces(placeList.size(), "");
                         }
                     }
                 }
@@ -83,11 +83,11 @@ public class TopPlacesFragment extends Fragment implements TabStacker.TabStackIn
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
         recyclerView.addOnScrollListener(scrollListener);
-        loadPlaces(placeList.size());
+        loadPlaces(placeList.size(), "");
     }
 
-    private void loadPlaces(int offset) {
-        ApiFactory.getApi().getPlaces(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), offset, 552, 0).enqueue(new retrofit2.Callback<ResponseContainer<ResponsePlaces>>() {
+    private void loadPlaces(int offset, String search) {
+        ApiFactory.getApi().getPlaces(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), offset, 552, 0, "").enqueue(new retrofit2.Callback<ResponseContainer<ResponsePlaces>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<ResponsePlaces>> call, retrofit2.Response<ResponseContainer<ResponsePlaces>> response) {
                 if(response.body()!=null){

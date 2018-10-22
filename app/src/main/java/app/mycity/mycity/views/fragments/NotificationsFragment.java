@@ -52,6 +52,8 @@ public class NotificationsFragment extends Fragment implements TabStacker.TabSta
     List<Notification> notificationList;
 
     MainAct activity;
+    private boolean isLoading;
+    private int totalCount;
 
     @Nullable
     @Override
@@ -75,18 +77,41 @@ public class NotificationsFragment extends Fragment implements TabStacker.TabSta
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Log.i("TAG21","onViewCreated Dialogs" + getArguments().getInt("tabPos"));
+        Log.i("TAG21","onViewCreated Dialogs " + getArguments().getInt("tabPos"));
 
         Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
         Util.setOnTabClick(view);
 
         notificationList = new ArrayList<>();
 
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int totalItemCount = layoutManager.getItemCount();
+                int lastVisibleItems = layoutManager.findLastVisibleItemPosition();
+
+                if (!isLoading) {
+                    if ( lastVisibleItems >= totalItemCount -10 ) {
+                        Log.d("TAG21", "ЗАГРУЗКА ДАННЫХ " + notificationList.size());
+                        isLoading = true;
+                        // load if we don't load all
+                        if(totalCount > notificationList.size()){
+                            Log.d("TAG21", "load notifications");
+                            loadDialogs(notificationList.size());
+
+                        }
+                    }
+                }
+            }
+        };
         adapter = new NotificationRecyclerAdapter(notificationList);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addOnScrollListener(scrollListener);
         recyclerView.setAdapter(adapter);
 
-        loadDialogs();
+        loadDialogs(notificationList.size());
     }
 
     @Override
@@ -101,20 +126,25 @@ public class NotificationsFragment extends Fragment implements TabStacker.TabSta
         EventBus.getDefault().unregister(this);
     }
 
-    private void loadDialogs() {
-        ApiFactory.getApi().getNotifications(App.accessToken()).enqueue(new Callback<ResponseContainer<NotificationResponce>>() {
+    private void loadDialogs(int offset) {
+        ApiFactory.getApi().getNotifications(App.accessToken(), offset).enqueue(new Callback<ResponseContainer<NotificationResponce>>() {
             @Override
             public void onResponse(Call<ResponseContainer<NotificationResponce>> call, Response<ResponseContainer<NotificationResponce>> response) {
                 if(response != null && response.body().getResponse() != null){
+
+
+                    totalCount = response.body().getResponse().getCount();
                     notificationList = response.body().getResponse().getItems();
                     Log.d("TAG21", "Size list = " + notificationList.size());
                     adapter.update(notificationList);
+
+                    isLoading = false;
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseContainer<NotificationResponce>> call, Throwable t) {
-
+                Log.d("TAG21", "FAIL " + t.getLocalizedMessage());
             }
         });
 

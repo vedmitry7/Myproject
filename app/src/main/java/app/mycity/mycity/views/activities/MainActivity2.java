@@ -53,6 +53,7 @@ import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.adapters.PlacesByCoordinatesRecyclerAdapter;
 import app.mycity.mycity.views.fragments.CommentsFragment;
 import app.mycity.mycity.views.fragments.DialogsFragment;
+import app.mycity.mycity.views.fragments.NotificationsFragment;
 import app.mycity.mycity.views.fragments.feed.FeedFragment;
 import app.mycity.mycity.views.fragments.feed.FeedPhotoReportFragmentContent;
 import app.mycity.mycity.views.fragments.feed.FeedPlacesCheckinFragment;
@@ -88,10 +89,8 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
     @BindView(R.id.main_act_profile_button) ImageView profileButton;*/
 
     @BindView(R.id.main_act_messages_container)         RelativeLayout messageButton;
-    @BindView(R.id.main_act_notification_container)     RelativeLayout notificattionButton;
 
     private TabStacker mTabStacker;
-
 
     Tab currentTab;
 
@@ -461,6 +460,14 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
 
     }
 
+    @OnClick(R.id.notificationsButton)
+    public void notification(View v){
+        Log.d("TAG21", "messages " + getCurrentTabPosition());
+
+       EventBus.getDefault().post(new EventBusMessages.OpenNotifications());
+
+    }
+
     @Override
     public void startSettings(int i) {
 
@@ -523,6 +530,14 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
                 getCurrentTabPosition(),
                 event.getUserId());
         mTabStacker.replaceFragment(subscriptionFragment, null);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void startUserPlaces(EventBusMessages.OpenNotifications event) {
+        NotificationsFragment notificationsFragment = NotificationsFragment.createInstance(
+                currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
+                getCurrentTabPosition());
+        mTabStacker.replaceFragment(notificationsFragment, null);
     }
 
 

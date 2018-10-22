@@ -468,10 +468,10 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
 
     @OnClick(R.id.someoneFragChat)
-    public void settings(View v) {
+    public void chat(View v) {
         Log.d("TAG", "Chat ");
         Intent intent = new Intent(getContext(), ChatActivity2.class);
-        intent.putExtra("user_id", userId);
+        intent.putExtra("user_id",  userId);
         intent.putExtra("image", user.getPhoto130());
         intent.putExtra("name", user.getFirstName() + " " + user.getLastName());
         getContext().startActivity(intent);

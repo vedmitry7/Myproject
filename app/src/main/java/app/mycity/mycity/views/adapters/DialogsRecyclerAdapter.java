@@ -57,7 +57,7 @@ public class DialogsRecyclerAdapter extends RecyclerView.Adapter<DialogsRecycler
         String name = dialogList.get(position).getTitle();
 
      /*   try {
-            holder.time.setText((CharSequence) format.parse(dialogList.get(position).getDate_ddMMyyyy().toString()));
+            holder.time.setText((CharSequence) format.parse(notifications.get(position).getDate_ddMMyyyy().toString()));
         } catch (ParseException e) {
             e.printStackTrace();
         }*/

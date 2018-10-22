@@ -301,9 +301,9 @@ public class EventBusMessages {
 
     public static class UpdateDialog {
         private String message;
-        private long id;
+        private String id;
 
-        public UpdateDialog(long id, String message) {
+        public UpdateDialog(String id, String message) {
             this.message = message;
             this.id = id;
         }
@@ -312,7 +312,7 @@ public class EventBusMessages {
             return message;
         }
 
-        public long getId() {
+        public String getId() {
             return id;
         }
     }
@@ -434,12 +434,15 @@ public class EventBusMessages {
     }
 
     public static class DeleteDialog {
-        long id;
-        public DeleteDialog(long id) {
+        String id;
+        public DeleteDialog(String id) {
             this.id = id;
         }
-        public long getId() {
+        public String getId() {
             return id;
         }
+    }
+
+    public static class OpenNotifications {
     }
 }

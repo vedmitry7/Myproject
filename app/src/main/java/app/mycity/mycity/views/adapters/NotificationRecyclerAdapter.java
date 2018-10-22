@@ -1,15 +1,14 @@
 package app.mycity.mycity.views.adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.PopupMenu;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -19,23 +18,22 @@ import org.greenrobot.eventbus.EventBus;
 import java.util.List;
 
 import app.mycity.mycity.R;
-import app.mycity.mycity.api.model.Dialog;
 import app.mycity.mycity.api.model.Notification;
+import app.mycity.mycity.api.model.Post;
 import app.mycity.mycity.util.EventBusMessages;
-import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
-import app.mycity.mycity.views.activities.ChatActivity2;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class NotificationRecyclerAdapter extends RecyclerView.Adapter<NotificationRecyclerAdapter.ViewHolder> {
 
-    List<Notification> dialogList;
+    List<Notification> notifications;
     private Context context;
 
-    public NotificationRecyclerAdapter(List<Notification> dialogList) {
-        this.dialogList = dialogList;
+    public NotificationRecyclerAdapter(List<Notification> notifications) {
+        this.notifications = notifications;
         Log.d("TAG", "rec created");
     }
 
@@ -45,97 +43,108 @@ public class NotificationRecyclerAdapter extends RecyclerView.Adapter<Notificati
         if(context == null){
             context =parent.getContext();
         }
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.dialog_row, parent, false);
-
+        View view = null;
+        switch (viewType){
+            case 0:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.notification_follow_row, parent, false);
+                break;
+            case 1:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.notification_like_post_row, parent, false);
+                break;
+            case 2:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.notification_like_comment_row, parent, false);
+                break;
+            case 3:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.notification_comment_post_row, parent, false);
+                break;
+            default:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.notification_comment_post_row, parent, false);
+        }
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-/*        String name = dialogList.get(position).getTitle();
 
-     *//*   try {
-            holder.time.setText((CharSequence) format.parse(dialogList.get(position).getDate_ddMMyyyy().toString()));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }*//*
+        Notification notification = notifications.get(position);
 
-        holder.name.setText(name);
-        holder.lastMessage.setText(dialogList.get(position).getText());
+        holder.time.setText(Util.getDatePretty(notification.getDate()));
+        holder.name.setText(notification.getFeedback().getFirstName() + " " + notification.getFeedback().getLastName());
+        Picasso.get().load(notification.getFeedback().getPhoto130()).into(holder.photo);
 
-        if(dialogList.get(position).getDate()!=null){
-            holder.time.setText(Util.getDatePretty(dialogList.get(position).getDate()));
-        } else {
-            holder.time.setText("null");
+        if(notification.getType().equals("follow")){
         }
 
-        if(SharedManager.getProperty("unread_" + dialogList.get(position).getId())==null){
-            Log.d("TAG21", name + " UNREAD NUUUUUUUULL");
-        } else {
-            if(SharedManager.getProperty("unread_" + dialogList.get(position).getId()).equals("0")){
-                Log.d("TAG21", name + " UNREAD ZERO");
-            }
+        if(notification.getType().equals("like_post")){
+            Picasso.get().load(notification.getParents().get(0).getAttachments().get(0).getPhoto130()).into(holder.contentImage);
         }
-
-
-
-        if(SharedManager.getProperty("unread_" + dialogList.get(position).getId())!=null && !SharedManager.getProperty("unread_" + dialogList.get(position).getId()).equals("0")){
-            holder.unreadCount.setVisibility(View.VISIBLE);
-            holder.unreadCount.setText(SharedManager.getProperty("unread_" + dialogList.get(position).getId()));
-            Log.d("TAG21", name + " COUNT " + SharedManager.getProperty("unread_" + dialogList.get(position).getId()));
+        if(notification.getType().equals("like_comment")){
+            holder.commentText.setText(notification.getParents().get(0).getText());
         }
-        else {
-            holder.unreadCount.setVisibility(View.GONE);
+        if(notification.getType().equals("comment_post")){
+            Picasso.get().load(notification.getParents().get(0).getAttachments().get(0).getPhoto130()).into(holder.contentImage);
+            holder.commentText.setText(notification.getFeedback().getComment().getText());
+            Log.d("TAG21", "Comment post - " + notification.getFeedback().getComment().getText());
         }
-
-        Picasso.get().load(dialogList.get(position).getPhoto130()).into(holder.image);*/
     }
 
     @Override
     public int getItemCount() {
-        return dialogList.size();
+        return notifications.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        switch (notifications.get(position).getType()){
+            case "follow":
+                return 0;
+            case "like_post":
+                return 1;
+            case "like_comment":
+                return 2;
+            case "comment_post":
+                return 3;
+        }
+        return -1;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.dialog_row_name)
+        @Nullable
+        @BindView(R.id.userName)
         TextView name;
-
-        @BindView(R.id.unreadCount)
-        TextView unreadCount;
-
-        @BindView(R.id.dialogsRowImage)
-        CircleImageView image;
-
-        @BindView(R.id.dialog_row_time)
+        @Nullable
+        @BindView(R.id.eventTime)
         TextView time;
-
-        @BindView(R.id.dialog_row_message)
-        TextView lastMessage;
+        @Nullable
+        @BindView(R.id.commentText)
+        TextView commentText;
+        @Nullable
+        @BindView(R.id.userPhoto)
+        ImageView photo;
+        @Nullable
+        @BindView(R.id.contentImage)
+        ImageView contentImage;
 
         ViewHolder(final View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            itemView.setOnClickListener(new View.OnClickListener() {
+
+            View.OnClickListener openUser = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    EventBus.getDefault().post(new EventBusMessages.OpenUser(notifications.get(getAdapterPosition()).getFeedback().getId()));
                 }
-            });
+            };
 
-            image.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    EventBus.getDefault().post(new EventBusMessages.OpenUser("1"));
-                }
-            });
+            photo.setOnClickListener(openUser);
+            name.setOnClickListener(openUser);
+
         }
-
-
     }
 
     public void update(List<Notification> dialogs){
-        dialogList = dialogs;
+        notifications = dialogs;
         notifyDataSetChanged();
         Log.d("TAG", "update rec");
     }

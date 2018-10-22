@@ -134,7 +134,7 @@ public class DialogsFragment extends Fragment implements TabStacker.TabStackInte
                 if(response.body()!=null && response.body().getResponse()!=null){
                     if(response.body().getResponse().getSuccess()==1){
                         for (int i = 0; i < dialogList.size(); i++) {
-                            if(dialogList.get(i).getId() == event.getId()){
+                            if(dialogList.get(i).getId().equals(event.getId())){
                                 dialogList.remove(i);
                                 adapter.notifyItemRemoved(i);
                                 break;
@@ -157,7 +157,7 @@ public class DialogsFragment extends Fragment implements TabStacker.TabStackInte
         Log.d("TAG21", "Update dialog");
         for (Dialog dialog: dialogList
              ) {
-            if(dialog.getId()==event.getId()){
+            if(dialog.getId().equals(event.getId())){
                 dialog.setText(event.getMessage());
             }
         }

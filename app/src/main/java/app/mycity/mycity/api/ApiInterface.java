@@ -161,13 +161,13 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("messages.deleteDialog")
     Call<ResponseContainer<SuccessResponceNumber>> deleteDialogs(@Field("access_token") String accessToken,
-                                                         @Field("peer_id") long id);
+                                                         @Field("peer_id") String id);
 
     //send message
     @FormUrlEncoded
     @POST("messages.send")
     Call<ResponseContainer<SendMessageResponse>> sendMessage(@Field("access_token") String accessToken,
-                                                             @Field("peer_id") long user_id,
+                                                             @Field("peer_id") String user_id,
                                                              @Field("chat_id") long chat_id,
                                                              @Field("text") String text);
 
@@ -175,7 +175,7 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("messages.markAsRead")
     Call<ResponseContainer<SuccessResponceNumber>> markAsRead(@Field("access_token") String accessToken,
-                                                           @Field("peer_id") long user_id);
+                                                           @Field("peer_id") String user_id);
 
     @FormUrlEncoded
     @POST("messages.markAsRead")
@@ -191,7 +191,7 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("messages.getHistory")
     Call<ResponseContainer<MessageResponse>> getMessages(@Field("access_token") String accessToken,
-                                                         @Field("peer_id") long peer_id,
+                                                         @Field("peer_id") String peer_id,
                                                          @Field("offset") int offset);
     @FormUrlEncoded
     @POST("messages.getHistory")
@@ -425,7 +425,8 @@ public interface ApiInterface {
     Call<ResponseContainer<ResponsePlaces>> getPlaces(@Field("access_token") String token,
                                                       @Field("offset") int offset,
                                                       @Field("city_id ") int cityId,
-                                                      @Field("category_id") int categoryId);
+                                                      @Field("category_id") int category,
+                                                      @Field("q") String filter);
 
     @FormUrlEncoded
     @POST("groups.get")
@@ -483,5 +484,6 @@ public interface ApiInterface {
 
     @FormUrlEncoded
     @POST("notifications.get")
-    Call<ResponseContainer<NotificationResponce>> getNotifications(@Field("access_token") String token);
+    Call<ResponseContainer<NotificationResponce>> getNotifications(@Field("access_token") String token,
+                                                                   @Field("offset") int offset);
 }

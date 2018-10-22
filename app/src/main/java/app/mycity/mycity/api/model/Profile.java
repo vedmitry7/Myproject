@@ -30,6 +30,18 @@ public class Profile {
     @Expose
     private String photo780;
 
+    @SerializedName("comment")
+    @Expose
+    private Comment comment;
+
+    public Comment getComment() {
+        return comment;
+    }
+
+    public void setComment(Comment comment) {
+        this.comment = comment;
+    }
+
     public String getId() {
         return id;
     }

@@ -87,7 +87,7 @@ public class ChatActivity extends AppCompatActivity {
 
     RealmResults<Message> results;
 
-    long userId = 1;
+    String userId = "1";
     public static String imageUrl;
 
     long lastMyMessageId;
@@ -101,7 +101,7 @@ public class ChatActivity extends AppCompatActivity {
 
         mRealm = Realm.getDefaultInstance();
         // initSocket();
-        userId = getIntent().getLongExtra("user_id", 0);
+        userId = getIntent().getStringExtra("user_id");
         imageUrl = getIntent().getStringExtra("image");
 
         if(getIntent().getStringExtra("image")==null){
@@ -309,7 +309,7 @@ public class ChatActivity extends AppCompatActivity {
         mRealm.beginTransaction();
         final Message message = mRealm.createObject(Message.class, longId);
             //message.setId(messageId);
-            message.setUser(userId);
+        //?    message.setUser(userId);
             message.setTime(23423423);
             message.setText("create before r - " + messageText);
             message.setOut(1);
@@ -335,7 +335,7 @@ public class ChatActivity extends AppCompatActivity {
 
                 Message message = mRealm.createObject(Message.class, response.body().getResponse().getMessageId());
                 //message.setId(messageId);
-                message.setUser(userId);
+                //?    message.setUser(userId);
                 message.setTime(23423423);
                 message.setText("create from r - " + messageText);
                 message.setOut(1);

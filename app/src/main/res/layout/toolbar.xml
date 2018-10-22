@@ -39,34 +39,29 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/main_act_notification_container"
+        app:layout_constraintEnd_toStartOf="@+id/notificationsButton"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:clickable="false"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
+            android:clickable="false"
             android:src="@drawable/ic_forum_white_24dp" />
     </RelativeLayout>
 
-    <RelativeLayout
 
-        android:id="@+id/main_act_notification_container"
+    <ImageView
+        android:id="@+id/notificationsButton"
         android:layout_width="48dp"
         android:layout_height="48dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:padding="12dp"
+        android:src="@drawable/ic_bell_white_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/ic_bell_white_24dp" />
-    </RelativeLayout>
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

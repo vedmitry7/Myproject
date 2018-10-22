@@ -39,21 +39,23 @@
     <include layout="@layout/navigation_bottom_buttons"
         android:id="@+id/includeNavigationButtonsContainer"/>
 
-    <Spinner
-        android:id="@+id/placesSpinner"
+    <EditText
+        android:id="@+id/editTextSearch"
         android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:hint="Поиск"
+        android:inputType="text"
+        android:imeOptions="actionSearch"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/include"
-        tools:ignore="MissingConstraints">
+        tools:ignore="MissingConstraints"
+        android:layout_height="wrap_content">
 
-    </Spinner>
+    </EditText>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/horizontalRecyclerView"
@@ -61,7 +63,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/placesSpinner">
+        app:layout_constraintTop_toBottomOf="@+id/editTextSearch">
 
     </android.support.v7.widget.RecyclerView>
 
