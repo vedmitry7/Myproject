@@ -123,14 +123,14 @@ public class ChatActivity extends AppCompatActivity {
 
         Picasso.get().load(imageUrl).into(imageView);
 
-        mRealm.beginTransaction();
+ /*       mRealm.beginTransaction();
         results = mRealm.where(Message.class).equalTo("user", userId)
                 .findAll();
         Log.d("TAG25", "Update chat List. Size - " + results.size());
-        mRealm.commitTransaction();
+        mRealm.commitTransaction();*/
 
 
-        Log.d("TAG21", "Size - " + results.size());
+//        Log.d("TAG21", "Size - " + results.size());
 
         adapter = new ChatRecyclerAdapter(results);
 
@@ -370,5 +370,6 @@ public class ChatActivity extends AppCompatActivity {
         Log.i("TAG21", "new request...");
         OkHttpClientFactory.getClient().newCall(request).enqueue(callback);
     }
+
 
 }

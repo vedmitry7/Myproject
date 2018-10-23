@@ -42,20 +42,37 @@
     <EditText
         android:id="@+id/editTextSearch"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
         android:hint="Поиск"
-        android:inputType="text"
         android:imeOptions="actionSearch"
+        android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/include"
-        tools:ignore="MissingConstraints"
-        android:layout_height="wrap_content">
+        app:layout_goneMarginEnd="@dimen/padding16"
+        tools:ignore="MissingConstraints">
 
     </EditText>
+
+    <ImageView
+        android:id="@+id/clearSearch"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginTop="8dp"
+        android:padding="12dp"
+        app:srcCompat="@drawable/ic_clear_edittext"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/horizontalRecyclerView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/editTextSearch" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/horizontalRecyclerView"

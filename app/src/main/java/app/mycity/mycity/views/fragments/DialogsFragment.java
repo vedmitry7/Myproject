@@ -21,6 +21,7 @@ import java.util.List;
 import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
+import app.mycity.mycity.api.model.RealmUser;
 import app.mycity.mycity.api.model.SuccessResponceNumber;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
@@ -36,6 +37,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import fr.arnaudguyon.tabstacker.TabStacker;
+import io.realm.Realm;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -114,6 +116,24 @@ public class DialogsFragment extends Fragment implements TabStacker.TabStackInte
                     dialogList = dialogs.getDialogs();
                     Log.d("TAG", "Size list = " + dialogList.size());
                     adapter.update(dialogList);
+
+                    for (Dialog d:dialogList
+                         ) {
+                        Realm mRealm = Realm.getDefaultInstance();
+
+                        RealmUser user = mRealm.where(RealmUser.class).equalTo("id", d.getId()).findFirst();
+                        if(user==null){
+                            Log.d("TAG21", "user  " + d.getTitle() + " null, add to db");
+                            mRealm.beginTransaction();
+                            RealmUser user1 = mRealm.createObject(RealmUser.class, d.getId());
+                            user1.setFirstName(d.getTitle());
+                          //  user1.setId(d.getId());
+                            mRealm.commitTransaction();
+                        } else {
+                            Log.d("TAG21", "user  " + d.getTitle() + " exist");
+                        }
+                    }
+
                 }
             }
 

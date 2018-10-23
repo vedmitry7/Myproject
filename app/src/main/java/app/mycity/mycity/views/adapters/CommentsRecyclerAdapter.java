@@ -92,8 +92,6 @@ public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecycl
             }
         }
 
-
-
         holder.time.setText(Util.getDatePretty(commentList.get(position).getDate()));
 
         holder.text.setText(commentList.get(position).getText());

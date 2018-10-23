@@ -55,7 +55,7 @@
 
         <activity
             android:name=".views.activities.ChatActivity2"
-            android:launchMode="singleTop"
+
             android:windowSoftInputMode="adjustPan" />
 
         <activity android:name=".views.activities.LoadImageActivity" />

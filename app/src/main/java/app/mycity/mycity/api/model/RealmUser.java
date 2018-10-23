@@ -6,16 +6,16 @@ import io.realm.annotations.PrimaryKey;
 public class RealmUser extends RealmObject {
 
     @PrimaryKey
-    long id;
+    String id;
     String firstName;
     String lastName;
     String photo130;
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

@@ -1,6 +1,7 @@
 package app.mycity.mycity;
 
 import android.app.AlarmManager;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -8,6 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.RequiresApi;
@@ -31,9 +34,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import app.mycity.mycity.api.model.Message;
+import app.mycity.mycity.api.model.RealmUser;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.activities.ChatActivity;
+import app.mycity.mycity.views.activities.ChatActivity2;
 import io.realm.Realm;
 
 public class NewTestService extends Service {
@@ -231,20 +236,34 @@ public class NewTestService extends Service {
                             message.setId(messageId);
                             message.setUser(userId);
                             message.setTime(time);
-                            message.setText("from s - " + text);
+                            message.setText(text);
                             message.setOut(out);
                             message.setWasSended(true);
                             message.setWasRead(false);
                             EventBus.getDefault().post(new EventBusMessages.NewChatMessage(message, out));
 
-
-                        if(!((App) getApplicationContext()).isAppForeground()){
+                   /*     if(!((App) getApplicationContext()).isAppForeground()){
                             Log.i("TAG21", "isNotForeground");
                             if(out == 0){
                                 Log.i("TAG21", "send Notification");
                                 //   sendNotification(text, String.valueOf(userId));
                                 generateNotification(text, String.valueOf(userId));
                             }
+                        } else {
+                            if(out == 0){
+                                generateNotification(text, String.valueOf(userId));
+                            }
+                        }*/
+
+                        if(((App) getApplicationContext()).isChatActivityStarted){
+                            Log.i("TAG21", "chat started");
+                            if(!((App) getApplicationContext()).getCurrentChatUser().equals(String.valueOf(userId))){
+                                Log.i("TAG21", "cur chat user - " + ((App) getApplicationContext()).getCurrentChatUser());
+                                generateNotification(text, String.valueOf(userId));
+                            }
+                        } else {
+                            Log.i("TAG21", "chat not started");
+                            generateNotification(text, String.valueOf(userId));
                         }
 
                         break;
@@ -276,7 +295,7 @@ public class NewTestService extends Service {
             Log.i("TAG21", "notification not exist");
         }
 
-        Intent notificationIntent = new Intent(this, ChatActivity.class);
+        Intent notificationIntent = new Intent(this, ChatActivity2.class);
         notificationIntent.putExtra("user_id", userId);
 
         PendingIntent contentIntent = PendingIntent.getActivity(this,
@@ -323,17 +342,35 @@ public class NewTestService extends Service {
     }
 
     private void generateNotification(String text, String userId) {
+        mRealm = Realm.getDefaultInstance();
+        RealmUser user = mRealm.where(RealmUser.class).equalTo("id", userId).findFirst();
+
+        String title;
+        if(user!=null){
+            title = "Сообщение от " +  user.getFirstName();
+        } else {
+            title = "Новое сообщение";
+        }
+
+        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.ic_main)
-                        .setContentTitle("Message from "+ userId)
+                        .setContentTitle(title)
                         .setContentText(text);
+      //  mBuilder.setSound(alarmSound);
+        mBuilder.setDefaults(Notification.DEFAULT_SOUND);
+        long[] vibrate = { 0, 200, 100, 100, 100, 50};
+        mBuilder.setVibrate(vibrate);
+
 // Creates an explicit intent for an Activity in your app
-        Intent resultIntent = new Intent(this, ChatActivity.class);
+        Intent resultIntent = new Intent(this, ChatActivity2.class);
+        resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        resultIntent.setFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
 
-      //  resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+      //  resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);dfg
 
-        resultIntent.putExtra("user_id", Long.parseLong(userId));
+        resultIntent.putExtra("user_id", userId);
 
         mBuilder.setAutoCancel(true);
 
@@ -346,13 +383,13 @@ public class NewTestService extends Service {
 // your application to the Home screen.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
 // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(ChatActivity.class);
+        stackBuilder.addParentStack(ChatActivity2.class);
 // Adds the Intent that starts the Activity to the top of the stack
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent =
                 stackBuilder.getPendingIntent(
                         0,
-                        PendingIntent.FLAG_UPDATE_CURRENT
+                        PendingIntent.FLAG_ONE_SHOT
                 );
         mBuilder.setContentIntent(resultPendingIntent);
         NotificationManager mNotificationManager =

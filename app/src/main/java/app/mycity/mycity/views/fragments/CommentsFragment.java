@@ -31,6 +31,7 @@ import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.Comment;
 import app.mycity.mycity.api.model.Likes;
 import app.mycity.mycity.api.model.Profile;
+import app.mycity.mycity.api.model.RealmUser;
 import app.mycity.mycity.api.model.ResponseAddComment;
 import app.mycity.mycity.api.model.ResponseComments;
 import app.mycity.mycity.api.model.ResponseContainer;
@@ -44,6 +45,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 import fr.arnaudguyon.tabstacker.TabStacker;
+import io.realm.Realm;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -179,7 +181,6 @@ public class CommentsFragment extends android.support.v4.app.Fragment implements
                             profiles.put(p.getId(), p);
                             Log.d("TAG21", "ADD ONE " + p.getFirstName() + " " + p.getLastName());
                             Log.d("TAG21", "ADD ONE " + p.toString());
-
                         }
                     }
                     adapter.update(commentList, profiles);

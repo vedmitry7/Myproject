@@ -1,5 +1,7 @@
 package app.mycity.mycity.views.activities;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -31,6 +33,8 @@ import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponseMarkAsRead;
 import app.mycity.mycity.api.model.SendMessageResponse;
 import app.mycity.mycity.api.model.SuccessResponceNumber;
+import app.mycity.mycity.api.model.User;
+import app.mycity.mycity.api.model.UsersContainer;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
@@ -95,6 +99,7 @@ public class ChatActivity2 extends AppCompatActivity {
         imageUrl = getIntent().getStringExtra("image");
 
         if(getIntent().getStringExtra("image")==null){
+            loadUserInfo();
             imageUrl = "https://wmpics.pics/di-CTC8.jpg";
         }
 
@@ -111,6 +116,9 @@ public class ChatActivity2 extends AppCompatActivity {
         if(name!=null)
             nameText.setText(name);
         Picasso.get().load(imageUrl).into(imageView);
+
+        NotificationManager nMgr = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        nMgr.cancel(Integer.parseInt(userId));
 
         adapter = new ChatRecyclerAdapter(results);
 
@@ -195,6 +203,26 @@ public class ChatActivity2 extends AppCompatActivity {
 
         loadMessages(0);
 
+    }
+
+    private void loadUserInfo() {
+        Log.d("chat22", "load user info ");
+        ApiFactory.getApi().getUserById(App.accessToken(), userId, "photo_130").enqueue(new Callback<ResponseContainer<User>>() {
+            @Override
+            public void onResponse(Call<ResponseContainer<User>> call, Response<ResponseContainer<User>> response) {
+
+                if(response.body().getResponse()!=null){
+                    Picasso.get().load(response.body().getResponse().getPhoto130()).into(imageView);
+                    nameText.setText(response.body().getResponse().getFirstName() + " " + response.body().getResponse().getLastName());
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseContainer<User>> call, Throwable t) {
+
+            }
+        });
     }
 
 
@@ -339,7 +367,7 @@ public class ChatActivity2 extends AppCompatActivity {
         message.setId(curId);
         //message.setUser(userId);
         message.setTime(System.currentTimeMillis()/1000);
-        message.setText("create before r - " + messageText);
+        message.setText(messageText);
         message.setOut(1);
         message.setWasRead(false);
 
@@ -370,7 +398,7 @@ public class ChatActivity2 extends AppCompatActivity {
                             m.setId(response.body().getResponse().getMessageId());
                             m.setWasSended(true);
                             Log.d("TAG25", "SET ID for response message");
-                            m.setText("after resp - id: " + m.getId() + " " + messageText);
+                            m.setText(messageText);
                         }
                     }
                     adapter.notifyDataSetChanged();
@@ -514,6 +542,10 @@ public class ChatActivity2 extends AppCompatActivity {
         Log.d("TAG21", "update chat...");
       //  markAsRead();
        // recyclerView.scrollToPosition(results.size()-1);
+    }
+
+    public String getCurrentChatUser() {
+        return userId;
     }
 
 }

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RadioButton
+            android:id="@+id/ratingRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_margin="4dp"
+            android:layoutDirection="rtl"
+            android:text="Рейтинг"
+            android:textAlignment="textStart"
+            android:textSize="16dp" />
+
+        <RadioButton
+            android:id="@+id/onlineCountRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_margin="4dp"
+            android:layoutDirection="rtl"
+            android:text="Колличество онлайн"
+            android:textAlignment="textStart"
+            android:textSize="16dp" />
+
+        <RadioButton
+            android:id="@+id/checkinCountRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_margin="4dp"
+            android:layoutDirection="rtl"
+            android:text="Колличество чекинов"
+            android:textAlignment="textStart"
+            android:textSize="16dp" />
+    </RadioGroup>
+
+
+</android.support.constraint.ConstraintLayout>

@@ -1,18 +1,27 @@
 package app.mycity.mycity.views.fragments.places;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -64,8 +73,11 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
     @BindView(R.id.placesFragmentMessage)
     TextView placesFragmentMessage;
 
-    @BindView(R.id.placesSpinner)
-    Spinner spinner;
+    @BindView(R.id.editTextSearch)
+    TextView search;
+
+    @BindView(R.id.clearSearch)
+    ImageView clearSearch;
 
     PlacesRecyclerAdapter adapter;
 
@@ -101,6 +113,53 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
         Log.d("TAG23", "create ");
 
 
+        search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.length()==0){
+                    clearSearch.setVisibility(View.GONE);
+                } else {
+                    clearSearch.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    placeList = new ArrayList<>();
+                    adapter.notifyDataSetChanged();
+                    placesProgressBar.setVisibility(View.VISIBLE);
+                    App.hideKeyboard(getActivity());
+                    loadPlaces(0, 0, search.getText().toString());
+                    getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+                    search.clearFocus();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        clearSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                search.setText("");
+                clearSearch.setVisibility(View.GONE);
+                loadPlaces(0, placesCategoriesAdapter.getCategoryId(), "");
+            }
+        });
+
+
+
         Util.indicateTabImageView(getContext(), view, 3);
         Util.setOnTabClick(view);
 
@@ -124,7 +183,7 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
                         // load if we don't load all
                         if(totalCount >= placeList.size()){
                             Log.d("TAG21", "load feed ");
-                            loadPlaces(placeList.size(), placesCategoriesAdapter.getCategoryId());
+                            loadPlaces(placeList.size(), placesCategoriesAdapter.getCategoryId(), "");
                         }
                     }
                 }
@@ -136,7 +195,7 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
 
         //recyclerView.addOnScrollListener(scrollListener);
 
-        loadPlaces(placeList.size(), 0);
+        loadPlaces(placeList.size(), 0, "");
 
         placeCategories = new ArrayList<>();
         PlaceCategory placeCategory = new PlaceCategory();
@@ -151,7 +210,7 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
         placesCategoriesAdapter = new PlacesTopBarAdapter(placeCategories);
         categoriesRecyclerView.setAdapter(placesCategoriesAdapter);
 
-        String[] sortStrings = {"Рейтинг", "Колличество людей", "Колличество чекинов"};
+/*        String[] sortStrings = {"Рейтинг", "Колличество людей", "Колличество чекинов"};
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, sortStrings);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -171,26 +230,76 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
 
             }
         };
-        spinner.setOnItemSelectedListener(itemSelectedListener);
+        spinner.setOnItemSelectedListener(itemSelectedListener);*/
 
         loadCategories();
+    }
+
+    @OnClick(R.id.sortButton)
+    public void sort(View v){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Сортировка");
+
+
+        View view = getActivity().getLayoutInflater().inflate(R.layout.places_sort_dialog, null);
+        builder.setView(view);
+
+        RadioGroup radioGroup = view.findViewById(R.id.radioGroup);
+        radioGroup.check(R.id.ratingRadioButton);
+
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId){
+                    case R.id.ratingRadioButton:
+                        Log.d("TAG23", "r ");
+                        break;
+                    case R.id.onlineCountRadioButton:
+                        Log.d("TAG23", "o ");
+                        break;
+                    case R.id.checkinCountRadioButton:
+                        Log.d("TAG23", "c");
+                        break;
+                }
+            }
+        });
+
+        builder.setPositiveButton("Ок", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked OK button
+            }
+        });
+
+        builder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+            }
+        });
+
+        final AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void gfdsgsd(EventBusMessages.SortPlaces event){
         placeList = new ArrayList<>();
         placesProgressBar.setVisibility(View.VISIBLE);
-        loadPlaces(0, placesCategoriesAdapter.getCategoryId());
+        loadPlaces(0, placesCategoriesAdapter.getCategoryId(), search.getText().toString());
+        search.clearFocus();
     }
 
-    private void loadPlaces(int offset, int category) {
-        ApiFactory.getApi().getPlaces(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), offset, 552, category).enqueue(new retrofit2.Callback<ResponseContainer<ResponsePlaces>>() {
+    private void loadPlaces(final int offset, int category, String search) {
+        ApiFactory.getApi().getPlaces(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), offset, 552, category, search).enqueue(new retrofit2.Callback<ResponseContainer<ResponsePlaces>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<ResponsePlaces>> call, retrofit2.Response<ResponseContainer<ResponsePlaces>> response) {
                 if(response.body()!=null){
                     totalCount = response.body().getResponse().getCount();
                     placesProgressBar.setVisibility(View.GONE);
-                    placeList.addAll(response.body().getResponse().getItems());
+                    if(offset==0){
+                        placeList = response.body().getResponse().getItems();
+                    } else {
+                        placeList.addAll(response.body().getResponse().getItems());
+                    }
                     Log.d("TAG21", "Places size" + response.body().getResponse().getItems().size());
                     adapter.update(placeList);
 
