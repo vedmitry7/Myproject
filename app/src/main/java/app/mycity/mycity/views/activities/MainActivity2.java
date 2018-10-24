@@ -70,6 +70,7 @@ import app.mycity.mycity.views.fragments.profile.ProfileFragment;
 import app.mycity.mycity.views.fragments.profile.SomeoneProfileFragment;
 import app.mycity.mycity.views.fragments.settings.MainSettingsFragment;
 import app.mycity.mycity.views.fragments.top.PeoplesFragment;
+import app.mycity.mycity.views.fragments.top.SuperPeoplesFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -231,7 +232,7 @@ public class MainActivity2 extends AppCompatActivity implements MainAct, Storage
 
             switch (clickedTab){
                 case TAB_PEOPLE:
-                    fragment = new PeoplesFragment();
+                    fragment = SuperPeoplesFragment.createInstance(getFragmentName(), mTabStacker.getCurrentTabSize(), 2);
                     break;
                 case TAB_PLACES:
                     fragment = new PlacesFragment();

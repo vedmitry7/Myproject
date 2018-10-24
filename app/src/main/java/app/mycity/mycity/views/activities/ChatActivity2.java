@@ -4,6 +4,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -66,9 +67,14 @@ public class ChatActivity2 extends AppCompatActivity {
     @BindView(R.id.newMessageIndicator)
     CardView newMessageIndicator;
 
+    @BindView(R.id.dateIndicator)
+    CardView dateIndicator;
 
     @BindView(R.id.dateIndicatorLabel)
     TextView dateIndicatorLabel;
+
+    @BindView(R.id.placesProgressBar)
+    ConstraintLayout progressBar;
 
     final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 
@@ -236,6 +242,9 @@ public class ChatActivity2 extends AppCompatActivity {
                     Log.d("TAG25", "Messages size - " + response.body().getResponse().getItems().size());
 
                     totalCount = response.body().getResponse().getCount();
+                    dateIndicator.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
+
 
                     for (MessageFromApi m: response.body().getResponse().getItems()){
                         Message message = new Message();

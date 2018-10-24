@@ -3,6 +3,7 @@ package app.mycity.mycity.views.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -47,6 +48,9 @@ public class NotificationsFragment extends Fragment implements TabStacker.TabSta
     @BindView(R.id.dialogsFragRecyclerView)
     RecyclerView recyclerView;
 
+    @BindView(R.id.placesProgressBar)
+    ConstraintLayout placesProgressBar;
+
     NotificationRecyclerAdapter adapter;
 
     List<Notification> notificationList;
@@ -58,7 +62,7 @@ public class NotificationsFragment extends Fragment implements TabStacker.TabSta
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_dialogs, container, false);
+        View view = inflater.inflate(R.layout.fragment_notifications, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
@@ -133,6 +137,7 @@ public class NotificationsFragment extends Fragment implements TabStacker.TabSta
                 if(response != null && response.body().getResponse() != null){
 
 
+                    placesProgressBar.setVisibility(View.GONE);
                     totalCount = response.body().getResponse().getCount();
                     notificationList = response.body().getResponse().getItems();
                     Log.d("TAG21", "Size list = " + notificationList.size());

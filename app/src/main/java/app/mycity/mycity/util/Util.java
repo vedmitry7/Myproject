@@ -136,15 +136,22 @@ public class Util {
         return sdf.format(date);
     }
 
-    private static String getTime(long time) {
+    public static String getTime(long time) {
         Date date = new Date(time*1000L); // *1000 is to convert seconds to milliseconds
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm"); // the format of your date
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm"); // the format of your date
         //sdf.setTimeZone(TimeZone.getTimeZone("GMT-2"));
 
         return sdf.format(date);
     }
 
     public static String getDatePretty(long time) {
+        Date date = new Date(time*1000L); // *1000 is to convert seconds to milliseconds
+        String niceDateStr = (String) DateUtils.getRelativeTimeSpanString(date.getTime(), Calendar.getInstance().getTimeInMillis(), DateUtils.MINUTE_IN_MILLIS);
+        return niceDateStr;
+    }
+
+
+    public static String getDatePrettyOld(long time) {
         Date date = new Date(time*1000L); // *1000 is to convert seconds to milliseconds
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm"); // the format of your date
         SimpleDateFormat formatTime = new SimpleDateFormat("hh:mm");
@@ -160,6 +167,7 @@ public class Util {
         if(isYesterday(time*1000L)){
             return "Yesterday";
         }
+
         return sdf.format(date);
     }
 

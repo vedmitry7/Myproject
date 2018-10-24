@@ -41,7 +41,7 @@ public class FriendsLongListRecyclerAdapter extends RecyclerView.Adapter<Friends
 
         holder.name.setText(position + "     " + name);
 
-        Picasso.get().load("http://192.168.0.104/img/avatar.png").into(holder.image);
+        Picasso.get().load("http://192.168.0.104/img/icon.png").into(holder.image);
     }
 
     @Override

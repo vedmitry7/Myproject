@@ -3,6 +3,7 @@ package app.mycity.mycity.views.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -47,6 +48,9 @@ public class DialogsFragment extends Fragment implements TabStacker.TabStackInte
 
     @BindView(R.id.dialogsFragRecyclerView)
     RecyclerView recyclerView;
+
+    @BindView(R.id.placesProgressBar)
+    ConstraintLayout placesProgressBar;
 
     DialogsRecyclerAdapter adapter;
 
@@ -117,6 +121,7 @@ public class DialogsFragment extends Fragment implements TabStacker.TabStackInte
                     Log.d("TAG", "Size list = " + dialogList.size());
                     adapter.update(dialogList);
 
+                    placesProgressBar.setVisibility(View.GONE);
                     for (Dialog d:dialogList
                          ) {
                         Realm mRealm = Realm.getDefaultInstance();

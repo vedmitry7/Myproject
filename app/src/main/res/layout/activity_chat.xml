@@ -7,6 +7,7 @@
     tools:context=".views.activities.ChatActivity">
 
 
+
     <android.support.constraint.ConstraintLayout
         android:id="@+id/chatToolbarContainer"
         android:layout_width="match_parent"
@@ -199,6 +200,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:maxWidth="200dp"
+        android:visibility="gone"
         app:cardBackgroundColor="@color/colorAccent"
         app:cardCornerRadius="15dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -222,5 +224,28 @@
 
     </android.support.v7.widget.CardView>
 
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/placesProgressBar"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@android:color/white"
+        app:layout_constraintBottom_toTopOf="@+id/up_shadow"
+        app:layout_constraintTop_toBottomOf="@+id/top_shadow"
+        app:layout_constraintVertical_bias="0.0"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="0dp">
+
+        <ProgressBar
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.25" />
+
+
+    </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>

@@ -68,7 +68,12 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
         } catch (ParseException e) {
             e.printStackTrace();
         }*/
-        holder.messageTime.setText(Util.getDatePretty(messages.get(position).getTime()));
+
+      if(holder.icon != null){
+      }
+
+
+        holder.messageTime.setText(Util.getTime(messages.get(position).getTime()));
 
         holder.message.setText(messages.get(position).getText());
         if(holder.indicator!=null && messages.get(position).getOut()==1){
@@ -108,8 +113,8 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
      //   Log.d("TAG25", "Bind - " + messages.get(position).getText() + " id - " + messages.get(position).getId() +  " was read - " + messages.get(position).isWasRead());
 
 
-        if(holder.avatar!=null){
-            Picasso.get().load(ChatActivity.imageUrl).into(holder.avatar);
+        if(holder.icon !=null){
+            Picasso.get().load(ChatActivity.imageUrl).into(holder.icon);
         }
     }
 
@@ -131,7 +136,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
 
      @Nullable
      @BindView(R.id.icon)
-     ImageView avatar;
+     ImageView icon;
 
      @BindView(R.id.messageContentBottomPadding)
      View messageContentBottomPadding;

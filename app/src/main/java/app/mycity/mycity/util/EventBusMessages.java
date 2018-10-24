@@ -445,4 +445,15 @@ public class EventBusMessages {
 
     public static class OpenNotifications {
     }
+
+    public static class SortPeople {
+        int position;
+        public SortPeople(int adapterPosition) {
+            position = adapterPosition;
+        }
+
+        public int getPosition() {
+            return position;
+        }
+    }
 }

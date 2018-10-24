@@ -64,6 +64,15 @@ public interface ApiInterface {
                                                         @Field("fields") String fields,
                                                         @Field("order") String order);
 
+    @FormUrlEncoded
+    @POST("users.getUsers")
+    Call<ResponseContainer<UsersContainer>> getTopUsersWithSearch(@Field("access_token") String accessToken,
+                                                        @Field("fields") String fields,
+                                                        @Field("order") String order,
+                                                                  @Field("filter") String filter,
+                                                        @Field("q") String search);
+
+
     //TOP users
     @FormUrlEncoded
     @POST("users.getUsers")
