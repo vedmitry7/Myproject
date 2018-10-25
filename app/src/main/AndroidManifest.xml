@@ -48,6 +48,12 @@
             android:name=".views.activities.MainActivity2"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".views.activities.MainActivity3"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
         <activity
             android:name=".views.activities.ChatActivity"
             android:launchMode="singleTop"

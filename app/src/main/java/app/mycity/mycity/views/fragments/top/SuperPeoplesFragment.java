@@ -1,10 +1,12 @@
 package app.mycity.mycity.views.fragments.top;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,7 +18,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -43,6 +52,7 @@ import app.mycity.mycity.views.adapters.PeoplesTopBarAdapter;
 import app.mycity.mycity.views.adapters.PlacesTopBarAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import fr.arnaudguyon.tabstacker.TabStacker;
 import fr.arnaudguyon.tabstacker.TabStacker.TabStackInterface;
 
@@ -232,6 +242,137 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
 
             }
         });
+    }
+
+    @OnClick(R.id.sortButton)
+    public void sort(View v){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Фильтры");
+
+        View view = getActivity().getLayoutInflater().inflate(R.layout.people_sort_dialog, null);
+        builder.setView(view);
+
+        final RadioGroup radioGroup = view.findViewById(R.id.radioGroupSex);
+        radioGroup.check(R.id.ratingRadioButton);
+
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId){
+                    case R.id.maleRadioButton:
+                        Log.d("TAG23", "m ");
+                        break;
+                    case R.id.femaleRadioButton:
+                        Log.d("TAG23", "f ");
+                        break;
+                }
+            }
+        });
+
+        CheckBox checkboxSex = view.findViewById(R.id.checkBoxSexActive);
+
+        checkboxSex.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                for(int i = 0; i < radioGroup.getChildCount(); i++){
+                    ((RadioButton)radioGroup.getChildAt(i)).setEnabled(isChecked);
+                }
+            }
+        });
+
+
+
+
+        String[] from_array = new String[60];
+        for (int i = 0; i < from_array.length; i++) {
+            from_array[i] = "От " + (i+18);
+        }
+
+        final Spinner spinnerFrom = view.findViewById(R.id.spinnerFrom);
+        ArrayAdapter<String> adapterFrom = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_spinner_item, from_array);
+
+        adapterFrom.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerFrom.setAdapter(adapterFrom);
+
+        String[] to_array = new String[60];
+        for (int i = 0; i < to_array.length; i++) {
+            to_array[i] = "До " + (i+18);
+        }
+
+        final Spinner spinnerTo = view.findViewById(R.id.spinnerTo);
+        ArrayAdapter<String> adapterTo = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_spinner_item, to_array);
+
+        adapterTo.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerTo.setAdapter(adapterTo);
+        spinnerTo.setAdapter(adapterTo);
+
+        final int[] positionFrom = {0};
+        final int[] positionTo = {15};
+
+        spinnerFrom.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                positionFrom[0] = position;
+                if (positionFrom[0] > positionTo[0]) {
+                    positionTo[0] = positionFrom[0];
+                    spinnerTo.setSelection(positionTo[0]);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        spinnerTo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                positionTo[0] = position;
+                if (positionTo[0] < positionFrom[0]) {
+                    positionFrom[0] = positionTo[0];
+                    spinnerFrom.setSelection(positionTo[0]);
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+
+        });
+
+        spinnerFrom.setSelection(positionFrom[0]);
+        spinnerTo.setSelection(positionTo[0]);
+
+
+        CheckBox checkboxAge = view.findViewById(R.id.checkBoxAgeActive);
+
+        checkboxAge.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                spinnerFrom.setEnabled(isChecked);
+                spinnerTo.setEnabled(isChecked);
+            }
+        });
+
+        builder.setPositiveButton("Ок", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked OK button
+            }
+        });
+
+        builder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+            }
+        });
+
+
+        final AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private void getFriendsListById(){
