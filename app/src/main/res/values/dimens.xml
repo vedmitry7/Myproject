@@ -33,4 +33,6 @@
     <dimen name="padding_10">10dp</dimen>
     <dimen name="margin_horizontal">16dp</dimen>
     <dimen name="lbl_edit_image_control">100dp</dimen>
+    <dimen name="main_fragment_card_corner_radius">10dp</dimen>
+    <dimen name="main_fragment_card_margin">10dp</dimen>
 </resources>
