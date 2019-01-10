@@ -39,7 +39,7 @@
             android:layout_gravity="start"
             android:layout_margin="4dp"
             android:layoutDirection="rtl"
-            android:text="Колличество онлайн"
+            android:text="Новые"
             android:textAlignment="textStart"
             android:textSize="16dp" />
 
@@ -50,7 +50,7 @@
             android:layout_gravity="start"
             android:layout_margin="4dp"
             android:layoutDirection="rtl"
-            android:text="Колличество чекинов"
+            android:text="Популярные"
             android:textAlignment="textStart"
             android:textSize="16dp" />
     </RadioGroup>

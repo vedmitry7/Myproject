@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="56dp">
+    android:layout_height="68dp">
 
     <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/dialogsRowImage"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="54dp"
+        android:layout_height="54dp"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
         app:civ_border_color="#FF000000"
@@ -21,13 +20,16 @@
 
     <TextView
         android:id="@+id/dialog_row_name"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:singleLine="true"
         android:text="Василий"
         android:textColor="@android:color/black"
         android:textSize="16sp"
@@ -38,44 +40,58 @@
 
 
     <TextView
-        android:lines="1"
-        android:ellipsize="end"
         android:id="@+id/dialog_row_message"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
         android:layout_marginLeft="16dp"
+        android:layout_marginRight="32dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="4dp"
-        android:text="Hello!"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:lines="1"
+        android:text="Hello! sdf dsf ds fsd fds fsd fsd fds fsd dsf sd dfs dsf dsf "
+        android:textColor="@color/black_67percent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/dialogsRowImage"
         app:layout_constraintTop_toBottomOf="@+id/dialog_row_name" />
 
     <TextView
-        android:textSize="12sp"
         android:id="@+id/dialog_row_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
         android:text="12:48"
+        android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:background="@drawable/round_textview_bg"
         android:id="@+id/unreadCount"
         android:layout_width="16dp"
         android:layout_height="16dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/round_textview_bg"
         android:gravity="center"
+        android:text="23"
+        android:textColor="@android:color/black"
         android:textSize="10dp"
         android:textStyle="bold"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:textColor="@android:color/black"
-        android:text="23"
+        app:layout_constraintBottom_toBottomOf="@+id/dialog_row_message"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/dialog_row_message" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1px"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:background="@color/deliver_color"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/dialogsRowImage" />
 
 </android.support.constraint.ConstraintLayout>

@@ -1,6 +1,7 @@
 package app.mycity.mycity.views.fragments.places;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Build;
@@ -12,6 +13,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,14 +23,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+import com.willy.ratingbar.BaseRatingBar;
+import com.willy.ratingbar.ScaleRatingBar;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
+import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
@@ -39,7 +42,6 @@ import app.mycity.mycity.api.model.Success;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
-import app.mycity.mycity.views.activities.MainActivity2;
 import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.adapters.PlacePagerAdapter;
 import butterknife.BindView;
@@ -54,6 +56,9 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
 
     @BindView(R.id.toolbarTitle)
     TextView title;
+
+    @BindView(R.id.ratingCount)
+    TextView ratingCount;
 
     @BindView(R.id.backButton)
     ImageView backButton;
@@ -77,6 +82,8 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
     @BindView(R.id.placeProgressBar)
     ConstraintLayout progressBar;
 
+    @BindView(R.id.simpleRatingBar)
+    ScaleRatingBar ratingBar;
 
     @BindView(R.id.placeSubscribersCount)
     TextView placeSubscribersCount;
@@ -85,8 +92,6 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
     TextView usersInPlace;
 
     private Place place;
-
-    MainActivity2 activity2;
 
     Storage storage;
 
@@ -102,73 +107,171 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
         return view;
     }
 
-
-
-    public static PlaceFragment createInstance(String name, int tabPos, String placeId) {
+    public static PlaceFragment createInstance(String name, String placeId) {
         PlaceFragment fragment = new PlaceFragment();
         Log.i("TAG21", "Create PlaceFragment " + name);
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
         bundle.putString("placeId", placeId);
-        bundle.putInt("tabPos", tabPos);
         fragment.setArguments(bundle);
         return fragment;
     }
 
     void createPagerAdapter(Place place){
-       /* FragmentManager man = null;
-        if(activity2.getChild()==null){
-            man = getChildFragmentManager();
-            activity2.setChild(man);
-            Log.d("TAG21", "act child == null " + man);
-        } else {
-            man = activity2.getChild();
-            Log.d("TAG21", "act child != null " + man);
-        }
-
-        if(viewPager != null) {
-            Log.d("TAG21", "View pager != null");
-        }
-        if(tabLayout != null) {
-            Log.d("TAG21", "Tab layout != null");
-        }
-        if(place != null) {
-            Log.d("TAG21", "place != null");
-        }
-        if(getChildFragmentManager() != null) {
-            Log.d("TAG21", "getChildFragmentManager() != null " + getChildFragmentManager());
-        }*/
-
         PlacePagerAdapter adapter = new PlacePagerAdapter(getChildFragmentManager(), place, getArguments().getString("name"));
         viewPager.setAdapter(adapter);
         viewPager.setOffscreenPageLimit(3);
         tabLayout.setupWithViewPager(viewPager);
+        ratingBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("TAG21", "click ");
+            }
+        });
     }
 
+    @OnClick(R.id.rateButton)
+    public void setRating(View v){
+        Log.d("TAG21", "click rating");
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Оценка заведения");
+
+        View view = getActivity().getLayoutInflater().inflate(R.layout.rating_dialog, null);
+        builder.setView(view);
+
+        final ScaleRatingBar serviceRatingBar = view.findViewById(R.id.serviceRatingBar);
+        final ScaleRatingBar qualityRatingBar = view.findViewById(R.id.qualityRatingBar);
+        final ScaleRatingBar priceRatingBar = view.findViewById(R.id.priceRatingBar);
+        final ScaleRatingBar interiorRatingBar = view.findViewById(R.id.interiorRatingBar);
+
+        TextView serviceCount = view.findViewById(R.id.serviceCount);
+        serviceCount.setText("(" + place.getRate().getService().getCount() + ")");
+
+        TextView qualityCount = view.findViewById(R.id.qualityCount);
+        qualityCount.setText("(" + place.getRate().getQuality().getCount() + ")");
+
+        TextView priceCount = view.findViewById(R.id.priceCount);
+        priceCount.setText("(" + place.getRate().getPrice().getCount() + ")");
+
+        TextView interiorCount = view.findViewById(R.id.interiorCount);
+        interiorCount.setText("(" + place.getRate().getInterior().getCount() + ")");
+        final boolean[] wasChanges = new boolean[4];
+
+        int service = (int) place.getRate().getService().getValue();
+        int quality = (int) place.getRate().getQuality().getValue();
+        int price = (int) place.getRate().getPrice().getValue();
+        int interior = (int) place.getRate().getInterior().getValue();
+
+        serviceRatingBar.setRating(place.getRate().getService().getValue());
+        qualityRatingBar.setRating(place.getRate().getQuality().getValue());
+        priceRatingBar.setRating(place.getRate().getPrice().getValue());
+        interiorRatingBar.setRating(place.getRate().getInterior().getValue());
+
+        BaseRatingBar.OnRatingChangeListener listener = new BaseRatingBar.OnRatingChangeListener() {
+            @Override
+            public void onRatingChange(BaseRatingBar baseRatingBar, float v) {
+                switch (baseRatingBar.getId()){
+                    case R.id.serviceRatingBar:
+                        wasChanges[0] = true;
+                        Log.d("TAG21", "ser");
+                        break;
+                    case R.id.qualityRatingBar:
+                        wasChanges[1] = true;
+                        Log.d("TAG21", "qua");
+                        break;
+                    case R.id.priceRatingBar:
+                        wasChanges[2] = true;
+                        Log.d("TAG21", "pri");
+                        break;
+                    case R.id.interiorRatingBar:
+                        Log.d("TAG21", "int");
+                        wasChanges[3] = true;
+                        break;
+                }
+                Log.d("TAG21", "base - " + baseRatingBar.getRating() + " / v - " + v);
+            }
+        };
+
+        serviceRatingBar.setOnRatingChangeListener(listener);
+        qualityRatingBar.setOnRatingChangeListener(listener);
+        priceRatingBar.setOnRatingChangeListener(listener);
+        interiorRatingBar.setOnRatingChangeListener(listener);
+
+
+        final Callback callback = new Callback<ResponseContainer<Success>>() {
+            @Override
+            public void onResponse(Call<ResponseContainer<Success>> call, Response<ResponseContainer<Success>> response) {
+                Log.d("TAG21", "resp");
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseContainer<Success>> call, Throwable t) {
+                Log.d("TAG21", "fail");
+
+            }
+        };
+
+        builder.setPositiveButton("Ок", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked OK button
+                Log.d("TAG21", "ok");
+
+                if(wasChanges[0]){
+                    Log.d("TAG21", "send 0 " + (int)place.getRate().getService().getValue());
+                    ApiFactory.getApi().rate(App.accessToken(), place.getId(), "service",
+                            (int)serviceRatingBar.getRating())
+                            .enqueue(callback);
+                }
+                if(wasChanges[1]){
+                    Log.d("TAG21", "send 1 " +  (int)place.getRate().getQuality().getValue());
+                    ApiFactory.getApi().rate(App.accessToken(), place.getId(), "quality",
+                            (int)qualityRatingBar.getRating())
+                            .enqueue(callback);
+                }
+                if(wasChanges[2]){
+                    Log.d("TAG21", "send 2");
+                    ApiFactory.getApi().rate(App.accessToken(), place.getId(), "price",
+                            (int)priceRatingBar.getRating())
+                            .enqueue(callback);
+                }
+                if(wasChanges[3]){
+                    Log.d("TAG21", "send 3");
+                    ApiFactory.getApi().rate(App.accessToken(), place.getId(), "interior",
+                            (int)interiorRatingBar.getRating())
+                            .enqueue(callback);
+                }
+            }
+        });
+
+        builder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+            }
+        });
+
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+
+    @OnClick(R.id.backButton)
+    public void back(View v){
+        getActivity().onBackPressed();
+    }
 
     @Override
     public void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
+        //EventBus.getDefault().register(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        EventBus.getDefault().unregister(this);
+        //EventBus.getDefault().unregister(this);
     }
 
-    // UI updates must run on MainThread
-    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
-    public void onEvent(Place place) {
-        this.place = place;
-        Log.d("TAG21", "STICK EVENT PLACE - " + place.getName());
-
-        if(this.place != null) {
-           // EventBus.getDefault().removeStickyEvent(place);
-        }
-      //  loadPlace(place.getPos());
-    }
 
     void loadPlace(String placeId) {
         if(mayRestore){
@@ -187,6 +290,8 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
 
                         EventBus.getDefault().postSticky(response.body().getResponse().get(0));
                         createPagerAdapter(response.body().getResponse().get(0));
+                        ratingBar.setRating(place.getRate().getAll().getValue());
+                        ratingCount.setText("(" + place.getRate().getAll().getCount() + ")");
                         showInfo(response.body().getResponse().get(0));
                         hideProgressBar();
                     } else {
@@ -209,13 +314,13 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
     }
 
     void showInfo(Place place){
-        Picasso.get().load(place.getPhoto780()).into(imageView);
+        Picasso.get().load(place.getCover1250()).into(imageView);
         title.setText(place.getName());
         placeSubscribersCount.setText("" + place.getCountMembers());
         usersInPlace.setText("Сейчас в заведении: " + place.getCountMembersInPlace());
 
         if(place.getIsMember()==1){
-            Log.d("TAG21", "MEMBER " );
+            Log.d("TAG21", "MEMBER ");
             joinLeaveButton.setImageResource(R.drawable.ic_delete_subscription);
         } else {
             Log.d("TAG21", "NOT MEMBER " );
@@ -272,8 +377,8 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
         super.onViewCreated(view, savedInstanceState);
         Log.d("TAG21", "onViewCreated");
 
-        Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
-        Util.setOnTabClick(view);
+        Util.setNawBarClickListener(view);
+        Util.setNawBarIconColor(getContext(), view, -1);
 
         final LinearLayout layout = view.findViewById(R.id.toolbarContent);
         layout.setVisibility(View.VISIBLE);
@@ -306,7 +411,6 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        activity2 = (MainActivity2) context;
         storage = (Storage) context;
         place = (Place) storage.getDate(getArguments().get("name")+ "_place");
 
@@ -337,6 +441,7 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
 
                     storage.remove(getArguments().get("name")+ "_eventsPostList");
                     storage.remove(getArguments().get("name")+ "_eventsGroups");
+                    storage.remove(getArguments().get("name")+ "_eventsScrollPosition");
 
                     storage.remove(getArguments().get("name")+ "_albumsList");
                     storage.remove(getArguments().get("name")+ "_mapAlbums");
@@ -348,9 +453,6 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
                 }
             }, 200);
 
-
-
-
         }
     }
 
@@ -361,7 +463,6 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
 
     @Override
     public void onRestoreTabFragmentInstance(Bundle bundle) {
-
     }
 
     @OnClick(R.id.placeSubscribersCount)

@@ -46,10 +46,8 @@ import app.mycity.mycity.api.model.UsersContainer;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
-import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.adapters.PeoplesRecyclerAdapter;
 import app.mycity.mycity.views.adapters.PeoplesTopBarAdapter;
-import app.mycity.mycity.views.adapters.PlacesTopBarAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -81,6 +79,8 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
 
     List<PlaceCategory> placeCategories;
 
+    String filter = "";
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -103,12 +103,17 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
         return fragment;
     }
 
+    @OnClick(R.id.backButton)
+    public void sadsa(View v){
+        getActivity().onBackPressed();
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
-        Util.setOnTabClick(view);
+        Util.setNawBarClickListener(view);
+        Util.setNawBarIconColor(getContext(), view, -1);
 
         userList = new ArrayList<>();
         recyclerView.setLayoutManager(new GridLayoutManager(this.getActivity(), 2));
@@ -196,14 +201,17 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
 
 
         userList = new ArrayList<>();
-        String filter = "";
+
 
         switch (event.getPosition()){
             case 0:
                 filter = "";
                 break;
             case 1:
-                filter = "in_places";
+                filter = "in_place";
+                break;
+            case 2:
+                filter = "ready_meet";
                 break;
         }
 
@@ -222,8 +230,22 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
     private void getUsersList(String filter, String search){
         Log.d("TAG", "getUsersList " + this.getClass().getSimpleName());
         Log.i("TAG21","getUsers - f:" + filter + " s:" + search);
+        int sex = 0;
+        if(SharedManager.getBooleanProperty("sortBySex")){
+            sex = SharedManager.getIntProperty("sex");
+        }
+        int ageFrom = 0;
+        int ageTo = 100;
+        if(SharedManager.getBooleanProperty("sortByAge")){
+            ageFrom = SharedManager.getIntProperty("ageFrom")+18;
+            ageTo = SharedManager.getIntProperty("ageTo")+18;
+            Log.i("TAG21", "Sort by age f: " + ageFrom + " to:" + ageTo );
+        } else {
+            Log.i("TAG21", "not Sort by age ");
+        }
 
-        ApiFactory.getApi().getTopUsersWithSearch(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "photo_780,place,count_likes", "top", filter, search).enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
+
+        ApiFactory.getApi().getTopUsersInPlacesWithSorting(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "photo_360,place,count_likes", "top", filter, sex, ageFrom, ageTo, "1").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<UsersContainer>> call, retrofit2.Response<ResponseContainer<UsersContainer>> response) {
                 UsersContainer users = response.body().getResponse();
@@ -254,6 +276,18 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
 
         final RadioGroup radioGroup = view.findViewById(R.id.radioGroupSex);
         radioGroup.check(R.id.ratingRadioButton);
+        RadioButton male = (RadioButton) view.findViewById(R.id.maleRadioButton);
+        RadioButton female = (RadioButton) view.findViewById(R.id.femaleRadioButton);
+
+        int sex = SharedManager.getIntProperty("sex");
+        if(sex==0){
+            SharedManager.addIntProperty("sex", 2);
+        }
+        if(sex==1){
+            female.setChecked(true);
+        } else {
+            male.setChecked(true);
+        }
 
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -261,30 +295,37 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
                 switch (checkedId){
                     case R.id.maleRadioButton:
                         Log.d("TAG23", "m ");
+                        SharedManager.addIntProperty("sex", 2);
                         break;
                     case R.id.femaleRadioButton:
                         Log.d("TAG23", "f ");
+                        SharedManager.addIntProperty("sex", 1);
                         break;
                 }
             }
         });
 
-        CheckBox checkboxSex = view.findViewById(R.id.checkBoxSexActive);
+        boolean sortBySex = SharedManager.getBooleanProperty("sortBySex");
+
+        final CheckBox checkboxSex = view.findViewById(R.id.checkBoxSexActive);
+        checkboxSex.setChecked(sortBySex);
+
+        for(int i = 0; i < radioGroup.getChildCount(); i++){
+            ((RadioButton)radioGroup.getChildAt(i)).setEnabled(sortBySex);
+        }
+
 
         checkboxSex.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
+                SharedManager.addBooleanProperty("sortBySex", isChecked);
                 for(int i = 0; i < radioGroup.getChildCount(); i++){
                     ((RadioButton)radioGroup.getChildAt(i)).setEnabled(isChecked);
                 }
             }
         });
 
-
-
-
-        String[] from_array = new String[60];
+        String[] from_array = new String[30];
         for (int i = 0; i < from_array.length; i++) {
             from_array[i] = "От " + (i+18);
         }
@@ -296,7 +337,8 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
         adapterFrom.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerFrom.setAdapter(adapterFrom);
 
-        String[] to_array = new String[60];
+
+        String[] to_array = new String[30];
         for (int i = 0; i < to_array.length; i++) {
             to_array[i] = "До " + (i+18);
         }
@@ -309,16 +351,30 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
         spinnerTo.setAdapter(adapterTo);
         spinnerTo.setAdapter(adapterTo);
 
-        final int[] positionFrom = {0};
-        final int[] positionTo = {15};
+
+        int from = SharedManager.getIntProperty("ageFrom");
+        int to = SharedManager.getIntProperty("ageTo");
+
+        if(from==-1){
+            SharedManager.addIntProperty("ageFrom", 0);
+            SharedManager.addIntProperty("ageTo", 7);
+        }
+
+        final int[] positionFrom = {SharedManager.getIntProperty("ageFrom")};
+         final int[] positionTo = {SharedManager.getIntProperty("ageTo")};
+
+     //   final int[] positionFrom = {0};
+     //   final int[] positionTo = {7};
 
         spinnerFrom.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                SharedManager.addIntProperty("ageFrom", position);
                 positionFrom[0] = position;
                 if (positionFrom[0] > positionTo[0]) {
                     positionTo[0] = positionFrom[0];
                     spinnerTo.setSelection(positionTo[0]);
+                    SharedManager.addIntProperty("ageTo", position);
                 }
             }
 
@@ -331,10 +387,12 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
         spinnerTo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                SharedManager.addIntProperty("ageTo", position);
                 positionTo[0] = position;
                 if (positionTo[0] < positionFrom[0]) {
                     positionFrom[0] = positionTo[0];
                     spinnerFrom.setSelection(positionTo[0]);
+                    SharedManager.addIntProperty("ageFrom", position);
                 }
             }
             @Override
@@ -347,12 +405,18 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
         spinnerFrom.setSelection(positionFrom[0]);
         spinnerTo.setSelection(positionTo[0]);
 
+        boolean sortByAge = SharedManager.getBooleanProperty("sortByAge");
 
         CheckBox checkboxAge = view.findViewById(R.id.checkBoxAgeActive);
+        checkboxAge.setChecked(sortByAge);
+
+        spinnerFrom.setEnabled(sortByAge);
+        spinnerTo.setEnabled(sortByAge);
 
         checkboxAge.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SharedManager.addBooleanProperty("sortByAge", isChecked);
                 spinnerFrom.setEnabled(isChecked);
                 spinnerTo.setEnabled(isChecked);
             }
@@ -360,6 +424,7 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
 
         builder.setPositiveButton("Ок", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
+                getUsersList(filter,"");
                 // User clicked OK button
             }
         });

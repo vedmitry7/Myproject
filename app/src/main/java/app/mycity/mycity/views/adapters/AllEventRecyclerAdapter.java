@@ -17,6 +17,7 @@ import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ import butterknife.ButterKnife;
 public class AllEventRecyclerAdapter extends RecyclerView.Adapter<AllEventRecyclerAdapter.ViewHolder> {
 
     List<Post> postList;
-    Map groups;
+    HashMap<String, Group> groups;
 
     int layout;
     Context context;
@@ -46,7 +47,7 @@ public class AllEventRecyclerAdapter extends RecyclerView.Adapter<AllEventRecycl
         this.imageClickListener = imageClickListener;
     }
 
-    public AllEventRecyclerAdapter(List<Post> postList, Map groups) {
+    public AllEventRecyclerAdapter(List<Post> postList, HashMap<String, Group> groups) {
         this.postList = postList;
         this.groups = groups;
     }
@@ -68,7 +69,7 @@ public class AllEventRecyclerAdapter extends RecyclerView.Adapter<AllEventRecycl
 
     @SuppressLint("ResourceAsColor")
     @Override
-    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         Picasso.get()
                 .load(postList.get(position).getAttachments()
                 .get(0).getPhoto780()).resize(App.dpToPx(context, 360), App.dpToPx(context, 360))
@@ -76,8 +77,10 @@ public class AllEventRecyclerAdapter extends RecyclerView.Adapter<AllEventRecycl
                 .into(holder.photo);
 
 
+        holder.eventName.setText(postList.get(position).getText());
+
         if(groups.containsKey(postList.get(position).getOwnerId())){
-            Group group = (Group) groups.get(postList.get(position).getOwnerId());
+            final Group group = (Group) groups.get(postList.get(position).getOwnerId());
             Picasso.get()
                     .load(group.getPhoto130())
                     .resize(App.dpToPx(context, 36), App.dpToPx(context, 36))
@@ -85,6 +88,17 @@ public class AllEventRecyclerAdapter extends RecyclerView.Adapter<AllEventRecycl
                     .into(holder.ownerImage);
 
             holder.name.setText(group.getName());
+
+            View.OnClickListener onGroupClick = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EventBus.getDefault().post(new EventBusMessages.OpenPlace(group.getId()));
+                }
+            };
+
+            holder.ownerImage.setOnClickListener(onGroupClick);
+            holder.name.setOnClickListener(onGroupClick);
+
         /*    holder.ownerImage.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                 @Override
                 public boolean onPreDraw() {
@@ -92,11 +106,21 @@ public class AllEventRecyclerAdapter extends RecyclerView.Adapter<AllEventRecycl
                     return false;
                 }
             });*/
+            holder.photo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EventBus.getDefault().post(new EventBusMessages.OpenEventContent(
+                            postList.get(position).getId(),
+                            postList.get(position).getOwnerId(),
+                            group.getName()));
+                }
+            });
+
         }
 
         holder.time.setText(Util.getDatePretty(postList.get(position).getDate()));
 
-        holder.visits.setText(String.valueOf(postList.get(position).getVisits().getCount()));
+ /*       holder.visits.setText(String.valueOf(postList.get(position).getVisits().getCount()));
 
         if(holder.visits!=null){
             if(postList.get(position).getVisits().getUserVisit()==1){
@@ -106,23 +130,20 @@ public class AllEventRecyclerAdapter extends RecyclerView.Adapter<AllEventRecycl
                 holder.eventConfirm.setBackground(context.getResources().getDrawable(R.drawable.border_events_bg));
                 holder.eventConfirm.setTextColor(Color.parseColor("#8724e6"));
             }
-        }
-
+        }*/
 
         if(holder.likesCount!=null)
             holder.likesCount.setText(String.valueOf(postList.get(position).getLikes().getCount()));
 
         if(holder.likeIcon!=null){
             if(postList.get(position).getLikes().getUserLikes()==1){
-                holder.likeIcon.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_heart_black_18dp));
-                holder.likeIcon.setColorFilter(context.getResources().getColor(R.color.colorAccentRed));
-                holder.likesCount.setTextColor(context.getResources().getColor(R.color.colorAccentRed));
+                holder.likeIcon.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_heart_vector_white));
             } else {
-                holder.likeIcon.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_heart_outline_grey600_18dp));
-                holder.likeIcon.setColorFilter(context.getResources().getColor(R.color.grey600));
-                holder.likesCount.setTextColor(context.getResources().getColor(R.color.black_67percent));
+                holder.likeIcon.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_heart_outline_vector_white));
             }
         }
+
+
     }
 
     @Override
@@ -150,10 +171,16 @@ public class AllEventRecyclerAdapter extends RecyclerView.Adapter<AllEventRecycl
 
         @BindView(R.id.placeEventTime)
         TextView time;
+        /*
         @BindView(R.id.visitCount)
         TextView visits;
+
         @BindView(R.id.eventConfirm)
         TextView eventConfirm;
+        */
+
+        @BindView(R.id.eventName)
+        TextView eventName;
 
         @Nullable
         @BindView(R.id.likesCount)
@@ -188,7 +215,7 @@ public class AllEventRecyclerAdapter extends RecyclerView.Adapter<AllEventRecycl
                 public void onClick(View v) {
                     EventBus.getDefault().post(new EventBusMessages.OpenComments(
                             postList.get(getAdapterPosition()).getId().toString(),
-                            postList.get(getAdapterPosition()).getOwnerId().toString(), "post"));
+                            postList.get(getAdapterPosition()).getOwnerId().toString(), "event"));
                 }
             });
 
@@ -199,7 +226,7 @@ public class AllEventRecyclerAdapter extends RecyclerView.Adapter<AllEventRecycl
                 }
             });
 
-            eventConfirm.setOnClickListener(new View.OnClickListener() {
+          /*  eventConfirm.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     EventBus.getDefault().post(new EventBusMessages.AddVisitor(
@@ -207,12 +234,14 @@ public class AllEventRecyclerAdapter extends RecyclerView.Adapter<AllEventRecycl
                             postList.get(getAdapterPosition()).getOwnerId().toString(),
                             getAdapterPosition()));
                 }
-            });
+            });*/
+
+
         }
 
     }
 
-    public void update(List<Post> posts, Map groups){
+    public void update(List<Post> posts, HashMap<String, Group> groups){
         postList = posts;
         this.groups = groups;
         notifyDataSetChanged();

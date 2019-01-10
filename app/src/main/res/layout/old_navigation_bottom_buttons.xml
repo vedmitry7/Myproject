@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/navigationButtonsContainer"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent">
+
+
+    <RelativeLayout
+        android:id="@+id/bottomBarMenuContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/bottomBarMenuIcon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerInParent="true"
+            android:background="@android:color/transparent"
+            android:clickable="false"
+            app:srcCompat="@drawable/ic_menu_vector_black" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/bottomBarProfileContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/bottomBarProfileIcon"
+            android:layout_width="21dp"
+            android:layout_height="21dp"
+            android:layout_centerInParent="true"
+            android:background="@android:color/transparent"
+            android:clickable="false"
+            app:srcCompat="@drawable/ic_person_vector_black" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/mainActAddBtn"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/main_act_search_button"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_centerInParent="true"
+            android:background="@android:color/transparent"
+            android:clickable="false"
+            app:srcCompat="@drawable/ic_make_photo" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/bottomBarChatContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/bottomBarChatIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_centerInParent="true"
+            app:srcCompat="@drawable/ic_chat_vector_black" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/bottomBarNotificationContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/bottomBarNotificationIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_centerInParent="true"
+            android:background="@android:color/transparent"
+            android:clickable="false"
+            app:srcCompat="@drawable/ic_notifications_vector" />
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -31,7 +31,6 @@ import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.Comment;
 import app.mycity.mycity.api.model.Likes;
 import app.mycity.mycity.api.model.Profile;
-import app.mycity.mycity.api.model.RealmUser;
 import app.mycity.mycity.api.model.ResponseAddComment;
 import app.mycity.mycity.api.model.ResponseComments;
 import app.mycity.mycity.api.model.ResponseContainer;
@@ -45,7 +44,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 import fr.arnaudguyon.tabstacker.TabStacker;
-import io.realm.Realm;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -85,7 +83,7 @@ public class CommentsFragment extends android.support.v4.app.Fragment implements
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.content_comment_activity, container, false);
+        View view = inflater.inflate(R.layout.comment_fragment, container, false);
         postId = getArguments().getString("postId");
         ownerId = getArguments().getString("ownerId");
         Log.d("TAG21", "Comment postId - " + postId);
@@ -148,7 +146,7 @@ public class CommentsFragment extends android.support.v4.app.Fragment implements
             Picasso.get().load(SharedManager.getProperty(Constants.KEY_PHOTO_130)).into(photo);
             Log.d("TAG21", "SharedManager.getProperty(Constants.KEY_PHOTO_130) NUUUUUUUUUUUUL ");
         } else {
-            Log.d("TAG21", SharedManager.getProperty(Constants.KEY_PHOTO_130) );
+            Log.d("TAG21", SharedManager.getProperty(Constants.KEY_PHOTO_130));
         }
 
         layoutManager.setReverseLayout(true);
@@ -228,6 +226,21 @@ public class CommentsFragment extends android.support.v4.app.Fragment implements
                         20,
                         "photo_130").enqueue(callback);
                 break;
+
+                case "event":
+                    Log.d("TAG21", "GET COMMENTS 1 " + postId);
+                    Log.d("TAG21", "GET COMMENTS 2 " + ownerId);
+
+                ApiFactory.getApi().getCommentsEvent(
+                        SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),
+                        "1",
+                        postId,
+                        ownerId,
+                        offset,
+                        "1",
+                        20,
+                        "photo_130").enqueue(callback);
+                break;
         }
 
 
@@ -284,6 +297,10 @@ public class CommentsFragment extends android.support.v4.app.Fragment implements
                 Log.d("TAG21", "photo photoId - " + postId + " owner id - " + ownerId );
                 ApiFactory.getApi().addCommentPhoto(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), postId, ownerId, commentText).enqueue(callback);
                 break;
+            case "event":
+                Log.d("TAG21", "photo photoId - " + postId + " owner id - " + ownerId );
+                ApiFactory.getApi().addCommentEvent(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), postId, ownerId, commentText).enqueue(callback);
+                break;
         }
     }
 
@@ -319,12 +336,14 @@ public class CommentsFragment extends android.support.v4.app.Fragment implements
         }
 
         if (commentList.get(event.getAdapterPosition()).getLikes().getUserLikes() == 0) {
-            Log.d("TAG21", "Like");
+            Log.d("TAG21", "Like id - " + commentList.get(event.getAdapterPosition()).getId().toString()
+                    + " ownerId - " + commentList.get(event.getAdapterPosition()).getOwnerId().toString());
             ApiFactory.getApi().like(
                     SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),
                     "comment",
                     commentList.get(event.getAdapterPosition()).getId().toString(),
                     commentList.get(event.getAdapterPosition()).getOwnerId().toString()
+
             ).enqueue(new retrofit2.Callback<ResponseContainer<ResponseLike>>() {
                 @Override
                 public void onResponse(retrofit2.Call<ResponseContainer<ResponseLike>> call, retrofit2.Response<ResponseContainer<ResponseLike>> response) {

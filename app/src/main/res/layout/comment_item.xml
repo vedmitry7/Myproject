@@ -92,7 +92,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="16dp"
-        android:src="@drawable/ic_dots"
+        app:srcCompat="@drawable/ic_dots"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
@@ -104,7 +104,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:src="@drawable/ic_heart_outline_grey600_18dp"
+        app:srcCompat="@drawable/ic_heart_outline_grey600_18dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/likesCount"
         app:layout_constraintTop_toBottomOf="@+id/feedImageCardView"

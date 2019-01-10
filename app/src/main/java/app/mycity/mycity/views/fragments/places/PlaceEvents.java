@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.github.nkzawa.socketio.client.Manager;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -50,7 +52,7 @@ public class PlaceEvents extends android.support.v4.app.Fragment{
     PlacesEventRecyclerAdapter adapter;
 
     List<Post> postList;
-    Map groups = new HashMap<Long, Group>();
+    HashMap<String, Group> groups = new HashMap<String, Group>();
 
     boolean isLoading;
     int totalCount;
@@ -58,6 +60,9 @@ public class PlaceEvents extends android.support.v4.app.Fragment{
     Storage storage;
 
     boolean mayRestore;
+    private int position;
+
+    LinearLayoutManager layoutManager;
 
     @Nullable
     @Override
@@ -82,7 +87,7 @@ public class PlaceEvents extends android.support.v4.app.Fragment{
 
         adapter = new PlacesEventRecyclerAdapter(postList, groups);
 
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager = new LinearLayoutManager(getActivity());
 
         RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
             @Override
@@ -115,6 +120,7 @@ public class PlaceEvents extends android.support.v4.app.Fragment{
 
         if(mayRestore){
             adapter.update(postList, groups);
+            recyclerView.scrollToPosition(position);
         } else {
             ApiFactory.getApi().getEvents(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("placeId"), "1", offset).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
                 @Override
@@ -294,7 +300,7 @@ public class PlaceEvents extends android.support.v4.app.Fragment{
         storage = (Storage) context;
 
         postList = (List<Post>) storage.getDate(getArguments().get("name")+ "_eventsPostList");
-        groups = (Map) storage.getDate(getArguments().get("name")+ "_eventsGroups");
+        groups = (HashMap<String, Group>) storage.getDate(getArguments().get("name")+ "_eventsGroups");
 
 
         if(postList==null){
@@ -303,6 +309,7 @@ public class PlaceEvents extends android.support.v4.app.Fragment{
             groups = new HashMap();
         } else {
             Log.d("TAG21", "restore ok - " + postList.size());
+            position = (int) storage.getDate(getArguments().get("name") + "_eventsScrollPosition");
             mayRestore = true;
         }
 
@@ -320,6 +327,7 @@ public class PlaceEvents extends android.support.v4.app.Fragment{
         Log.d("TAG21", "Stop EVENTS FRAGMENT Save " + getArguments().getString("name"));
         storage.setDate(getArguments().get("name") + "_eventsPostList", postList);
         storage.setDate(getArguments().get("name") + "_eventsGroups", groups);
+        storage.setDate(getArguments().get("name") + "_eventsScrollPosition", layoutManager.findFirstVisibleItemPosition());
 
         super.onStop();
     }

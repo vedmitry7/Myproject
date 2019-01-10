@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+import com.willy.ratingbar.ScaleRatingBar;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -48,10 +49,12 @@ public class PlacesRecyclerAdapter extends RecyclerView.Adapter<PlacesRecyclerAd
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        Picasso.get().load(placeList.get(position).getPhoto780()).into(holder.image);
+        Picasso.get().load(placeList.get(position).getPhoto130()).into(holder.image);
 
         holder.name.setText(placeList.get(position).getName());
 
+
+        holder.ratingBar.setRating( placeList.get(position).getRate().getAll().getValue());
     }
 
     @Override
@@ -66,6 +69,11 @@ public class PlacesRecyclerAdapter extends RecyclerView.Adapter<PlacesRecyclerAd
 
         @BindView(R.id.placeName)
         TextView name;
+
+        @BindView(R.id.placeRatingBar)
+        ScaleRatingBar ratingBar;
+
+
 
         public ViewHolder(View itemView) {
             super(itemView);

@@ -81,8 +81,8 @@ public class UserPlacesFragment extends Fragment implements TabStacker.TabStackI
         Log.d("TAG23", "create ");
 
 
-        Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
-        Util.setOnTabClick(view);
+        Util.setNawBarClickListener(view);
+        Util.setNawBarIconColor(getContext(), view, -1);
 
         placeList = new ArrayList<>();
         adapter = new PlacesRecyclerAdapter(placeList);

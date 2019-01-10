@@ -25,11 +25,13 @@ public class FeedPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position){
             case 0:
-                return FeedCheckinFragmentNew.createInstance(tabName);
+                return FeedCheckinFragmentNew.createInstance(tabName, "all");
             case 1:
+                return FeedCheckinFragmentNew.createInstance(tabName, "subscriptions");
+         /*       case 1:
                 return FeedPhotoAlbumFragment.createInstance(tabName);
             case 2:
-                return AllEvents.createInstance(tabName, 4);
+                return AllEvents.createInstance(tabName, 4);*/
 
         }
         return null;
@@ -37,18 +39,16 @@ public class FeedPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 3;
+        return 2;
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
         switch (position) {
             case 0:
-                return "Чекины";
+                return "ВСЕ";
             case 1:
-                return "Хроники";
-            case 2:
-                return "События";
+                return "ПОДПИСКИ";
         }
         return null;
     }

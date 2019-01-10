@@ -47,6 +47,7 @@ import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.adapters.PlacesRecyclerAdapter;
 import app.mycity.mycity.views.adapters.PlacesTopBarAdapter;
+import app.mycity.mycity.views.fragments.feed.ChronicsFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -92,12 +93,27 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
 
     Storage storage;
 
+    String order = "rate";
+    private View fragmentView;
 
+
+/*
     @OnClick(R.id.mainActAddBtn)
     public void photo(View v){
         Log.d("TAG21", "PHOTO - ");
         EventBus.getDefault().post(new EventBusMessages.MakeCheckin());
     }
+*/
+
+    public static PlacesFragment createInstance(String name) {
+        PlacesFragment fragment = new PlacesFragment();
+        Log.i("TAG21", "Create FeedFragment " + name);
+        Bundle bundle = new Bundle();
+        bundle.putString("name", name);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
 
     @Nullable
     @Override
@@ -107,11 +123,21 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
         return view;
     }
 
+    @OnClick(R.id.backButton)
+    public void sadsa(View v){
+        getActivity().onBackPressed();
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.d("TAG23", "create ");
 
+        fragmentView = view;
+
+        if(SharedManager.getProperty("placesOrder")!=null && !SharedManager.getProperty("placesOrder").equals("")){
+            order = SharedManager.getProperty("placesOrder");
+        }
 
         search.addTextChangedListener(new TextWatcher() {
             @Override
@@ -140,7 +166,7 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
                     adapter.notifyDataSetChanged();
                     placesProgressBar.setVisibility(View.VISIBLE);
                     App.hideKeyboard(getActivity());
-                    loadPlaces(0, 0, search.getText().toString());
+                    loadPlaces(0, 0, search.getText().toString(), order);
                     getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
                     search.clearFocus();
                     return true;
@@ -154,14 +180,17 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
             public void onClick(View v) {
                 search.setText("");
                 clearSearch.setVisibility(View.GONE);
-                loadPlaces(0, placesCategoriesAdapter.getCategoryId(), "");
+                loadPlaces(0, placesCategoriesAdapter.getCategoryId(), "", order);
             }
         });
 
 
+        Util.setNawBarClickListener(view);
+        Util.setNawBarIconColor(getContext(), view, -1);
+        Util.setUnreadCount(view);
 
-        Util.indicateTabImageView(getContext(), view, 3);
-        Util.setOnTabClick(view);
+/*        Util.indicateTabImageView(getContext(), view, 3);
+        Util.setOnTabClick(view);*/
 
         title.setText("Места");
 
@@ -183,7 +212,7 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
                         // load if we don't load all
                         if(totalCount >= placeList.size()){
                             Log.d("TAG21", "load feed ");
-                            loadPlaces(placeList.size(), placesCategoriesAdapter.getCategoryId(), "");
+                            loadPlaces(placeList.size(), placesCategoriesAdapter.getCategoryId(), "", order);
                         }
                     }
                 }
@@ -195,7 +224,7 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
 
         //recyclerView.addOnScrollListener(scrollListener);
 
-        loadPlaces(placeList.size(), 0, "");
+        loadPlaces(placeList.size(), 0, "", order);
 
         placeCategories = new ArrayList<>();
         PlaceCategory placeCategory = new PlaceCategory();
@@ -235,6 +264,13 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
         loadCategories();
     }
 
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onEvent(EventBusMessages.UnreadCountUpdate event){
+        Util.setUnreadCount(fragmentView);
+        Log.d("TAG25", "Update TOTAL UNREAD COUNT   -  Chronics");
+    }
+
+
     @OnClick(R.id.sortButton)
     public void sort(View v){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -244,8 +280,16 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
         View view = getActivity().getLayoutInflater().inflate(R.layout.places_sort_dialog, null);
         builder.setView(view);
 
+
+
+
         RadioGroup radioGroup = view.findViewById(R.id.radioGroup);
+        if(order.equals("rate"))
         radioGroup.check(R.id.ratingRadioButton);
+        if(order.equals("new"))
+            radioGroup.check(R.id.onlineCountRadioButton);
+        if(order.equals("pop"))
+            radioGroup.check(R.id.checkinCountRadioButton);
 
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -253,12 +297,18 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
                 switch (checkedId){
                     case R.id.ratingRadioButton:
                         Log.d("TAG23", "r ");
+                        SharedManager.addProperty("placesOrder", "rate");
+                        order = "rate";
                         break;
                     case R.id.onlineCountRadioButton:
                         Log.d("TAG23", "o ");
+                        SharedManager.addProperty("placesOrder", "new");
+                        order = "new";
                         break;
                     case R.id.checkinCountRadioButton:
                         Log.d("TAG23", "c");
+                        SharedManager.addProperty("placesOrder", "pop");
+                        order = "pop";
                         break;
                 }
             }
@@ -267,6 +317,7 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
         builder.setPositiveButton("Ок", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked OK button
+                loadPlaces(0, placesCategoriesAdapter.getCategoryId(), "", order);
             }
         });
 
@@ -284,12 +335,12 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
     public void gfdsgsd(EventBusMessages.SortPlaces event){
         placeList = new ArrayList<>();
         placesProgressBar.setVisibility(View.VISIBLE);
-        loadPlaces(0, placesCategoriesAdapter.getCategoryId(), search.getText().toString());
+        loadPlaces(0, placesCategoriesAdapter.getCategoryId(), search.getText().toString(), order);
         search.clearFocus();
     }
 
-    private void loadPlaces(final int offset, int category, String search) {
-        ApiFactory.getApi().getPlaces(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), offset, 552, category, search).enqueue(new retrofit2.Callback<ResponseContainer<ResponsePlaces>>() {
+    private void loadPlaces(final int offset, int category, String search, String order) {
+        ApiFactory.getApi().getPlaces(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), offset, 552, category, order, search).enqueue(new retrofit2.Callback<ResponseContainer<ResponsePlaces>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<ResponsePlaces>> call, retrofit2.Response<ResponseContainer<ResponsePlaces>> response) {
                 if(response.body()!=null){
@@ -316,7 +367,7 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
 
             @Override
             public void onFailure(retrofit2.Call<ResponseContainer<ResponsePlaces>> call, Throwable t) {
-
+                Log.d("TAG21", "places fail "  + t.getLocalizedMessage());
             }
         });
     }

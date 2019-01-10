@@ -194,6 +194,7 @@ public class BitmapUtils {
      */
 
     public static void storeImage(Bitmap image, String path) {
+        Log.d("TAG21", "storeImage storeImage storeImage = " + image.getWidth() + " : " + image.getHeight());
         File pictureFile = new File(path);
         if (pictureFile == null) {
             Log.d(TAG,
@@ -202,7 +203,7 @@ public class BitmapUtils {
         }
         try {
             FileOutputStream fos = new FileOutputStream(pictureFile);
-            image.compress(Bitmap.CompressFormat.PNG, 90, fos);
+            image.compress(Bitmap.CompressFormat.PNG, 100, fos);
             fos.close();
         } catch (FileNotFoundException e) {
             Log.d(TAG, "File not found: " + e.getMessage());

@@ -13,10 +13,21 @@ public class ResponseUploadServer {
     private String baseUrl;
     @SerializedName("user_id")
     @Expose
-    private Integer userId;
+    private String userId;
     @SerializedName("owner_id")
     @Expose
     private Integer ownerId;
+    @SerializedName("action")
+    @Expose
+    private String action;
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
 
     public String getServer() {
         return server;
@@ -34,11 +45,11 @@ public class ResponseUploadServer {
         this.baseUrl = baseUrl;
     }
 
-    public Integer getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

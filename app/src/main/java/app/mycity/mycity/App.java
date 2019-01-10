@@ -1,19 +1,27 @@
 package app.mycity.mycity;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import app.mycity.mycity.util.SharedManager;
+import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.activities.ChatActivity;
-import app.mycity.mycity.views.activities.ChatActivity2;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
@@ -92,9 +100,9 @@ public class App extends Application implements Application.ActivityLifecycleCal
     public void onActivityResumed(Activity activity) {
         Log.i("TAG21", "onActivityResumed");
         activityCount++;
-        if (activity instanceof ChatActivity2) {
+        if (activity instanceof ChatActivity) {
             isChatActivityStarted = true;
-            currentChatUser = ((ChatActivity2)activity).getCurrentChatUser();
+            currentChatUser = ((ChatActivity)activity).getCurrentChatUser();
             Log.i("TAG21", "onActivityResumed - chat");
 
         }
@@ -103,7 +111,7 @@ public class App extends Application implements Application.ActivityLifecycleCal
     @Override
     public void onActivityPaused(Activity activity) {
         activityCount--;
-        if (activity instanceof ChatActivity2) {
+        if (activity instanceof ChatActivity) {
             isChatActivityStarted = false;
         }
     }
@@ -131,5 +139,54 @@ public class App extends Application implements Application.ActivityLifecycleCal
             view = new View(activity);
         }
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+
+    public static boolean isOnline(Context context) {
+
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        //should check null because in airplane mode it will be null
+        return (netInfo != null && netInfo.isConnected());
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void appendLog(String text)
+    {
+        File logFile = new File("sdcard/log.file");
+        if (!logFile.exists())
+        {
+            try
+            {
+                logFile.createNewFile();
+            }
+            catch (IOException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        try
+        {
+            //BufferedWriter for performance, true to set append to file flag
+            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
+            buf.append(Util.getTimeForLog(System.currentTimeMillis()) + " :-- " + text);
+            buf.newLine();
+            buf.close();
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }

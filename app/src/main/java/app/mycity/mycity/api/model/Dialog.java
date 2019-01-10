@@ -29,6 +29,9 @@ public class Dialog {
     @SerializedName("read")
     @Expose
     private Integer read;
+    @SerializedName("count_unread")
+    @Expose
+    private Integer countUnread;
     @SerializedName("photo_50")
     @Expose
     private String photo50;
@@ -38,12 +41,12 @@ public class Dialog {
     @SerializedName("photo_130")
     @Expose
     private String photo130;
-    @SerializedName("photo_780")
+    @SerializedName("photo_360")
     @Expose
-    private String photo780;
-    @SerializedName("photo_orig")
+    private String photo360;
+    @SerializedName("photo_550")
     @Expose
-    private String photoOrig;
+    private String photo550;
 
     public String getId() {
         return id;
@@ -109,6 +112,14 @@ public class Dialog {
         this.read = read;
     }
 
+    public Integer getCountUnread() {
+        return countUnread;
+    }
+
+    public void setCountUnread(Integer countUnread) {
+        this.countUnread = countUnread;
+    }
+
     public String getPhoto50() {
         return photo50;
     }
@@ -133,20 +144,20 @@ public class Dialog {
         this.photo130 = photo130;
     }
 
-    public String getPhoto780() {
-        return photo780;
+    public String getPhoto360() {
+        return photo360;
     }
 
-    public void setPhoto780(String photo780) {
-        this.photo780 = photo780;
+    public void setPhoto360(String photo360) {
+        this.photo360 = photo360;
     }
 
-    public String getPhotoOrig() {
-        return photoOrig;
+    public String getPhoto550() {
+        return photo550;
     }
 
-    public void setPhotoOrig(String photoOrig) {
-        this.photoOrig = photoOrig;
+    public void setPhoto550(String photo550) {
+        this.photo550 = photo550;
     }
 
 }

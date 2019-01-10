@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="@android:color/white"
+    android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/include3"
+        layout="@layout/toolbar" />
+
+    <View
+        app:layout_constraintTop_toBottomOf="@+id/include3"
+        android:id="@+id/top_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@drawable/toolbar_down_shadow_light"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="567dp" />
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/feedFragmentRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNawBar"
+        app:layout_constraintTop_toBottomOf="@+id/include3">
+    </android.support.v7.widget.RecyclerView>
+
+    <View
+        android:id="@+id/up_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@drawable/toolbar_up_shadow"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNawBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints" />
+
+    <include
+        android:id="@+id/bottomNawBar"
+        layout="@layout/new_bottom_nav_bar" />
+
+</android.support.constraint.ConstraintLayout>

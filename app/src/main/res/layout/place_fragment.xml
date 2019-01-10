@@ -137,7 +137,7 @@
 
     <include
         android:id="@+id/include4"
-        layout="@layout/navigation_bottom_buttons"
+        layout="@layout/new_bottom_nav_bar"
         tools:layout_editor_absoluteY="519dp"
         tools:ignore="MissingConstraints" />
 

@@ -19,9 +19,11 @@ import com.squareup.picasso.Picasso;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
+import java.util.Map;
 
 import app.mycity.mycity.App;
 import app.mycity.mycity.R;
+import app.mycity.mycity.api.model.Group;
 import app.mycity.mycity.api.model.Likes;
 import app.mycity.mycity.api.model.Photo;
 import app.mycity.mycity.api.model.Post;
@@ -36,8 +38,8 @@ public class CheckinRecyclerAdapter extends RecyclerView.Adapter<CheckinRecycler
     public static final int LINEAR_LAYOUT = 1;
 
     List<Post> postList;
+    Map<String, Group> groups;
 
-    int layout;
     Context context;
     ImageClickListener imageClickListener;
 
@@ -49,12 +51,9 @@ public class CheckinRecyclerAdapter extends RecyclerView.Adapter<CheckinRecycler
         this.imageClickListener = imageClickListener;
     }
 
-    public CheckinRecyclerAdapter(List<Post> postList) {
+    public CheckinRecyclerAdapter(List<Post> postList, Map groups) {
         this.postList = postList;
-    }
-
-    public void setLayout(int layout){
-        this.layout = layout;
+        this.groups = groups;
     }
 
     @NonNull
@@ -66,13 +65,9 @@ public class CheckinRecyclerAdapter extends RecyclerView.Adapter<CheckinRecycler
         if(context==null){
             context = parent.getContext();
         }
-        if(layout == LINEAR_LAYOUT){
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.photo_row_list, parent, false);
-            return new ViewHolder(view);
-        } else {
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.photo_row_grid, parent, false);
-            return new ViewHolder(view);
-        }
+
+        view = LayoutInflater.from(parent.getContext()).inflate(R.layout.photo_row_grid, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
@@ -88,17 +83,26 @@ public class CheckinRecyclerAdapter extends RecyclerView.Adapter<CheckinRecycler
 
         Log.d("TAG", "picture width - " + pictureWidth);
 
-        Picasso.get()
-                .load(postList.get(position).getAttachments().get(0).getPhoto780())
-                .resize(pictureWidth, pictureWidth)
-                .centerCrop()
-                .into(holder.photo);
+
+        if(postList.get(position).getAttachments()!=null && postList.get(position).getAttachments().get(0).getPhoto360()!=null) {
+            Picasso.get()
+                    .load(postList.get(position).getAttachments().get(0).getPhoto360())
+                    .resize(pictureWidth, pictureWidth)
+                    .centerCrop()
+                    .into(holder.photo);
+        } else {
+            Picasso.get()
+                    .load("/")
+                    .placeholder(R.drawable.ic_baseline_error_outline_24px)
+                    .into(holder.photo);
+        }
+
 
         if(holder.likesCount!=null)
             holder.likesCount.setText(String.valueOf(postList.get(position).getLikes().getCount()));
 
         if(holder.commentText!=null)
-        holder.commentText.setText(String.valueOf(postList.get(position).getComments().getCount()));
+            holder.commentText.setText(String.valueOf(postList.get(position).getComments().getCount()));
 
         if(holder.likeIcon!=null){
             if(postList.get(position).getLikes().getUserLikes()==1){
@@ -107,8 +111,16 @@ public class CheckinRecyclerAdapter extends RecyclerView.Adapter<CheckinRecycler
                 holder.likesCount.setTextColor(context.getResources().getColor(R.color.colorAccentRed));
             } else {
                 holder.likeIcon.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_heart_outline_grey600_18dp));
-                holder.likeIcon.setColorFilter(context.getResources().getColor(R.color.grey600));
                 holder.likesCount.setTextColor(context.getResources().getColor(R.color.black_67percent));
+            }
+        }
+
+
+        if(holder.place!=null){
+            if(groups.containsKey(postList.get(position).getPlaceId())){
+                holder.place.setText((groups.get(postList.get(position).getPlaceId())).getName());
+            } else {
+                holder.place.setText("");
             }
         }
     }
@@ -147,11 +159,15 @@ public class CheckinRecyclerAdapter extends RecyclerView.Adapter<CheckinRecycler
             super(itemView);
             ButterKnife.bind(this, itemView);
 
+            final int adapterPosition = getAdapterPosition();
+
             if(photo!=null){
                 photo.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        imageClickListener.onClick(getAdapterPosition());
+                        //imageClickListener.onClick(getAdapterPosition());
+                        EventBus.getDefault().post(
+                                new EventBusMessages.ShowImage(getAdapterPosition()));
                     }
                 });
 
@@ -179,12 +195,23 @@ public class CheckinRecyclerAdapter extends RecyclerView.Adapter<CheckinRecycler
                     }
                 });
             }
-        }
+            if(place!=null)
+                place.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(groups.containsKey(postList.get(adapterPosition).getPlaceId())){
+                            EventBus.getDefault().post(new EventBusMessages.OpenPlace(groups.get(postList.get(adapterPosition)).getId()));
+                        }
+                    }
+                });
 
+
+        }
     }
 
-    public void update(List<Post> posts){
+    public void update(List<Post> posts, Map groups){
         postList = posts;
+        this.groups = groups;
         notifyDataSetChanged();
         Log.d("TAG", "update Photo recycler");
     }

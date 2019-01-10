@@ -34,7 +34,7 @@ import butterknife.ButterKnife;
 public class PlacesEventRecyclerAdapter extends RecyclerView.Adapter<PlacesEventRecyclerAdapter.ViewHolder> {
 
     List<Post> postList;
-    Map groups;
+    HashMap<String, Group> groups;
 
     int layout;
     Context context;
@@ -48,7 +48,7 @@ public class PlacesEventRecyclerAdapter extends RecyclerView.Adapter<PlacesEvent
         this.imageClickListener = imageClickListener;
     }
 
-    public PlacesEventRecyclerAdapter(List<Post> postList, Map groups) {
+    public PlacesEventRecyclerAdapter(List<Post> postList, HashMap<String, Group> groups) {
         this.postList = postList;
         this.groups = groups;
     }
@@ -98,7 +98,7 @@ public class PlacesEventRecyclerAdapter extends RecyclerView.Adapter<PlacesEvent
 
         holder.time.setText(Util.getDatePretty(postList.get(position).getDate()));
 
-        holder.visits.setText(String.valueOf(postList.get(position).getVisits().getCount()));
+  /*      holder.visits.setText(String.valueOf(postList.get(position).getVisits().getCount()));
 
         if(holder.visits!=null){
             if(postList.get(position).getVisits().getUserVisit()==1){
@@ -108,7 +108,7 @@ public class PlacesEventRecyclerAdapter extends RecyclerView.Adapter<PlacesEvent
                 holder.eventConfirm.setBackground(context.getResources().getDrawable(R.drawable.border_events_bg));
                 holder.eventConfirm.setTextColor(Color.parseColor("#8724e6"));
             }
-        }
+        }*/
 
 
         if(holder.likesCount!=null)
@@ -152,10 +152,11 @@ public class PlacesEventRecyclerAdapter extends RecyclerView.Adapter<PlacesEvent
 
         @BindView(R.id.placeEventTime)
         TextView time;
+   /*
         @BindView(R.id.visitCount)
         TextView visits;
         @BindView(R.id.eventConfirm)
-        TextView eventConfirm;
+        TextView eventConfirm;*/
 
         @Nullable
         @BindView(R.id.likesCount)
@@ -168,7 +169,10 @@ public class PlacesEventRecyclerAdapter extends RecyclerView.Adapter<PlacesEvent
                 photo.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                   //     imageClickListener.onClick(getAdapterPosition());
+                     //   imageClickListener.onClick(getAdapterPosition());
+                        EventBus.getDefault().post(new EventBusMessages.OpenEventContent(postList.get(getAdapterPosition()).getId(),
+                                postList.get(getAdapterPosition()).getOwnerId(),
+                                groups.get(postList.get(getAdapterPosition()).getOwnerId()).getName()));
                     }
                 });
             }
@@ -200,7 +204,7 @@ public class PlacesEventRecyclerAdapter extends RecyclerView.Adapter<PlacesEvent
                     EventBus.getDefault().post(new EventBusMessages.OpenUser(postList.get(getAdapterPosition()).getOwnerId()));
                 }
             });
-
+/*
             eventConfirm.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -209,12 +213,12 @@ public class PlacesEventRecyclerAdapter extends RecyclerView.Adapter<PlacesEvent
                             postList.get(getAdapterPosition()).getOwnerId().toString(),
                             getAdapterPosition()));
                 }
-            });
+            });*/
         }
 
     }
 
-    public void update(List<Post> posts, Map groups){
+    public void update(List<Post> posts, HashMap<String, Group> groups){
         postList = posts;
         this.groups = groups;
         notifyDataSetChanged();

@@ -71,7 +71,7 @@ public class NewFeedRecyclerAdapter extends RecyclerView.Adapter<NewFeedRecycler
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         Picasso.get()
                 .load(postList.get(position).getAttachments()
-                .get(0).getPhoto780())
+                .get(0).getPhoto550())
               //  .resize(App.dpToPx(context, 360), App.dpToPx(context, 360))
                 .placeholder(R.drawable.logo)
              //   .centerCrop()
@@ -88,7 +88,7 @@ public class NewFeedRecyclerAdapter extends RecyclerView.Adapter<NewFeedRecycler
             holder.place.setText((groups.get(postList.get(position).getPlaceId())).getName());
         } else {
             Log.d("TAG", "groups doesnt contains " + postList.get(position).getPlaceId());
-            holder.place.setText("place absent");
+            holder.place.setText("albumName absent");
         }
     }
 
@@ -114,12 +114,13 @@ public class NewFeedRecyclerAdapter extends RecyclerView.Adapter<NewFeedRecycler
            itemView.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View v) {
-                   Log.d("TAG21", "click place - " + getAdapterPosition());
+                   Log.d("TAG21", "click albumName - " + getAdapterPosition());
                    if(getAdapterPosition()!=-1){
                        if(groups.containsKey(postList.get(getAdapterPosition()).getPlaceId())){
-                           Log.d("TAG21", "click place contains " );
+                           Log.d("TAG21", "click albumName contains " );
                            EventBus.getDefault().post(new EventBusMessages.OpenPlacePhoto(
-                                   groups.get(postList.get(getAdapterPosition()).getPlaceId()).getId())
+                                   groups.get(postList.get(getAdapterPosition()).getPlaceId()).getId(),
+                                   postList.get(getAdapterPosition()).getId())
                            );
                            EventBus.getDefault().postSticky(new EventBusMessages.OpenPlacePhoto2(
                                    groups.get(postList.get(getAdapterPosition()).getPlaceId()).getId(),
@@ -128,10 +129,10 @@ public class NewFeedRecyclerAdapter extends RecyclerView.Adapter<NewFeedRecycler
                                    profiles.get(postList.get(getAdapterPosition()).getOwnerId())
                            ));
                        } else {
-                           Log.d("TAG21", "click place not contains" );
+                           Log.d("TAG21", "click albumName not contains" );
                        }
                    } else {
-                       Log.d("TAG21", "click place -1  - " + getAdapterPosition());
+                       Log.d("TAG21", "click albumName -1  - " + getAdapterPosition());
                    }
                }
            });

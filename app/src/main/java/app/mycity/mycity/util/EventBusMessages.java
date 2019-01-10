@@ -65,8 +65,14 @@ public class EventBusMessages {
 
     public static class OpenPlacePhoto {
         private String placeId;
-        public OpenPlacePhoto(String placeId) {
+        private String postId;
+        public OpenPlacePhoto(String placeId, String postId) {
             this.placeId = placeId;
+            this.postId = postId;
+        }
+
+        public String getPostId() {
+            return postId;
         }
 
         public String getPlaceId() {
@@ -455,5 +461,184 @@ public class EventBusMessages {
         public int getPosition() {
             return position;
         }
+    }
+
+    public static class OpenFeed {
+    }
+
+    public static class OpenChronics {
+    }
+
+    public static class OpenPlaces {
+    }
+
+    public static class OpenPeople {
+    }
+
+    public static class OpenProfile {
+    }
+
+    public static class OpenMenu {
+    }
+
+    public static class OpenChat {
+
+    }
+
+    public static class OpenEvents {
+    }
+
+    public static class OpenCheckins {
+    }
+
+    public static class UpdateCoordinates {
+    }
+
+    public static class LocationStop {
+    }
+
+    public static class LocationResume {
+    }
+
+    public static class PublicationComplete {
+    }
+
+    public static class MainSettings {
+    }
+
+    public static class PublicationError {
+    }
+
+    public static class ClickOnSliderImage {
+    }
+
+    public static class OpenPlaceContent {
+        String postId;
+
+        public OpenPlaceContent(String postId) {
+            this.postId = postId;
+        }
+
+        public String getPostId() {
+            return postId;
+        }
+    }
+
+    public static class OpenCheckinProfileContent {
+        private String postId;
+        private String storageKey;
+
+        public OpenCheckinProfileContent(String postId, String storageKey) {
+            this.postId = postId;
+            this.storageKey = storageKey;
+        }
+
+        public String getStorageKey() {
+            return storageKey;
+        }
+
+        public String getPostId() {
+            return postId;
+        }
+    }
+
+    public static class OpenEventContent {
+
+        private String eventId;
+        private String ownerId;
+        private String placeName;
+
+        public OpenEventContent(String eventId, String ownerId, String placeName) {
+            this.eventId = eventId;
+            this.ownerId = ownerId;
+            this.placeName = placeName;
+        }
+
+        public String getEventId() {
+            return eventId;
+        }
+
+        public String getOwnerId() {
+            return ownerId;
+        }
+
+        public String getPlaceName() {
+            return placeName;
+        }
+    }
+
+    public static class OpenActionContent {
+
+        private String eventId;
+        private String ownerId;
+        private String placeName;
+
+        public OpenActionContent(String eventId, String ownerId, String placeName) {
+            this.eventId = eventId;
+            this.ownerId = ownerId;
+            this.placeName = placeName;
+        }
+
+        public String getEventId() {
+            return eventId;
+        }
+
+        public String getOwnerId() {
+            return ownerId;
+        }
+
+        public String getPlaceName() {
+            return placeName;
+        }
+    }
+
+    public static class DialogUpdate{
+        String dialogId;
+        String messageText;
+        int unreadCount;
+        int time;
+
+        public int getTime() {
+            return time;
+        }
+
+        public void setTime(int time) {
+            this.time = time;
+        }
+
+        public DialogUpdate(String dialogId, String messageText, int unreadCount, int time) {
+            this.dialogId = dialogId;
+            this.messageText = messageText;
+            this.unreadCount = unreadCount;
+            this.time = time;
+        }
+
+        public String getDialogId() {
+            return dialogId;
+        }
+
+        public void setDialogId(String dialogId) {
+            this.dialogId = dialogId;
+        }
+
+        public String getMessageText() {
+            return messageText;
+        }
+
+        public void setMessageText(String messageText) {
+            this.messageText = messageText;
+        }
+
+        public int getUnreadCount() {
+            return unreadCount;
+        }
+
+        public void setUnreadCount(int unreadCount) {
+            this.unreadCount = unreadCount;
+        }
+    }
+
+    public static class UnreadCountUpdate{
+
     }
 }

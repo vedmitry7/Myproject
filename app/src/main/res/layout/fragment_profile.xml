@@ -125,7 +125,7 @@
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:layout_alignParentLeft="true"
-                    android:src="@drawable/ic_map_marker_black_24dp" />
+                    app:srcCompat="@drawable/ic_marker_vector" />
 
                 <TextView
                     android:layout_width="wrap_content"

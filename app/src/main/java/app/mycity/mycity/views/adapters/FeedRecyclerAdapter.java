@@ -98,7 +98,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
             holder.place.setText((groups.get(postList.get(position).getPlaceId())).getName());
         } else {
             Log.d("TAG", "groups doesnt contains " + postList.get(position).getPlaceId());
-            holder.place.setText("place absent");
+            holder.place.setText("albumName absent");
 
         }
 
@@ -197,17 +197,17 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
             place.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d("TAG21", "click place - " + getAdapterPosition());
+                    Log.d("TAG21", "click albumName - " + getAdapterPosition());
                     if(getAdapterPosition()!=-1){
                         if(groups.containsKey(postList.get(getAdapterPosition()).getPlaceId())){
-                            Log.d("TAG21", "click place contains " );
+                            Log.d("TAG21", "click albumName contains " );
                             EventBus.getDefault().post(new EventBusMessages.OpenPlace(
                                             groups.get(postList.get(getAdapterPosition()).getPlaceId()).getId()));
                         } else {
-                            Log.d("TAG21", "click place not contains" );
+                            Log.d("TAG21", "click albumName not contains" );
                         }
                     } else {
-                        Log.d("TAG21", "click place -1  - " + getAdapterPosition());
+                        Log.d("TAG21", "click albumName -1  - " + getAdapterPosition());
                     }
                 }
             });

@@ -10,39 +10,21 @@
         android:id="@+id/feedImage"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="@dimen/photo_item_padding"
         android:scaleType="centerCrop"
-        app:layout_constraintDimensionRatio="H,1:1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 
-
-    <ImageView
-        android:visibility="invisible"
-        android:id="@+id/imageView3"
-        android:layout_width="0dp"
-        android:layout_height="26dp"
-        android:adjustViewBounds="true"
-        android:background="#29000000"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent" />
-
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="@color/deliver_color"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-
     <TextView
+        android:gravity="center"
         android:id="@+id/placeLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
@@ -54,10 +36,10 @@
         android:text="pdsgfdsf dsf d"
         android:textColor="@android:color/white"
         android:textSize="12dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/imageView3"
+        app:layout_constraintBottom_toBottomOf="@+id/feedImage"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imageView3"
         tools:ignore="MissingConstraints" />
+
 
 </android.support.constraint.ConstraintLayout>

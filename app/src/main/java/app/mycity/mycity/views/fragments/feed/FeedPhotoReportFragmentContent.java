@@ -3,6 +3,7 @@ package app.mycity.mycity.views.fragments.feed;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -83,6 +84,9 @@ public class FeedPhotoReportFragmentContent extends android.support.v4.app.Fragm
     @BindView(R.id.placeName)
     TextView placeName;
 
+    @BindView(R.id.progressBarPlaceHolder)
+    ConstraintLayout placeHolder;
+
     List<Photo> photoList;
 
     Group group;
@@ -122,6 +126,11 @@ public class FeedPhotoReportFragmentContent extends android.support.v4.app.Fragm
         return fragment;
     }
 
+    @OnClick(R.id.backButton)
+    public void backButton(View v){
+        getActivity().onBackPressed();
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -136,8 +145,8 @@ public class FeedPhotoReportFragmentContent extends android.support.v4.app.Fragm
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 
-        Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
-        Util.setOnTabClick(view);
+        Util.setNawBarClickListener(view);
+        Util.setNawBarIconColor(getContext(), view, -1);
 
         time.setText(Util.getDatePretty(getArguments().getLong("albumDate")));
         placeName.setText(getArguments().getString("albumName"));
@@ -197,6 +206,7 @@ public class FeedPhotoReportFragmentContent extends android.support.v4.app.Fragm
                         photoList.addAll(response.body().getResponse().getPhotos());
                         adapter.update(photoList);
                         recyclerView.scrollToPosition(getArguments().getInt("position"));
+                        placeHolder.setVisibility(View.GONE);
                         Picasso.get().load(photoList.get(getArguments().getInt("position")).getPhoto780()).into(image);
                         if(response.body().getResponse().getGroups()!=null){
                             Log.d("TAG24", "Groups GET");
@@ -284,13 +294,13 @@ public class FeedPhotoReportFragmentContent extends android.support.v4.app.Fragm
 
     void setLiked(boolean b){
         if(b){
-            likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart_black_18dp));
-            likeIcon.setColorFilter(getResources().getColor(R.color.colorAccentRed));
-            likesCount.setTextColor(getResources().getColor(R.color.colorAccentRed));
+            likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart_vector_white));
+          //  likeIcon.setColorFilter(getResources().getColor(R.color.colorAccentRed));
+           // likesCount.setTextColor(getResources().getColor(R.color.colorAccentRed));
         } else {
-            likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart_outline_grey600_18dp));
-            likeIcon.setColorFilter(getResources().getColor(R.color.grey600));
-            likesCount.setTextColor(getResources().getColor(R.color.black_67percent));
+            likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart_outline_vector_white));
+           // likeIcon.setColorFilter(getResources().getColor(R.color.grey600));
+          //  likesCount.setTextColor(getResources().getColor(R.color.black_67percent));
         }
     }
 

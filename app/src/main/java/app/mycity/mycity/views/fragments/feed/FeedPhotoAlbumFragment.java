@@ -3,6 +3,7 @@ package app.mycity.mycity.views.fragments.feed;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,15 +11,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.Album;
+import app.mycity.mycity.api.model.Group;
 import app.mycity.mycity.api.model.ResponseAlbums;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.util.SharedManager;
@@ -37,9 +42,17 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment {
     @BindView(R.id.feedFragmentRecyclerView)
     RecyclerView recyclerView;
 
+    @BindView(R.id.progressBarPlaceHolder)
+    ConstraintLayout placeHolder;
+
+    @BindView(R.id.chronicksHolder)
+    RelativeLayout holderInfo;
+
     FeedPhotoReportAdapter adapter;
 
     List<Album> albumsList;
+    Map<String, Group> groups = new HashMap<>();
+
 
     boolean isLoading;
 
@@ -59,11 +72,12 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment {
         return view;
     }
 
-    public static FeedPhotoAlbumFragment createInstance(String name) {
+    public static FeedPhotoAlbumFragment createInstance(String name, String subscriptionOnly) {
         FeedPhotoAlbumFragment fragment = new FeedPhotoAlbumFragment();
         Log.i("TAG24", "Create albums fr " + name);
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
+        bundle.putString("subscriptionOnly", subscriptionOnly);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -72,9 +86,10 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        adapter = new FeedPhotoReportAdapter(albumsList);
+        adapter = new FeedPhotoReportAdapter(albumsList, groups);
 
-        final LinearLayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
+     //   final LinearLayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
 
         RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
             @Override
@@ -115,14 +130,16 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment {
 
 
        albumsList = (List<Album>) storage.getDate(getArguments().get("name")+ "_albumsList");
+       groups = (Map) storage.getDate(getArguments().get("name")+ "_groups");
 
         if(albumsList==null){
             albumsList = new ArrayList<>();
+            groups = new HashMap<>();
             totalCount = 0;
         } else {
             //totalCount = (int) storage.getDate_ddMMyyyy(getArguments().get("name")+ "_postListTotalCount");
             Log.d("TAG24", "Scroll position - " + storage.getDate(getArguments().get("name")+ "_scrollPosition"));
-            scrollPos = (Integer) storage.getDate(getArguments().get("name")+ "_scrollPosition");
+//            scrollPos = (Integer) storage.getDate(getArguments().get("name")+ "_scrollPosition");
             mayRestore = true;
         }
 
@@ -133,10 +150,11 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment {
         if(mayRestore){
             Log.d("TAG24", "RESTORE date - ");
             mayRestore = false;
-            adapter.update(albumsList);
+            adapter.update(albumsList, groups);
             recyclerView.scrollToPosition(scrollPos);
+            placeHolder.setVisibility(View.GONE);
         } else {
-            ApiFactory.getApi().getAllGroupAlbums(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),  0)
+            ApiFactory.getApi().getAllGroupAlbums(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),  0, "1", getArguments().getString("subscriptionOnly"))
                     .enqueue(new Callback<ResponseContainer<ResponseAlbums>>() {
                         @Override
                         public void onResponse(Call<ResponseContainer<ResponseAlbums>> call, Response<ResponseContainer<ResponseAlbums>> response) {
@@ -144,15 +162,30 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment {
 
                             if (response.body().getResponse() != null) {
 
-                                if(response.body().getResponse().getCount()==0){
-                                  //  placeHolderNoAlbums.setVisibility(View.VISIBLE);
+                                if(response.body().getResponse().getCount() !=0){
+                                    placeHolder.setVisibility(View.GONE);
+
+                                    if(response.body().getResponse().getCount()==0){
+                                        //  placeHolderNoAlbums.setVisibility(View.VISIBLE);
+                                    }
+
+                                    for (Group g: response.body().getResponse().getGroups()){
+                                        Log.d("TAG24", "G - " + g.getId() + " " + g.getName());
+                                        groups.put(g.getId(), g);
+                                    }
+
+                                    //  progress.setVisibility(View.GONE);
+                                    albumsList.addAll(response.body().getResponse().getItems());
+                                    Log.d("TAG24", "Albums size - " + albumsList.size());
+                                    adapter.update(albumsList, groups);
+                                } else {
+                                    placeHolder.setVisibility(View.GONE);
+                                    holderInfo.setVisibility(View.VISIBLE);
                                 }
 
-                              //  progress.setVisibility(View.GONE);
-                                albumsList.addAll(response.body().getResponse().getItems());
-                                Log.d("TAG24", "Albums size - " + albumsList.size());
-                                adapter.update(albumsList);
+
                             }
+
                         }
 
                         @Override
@@ -172,7 +205,9 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment {
 
     @Override
     public void onStop() {
+        Log.i("TAG25","chronics save date");
         storage.setDate(getArguments().get("name") + "_albumsList", albumsList);
+        storage.setDate(getArguments().get("name") + "_groups", groups);
         super.onStop();
     }
 }

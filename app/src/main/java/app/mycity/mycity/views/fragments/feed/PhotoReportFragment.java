@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -33,6 +34,7 @@ import app.mycity.mycity.views.adapters.PhotoReportRecyclerAdapter;
 import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import fr.arnaudguyon.tabstacker.TabStacker;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -44,6 +46,9 @@ public class PhotoReportFragment extends android.support.v4.app.Fragment impleme
 
     @BindView(R.id.photoAlbumRecyclerView)
     RecyclerView recyclerView;
+
+    @BindView(R.id.placeName)
+    TextView albumName;
 
     List<Photo> photoList;
     PhotoReportRecyclerAdapter adapter;
@@ -73,15 +78,25 @@ public class PhotoReportFragment extends android.support.v4.app.Fragment impleme
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.photo_album_fragment, container, false);
+        ButterKnife.bind(this, view);
 
+        if(getArguments().getString("name")!=null){
+            albumName.setText(getArguments().getString("albumName"));
+        } else {
+            albumName.setText("");
+        }
 
-        Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
-        Util.setOnTabClick(view);
+        Util.setNawBarClickListener(view);
+        Util.setNawBarIconColor(getContext(), view, -1);
 
         reportId = getArguments().getString("id");
 
-        ButterKnife.bind(this, view);
         return view;
+    }
+
+    @OnClick(R.id.backButton)
+    public void backButton(View v){
+        getActivity().onBackPressed();
     }
 
     @Override

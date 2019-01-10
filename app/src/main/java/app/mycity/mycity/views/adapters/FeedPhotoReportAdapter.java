@@ -14,9 +14,13 @@ import com.squareup.picasso.Picasso;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
+import java.util.Map;
 
+import app.mycity.mycity.App;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.model.Album;
+import app.mycity.mycity.api.model.Group;
+import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.util.EventBusMessages;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -24,10 +28,13 @@ import butterknife.ButterKnife;
 public class FeedPhotoReportAdapter extends RecyclerView.Adapter<FeedPhotoReportAdapter.ViewHolder> {
 
     List<Album> albumsList;
+    Map<String, Group> groups;
     Context context;
 
-    public FeedPhotoReportAdapter(List<Album> albumsList){
+    public FeedPhotoReportAdapter(List<Album> albumsList, Map groups){
         this.albumsList = albumsList;
+        this.groups = groups;
+
     }
 
     @NonNull
@@ -37,7 +44,7 @@ public class FeedPhotoReportAdapter extends RecyclerView.Adapter<FeedPhotoReport
         if(context==null)
             context = parent.getContext();
 
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.new_feed_checkin_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chronichs_item, parent, false);
             return new ViewHolder(view);
     }
 
@@ -47,6 +54,16 @@ public class FeedPhotoReportAdapter extends RecyclerView.Adapter<FeedPhotoReport
                 .load(albumsList.get(position).getPhoto780())
                 //.centerCrop()
                 .into(holder.photo);
+
+        if(groups.containsKey(albumsList.get(position).getGroupId())){
+            Group group = (Group) groups.get(albumsList.get(position).getGroupId());
+            Picasso.get()
+                    .load(group.getPhoto130())
+                    .resize(App.dpToPx(context, 36), App.dpToPx(context, 36))
+                    .centerCrop()
+                    .into(holder.groupPhoto);
+            holder.placeName.setText(group.getName());
+        }
     }
 
     @Override
@@ -58,8 +75,14 @@ public class FeedPhotoReportAdapter extends RecyclerView.Adapter<FeedPhotoReport
         @BindView(R.id.feedImage)
         ImageView photo;
 
+        @BindView(R.id.groupPhoto)
+        ImageView groupPhoto;
+
+        @BindView(R.id.placeName)
+        TextView placeName;
+
         @BindView(R.id.placeLabel)
-        TextView place;
+        TextView albumName;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -74,9 +97,9 @@ public class FeedPhotoReportAdapter extends RecyclerView.Adapter<FeedPhotoReport
         }
     }
 
-    public void update(List<Album> albumsList){
+    public void update(List<Album> albumsList, Map groups){
         this.albumsList = albumsList;
-
+        this.groups = groups;
         notifyDataSetChanged();
     }
 }

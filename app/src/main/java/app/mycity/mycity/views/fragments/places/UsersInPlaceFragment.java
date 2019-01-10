@@ -42,13 +42,12 @@ public class UsersInPlaceFragment extends Fragment implements TabStacker.TabStac
     Storage storage;
 
 
-    public static UsersInPlaceFragment createInstance(String name, int tabPos, String groupId) {
+    public static UsersInPlaceFragment createInstance(String name, String groupId) {
         UsersInPlaceFragment fragment = new UsersInPlaceFragment();
         Log.i("TAG21", "Create Subscribers " + name + " " + groupId);
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
         bundle.putString("groupId", groupId);
-        bundle.putInt("tabPos", tabPos);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -76,8 +75,8 @@ public class UsersInPlaceFragment extends Fragment implements TabStacker.TabStac
      //   Log.i("TAG21","Friends Fragment - " + getActivity().getFragmentManager().getBackStackEntryCount());
         Log.i("TAG","Place sub...s  on CreateView");
 
-        Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
-        Util.setOnTabClick(view);
+        Util.setNawBarClickListener(view);
+        Util.setNawBarIconColor(getContext(), view, -1);
 
         title.setText("Подписчики");
 

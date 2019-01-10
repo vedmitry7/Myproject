@@ -76,13 +76,13 @@ public class NotificationRecyclerAdapter extends RecyclerView.Adapter<Notificati
         }
 
         if(notification.getType().equals("like_post")){
-            Picasso.get().load(notification.getParents().get(0).getAttachments().get(0).getPhoto130()).into(holder.contentImage);
+            Picasso.get().load(notification.getParents().get(0).getAttachments().get(0).getPhoto360()).into(holder.contentImage);
         }
         if(notification.getType().equals("like_comment")){
             holder.commentText.setText(notification.getParents().get(0).getText());
         }
         if(notification.getType().equals("comment_post")){
-            Picasso.get().load(notification.getParents().get(0).getAttachments().get(0).getPhoto130()).into(holder.contentImage);
+            Picasso.get().load(notification.getParents().get(0).getAttachments().get(0).getPhoto360()).into(holder.contentImage);
             holder.commentText.setText(notification.getFeedback().getComment().getText());
             Log.d("TAG21", "Comment post - " + notification.getFeedback().getComment().getText());
         }

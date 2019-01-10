@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@android:color/white"
     android:layout_height="match_parent"
     tools:context=".views.activities.ChatActivity">
 
@@ -51,7 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
-            android:text="TextView"
+            android:text="Загрузка..."
             android:textColor="@android:color/black"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -71,7 +72,7 @@
                 android:layout_height="24dp"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:src="@drawable/ic_dots" />
+                app:srcCompat="@drawable/ic_dots" />
         </RelativeLayout>
 
 
@@ -82,6 +83,11 @@
         android:id="@+id/chatRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+
+
+        android:isScrollContainer="true"
+
+
         app:layout_constraintBottom_toTopOf="@+id/sendMessageContainer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -93,11 +99,26 @@
         android:id="@+id/up_shadow"
         android:layout_width="match_parent"
         android:layout_height="3dp"
+        android:visibility="gone"
         android:background="@drawable/toolbar_up_shadow"
         app:layout_constraintBottom_toTopOf="@+id/sendMessageContainer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="MissingConstraints" />
+
+
+    <View
+        android:id="@+id/messageDeliverLine"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginEnd="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="16dp"
+        android:background="@color/deliver_color"
+        app:layout_constraintBottom_toTopOf="@+id/sendMessageContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/sendMessageContainer"
@@ -107,16 +128,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <ImageButton
-            android:id="@+id/updateChat"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            android:background="@drawable/ic_update"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
             android:id="@+id/chatEditText"
@@ -130,7 +141,7 @@
             android:hint="Сообщение"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/sendMessageButton"
-            app:layout_constraintStart_toEndOf="@+id/updateChat"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
@@ -200,8 +211,9 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:maxWidth="200dp"
-        android:visibility="gone"
-        app:cardBackgroundColor="@color/colorAccent"
+        android:visibility="visible"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="#3f000000"
         app:cardCornerRadius="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -213,14 +225,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:maxWidth="250dp"
             android:minWidth="40dp"
+            android:textSize="13dp"
             android:paddingBottom="5dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:paddingTop="5dp"
-            android:text="26 января"
-            android:textColor="@android:color/white" />
+            android:text="30.12.2018"
+            android:textColor="@android:color/black" />
 
     </android.support.v7.widget.CardView>
 

@@ -76,8 +76,8 @@ public class SubscribersFragment extends Fragment implements TabStacker.TabStack
      //   Log.i("TAG21","Friends Fragment - " + getActivity().getFragmentManager().getBackStackEntryCount());
         Log.i("TAG","Friends fragment on CreateView");
 
-        Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
-        Util.setOnTabClick(view);
+        Util.setNawBarClickListener(view);
+        Util.setNawBarIconColor(getContext(), view, -1);
 
         title.setText("Подписчики");
 

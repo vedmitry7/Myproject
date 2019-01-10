@@ -7,16 +7,14 @@
     android:layout_width="match_parent"
     android:layout_height="56dp">
 
-    <ImageButton
-        android:id="@+id/toolbarLogo"
-        android:layout_width="40dp"
-        android:layout_height="36dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:background="@drawable/logo_white_no_shadow"
+    <ImageView
+        android:id="@+id/backButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_back_white" />
 
     <TextView
         android:id="@+id/toolBarTitle"
@@ -28,49 +26,19 @@
         android:textColor="@android:color/white"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/toolbarLogo"
+        app:layout_constraintStart_toEndOf="@+id/backButton"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.517" />
-
-
-    <RelativeLayout
-
-        android:id="@+id/main_act_messages_container"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/notificationsButton"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:clickable="false"
-            android:src="@drawable/ic_forum_white_24dp" />
-    </RelativeLayout>
-
-
-    <ImageView
-        android:id="@+id/notificationsButton"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:padding="12dp"
-        android:src="@drawable/ic_bell_white_24dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/sortButton"
         android:layout_width="48dp"
         android:layout_height="48dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:padding="14dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/main_act_messages_container"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_sort" />
 

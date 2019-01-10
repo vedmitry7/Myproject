@@ -51,7 +51,7 @@ public class Group {
     private String site;
     @SerializedName("rate")
     @Expose
-    private Integer rate;
+    private Rate rate;
     @SerializedName("count_rate")
     @Expose
     private Integer countRate;
@@ -191,11 +191,11 @@ public class Group {
         this.site = site;
     }
 
-    public Integer getRate() {
+    public Rate getRate() {
         return rate;
     }
 
-    public void setRate(Integer rate) {
+    public void setRate(Rate rate) {
         this.rate = rate;
     }
 

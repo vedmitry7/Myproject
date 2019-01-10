@@ -2,16 +2,14 @@ package app.mycity.mycity.views.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.InputType;
-import android.text.method.HideReturnsTransformationMethod;
-import android.text.method.PasswordTransformationMethod;
+import android.support.v7.app.AppCompatDelegate;
+import android.support.v7.widget.CardView;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -19,7 +17,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
+import app.mycity.mycity.api.model.CheckTokenResponse;
+import app.mycity.mycity.api.model.RefreshTokenResponse;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
@@ -28,6 +29,9 @@ import app.mycity.mycity.api.model.ResponseContainer;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -54,6 +58,16 @@ public class LoginActivity extends AppCompatActivity {
     View passwordString;
     int selection = 0;
 
+
+    @BindView(R.id.loginActEnterButtonContainer)
+    CardView loginActEnterButtonContainer;
+
+    @BindView(R.id.progressBarPlaceHolder)
+    ConstraintLayout progressBarPlaceHolder;
+
+    @BindView(R.id.noInternetContainer)
+    ConstraintLayout noInternetContainer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,9 +76,21 @@ public class LoginActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_login_new);
 
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+
+
         ButterKnife.bind(this);
+
+        checkToken();
+
+        if(!App.isOnline(this)){
+            noInternetContainer.setVisibility(View.VISIBLE);
+        }
+
         Typeface type = Typeface.createFromAsset(getAssets(),"abril_fatface_regular.otf");
         label.setTypeface(type);
+
+
 
         login.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -85,12 +111,63 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 else {
                     passwordString.setBackgroundColor(getResources().getColor(R.color.black_10percent));
-
                 }
             }
         });
+        loginActEnterButtonContainer.setVisibility(View.GONE);
 
 
+        if(SharedManager.getProperty(Constants.KEY_LOGIN)!=null){
+            login.setText(SharedManager.getProperty(Constants.KEY_LOGIN));
+            password.setText(SharedManager.getProperty(Constants.KEY_PASSWORD));
+        } else {
+
+        }
+
+    }
+
+    private void checkToken() {
+        ApiFactory.getApi().checkToken(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN)).enqueue(new Callback<ResponseContainer<CheckTokenResponse>>() {
+            @Override
+            public void onResponse(Call<ResponseContainer<CheckTokenResponse>> call, Response<ResponseContainer<CheckTokenResponse>> response) {
+                if(response.body().getResponse()!=null){
+                    if(response.body().getResponse().getSuccess()==1){
+                        launchApp();
+                    }
+                } else {
+                    progressBarPlaceHolder.setVisibility(View.GONE);
+                    loginActEnterButtonContainer.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseContainer<CheckTokenResponse>> call, Throwable t) {
+
+                if(!App.isOnline(LoginActivity.this)){
+                    noInternetContainer.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+    }
+
+    private void updateToken(){
+        ApiFactory.getApi().updateToken(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), SharedManager.getProperty(Constants.KEY_REFRESH_TOKEN)).enqueue(new Callback<ResponseContainer<RefreshTokenResponse>>() {
+            @Override
+            public void onResponse(Call<ResponseContainer<RefreshTokenResponse>> call, Response<ResponseContainer<RefreshTokenResponse>> response) {
+
+                RefreshTokenResponse tokenResponse = response.body().getResponse();
+                if(tokenResponse!=null){
+                    SharedManager.addProperty(Constants.KEY_ACCESS_TOKEN, tokenResponse.getAccessToken());
+                    SharedManager.addProperty(Constants.KEY_REFRESH_TOKEN, tokenResponse.getRefreshToken());
+                    SharedManager.addProperty(Constants.KEY_EXPIRED_AT, String.valueOf(tokenResponse.getExpiredAt()));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseContainer<RefreshTokenResponse>> call, Throwable t) {
+
+            }
+        });
     }
 
     @OnClick(R.id.loginActRegistrationButtonTv)
@@ -134,7 +211,7 @@ public class LoginActivity extends AppCompatActivity {
         String loginText = login.getText().toString();
         String passwordText = password.getText().toString();
 
-        if(v.getId()==R.id.kolia){
+  /*      if(v.getId()==R.id.kolia){
             loginText = "nicker08@inbox.ru";
             passwordText = "12345678";
         }
@@ -143,11 +220,12 @@ public class LoginActivity extends AppCompatActivity {
             loginText = "Winchester_1995@mail.ru";
             passwordText = "12345678";
         }
-
+*/
 
         final String finalLoginText = loginText;
 
 
+        final String finalPasswordText = passwordText;
         ApiFactory.getApi().authorize(loginText, passwordText).enqueue(new retrofit2.Callback<ResponseContainer<ResponseAuth>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<ResponseAuth>> call, retrofit2.Response<ResponseContainer<ResponseAuth>> response) {
@@ -161,16 +239,18 @@ public class LoginActivity extends AppCompatActivity {
                 if(responseAuth != null){
                     Log.i("TAG", "USER ID - " + String.valueOf(responseAuth.getUserId()));
                     Log.i("TAG", "TOKEN - " + responseAuth.getAccessToken());
+                    Log.i("TAG", "REFRESH_TOKEN - " + responseAuth.getRefreshToken());
+                    Log.i("TAG", "REFRESH_TOKEN - " + responseAuth.getRefreshToken());
 
                     SharedManager.addProperty(Constants.KEY_MY_ID, responseAuth.getUserId());
                     SharedManager.addProperty(Constants.KEY_ACCESS_TOKEN, responseAuth.getAccessToken());
                     SharedManager.addProperty(Constants.KEY_REFRESH_TOKEN, responseAuth.getRefreshToken());
                     SharedManager.addProperty(Constants.KEY_EXPIRED_AT, responseAuth.getExpiredAt());
                     SharedManager.addProperty(Constants.KEY_LOGIN, finalLoginText);
+                    SharedManager.addProperty(Constants.KEY_PASSWORD, finalPasswordText);
 
-                    Intent intent = new Intent(LoginActivity.this, MainActivity2.class);
-                    startActivity(intent);
-                    LoginActivity.this.finish();
+
+                    launchApp();
 
                 } else {
                     Toast.makeText(LoginActivity.this, "response wrong", Toast.LENGTH_SHORT).show();
@@ -267,6 +347,12 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });*/
+    }
+
+    void launchApp(){
+        Intent intent = new Intent(LoginActivity.this, MainActivity3.class);
+        startActivity(intent);
+        LoginActivity.this.finish();
     }
 
 

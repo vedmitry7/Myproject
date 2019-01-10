@@ -14,6 +14,18 @@ public class ResponseAlbums {
     @Expose
     private List<Album> items = null;
 
+    @SerializedName("groups")
+    @Expose
+    private List<Group> groups = null;
+
+    public List<Group> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
+    }
+
     public Integer getCount() {
         return count;
     }

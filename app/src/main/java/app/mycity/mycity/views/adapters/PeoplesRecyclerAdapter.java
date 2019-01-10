@@ -46,7 +46,7 @@ public class PeoplesRecyclerAdapter extends RecyclerView.Adapter<PeoplesRecycler
 
         holder.name.setText(name);
 
-        Picasso.get().load(userList.get(position).getPhoto780()).into(holder.image);
+        Picasso.get().load(userList.get(position).getPhoto360()).into(holder.image);
 
         //holder.position.setText(String.valueOf(position+1));
 
@@ -54,6 +54,8 @@ public class PeoplesRecyclerAdapter extends RecyclerView.Adapter<PeoplesRecycler
 
         if(userList.get(position).getPlace()!=null){
             holder.placeName.setText(userList.get(position).getPlace().getName());
+            holder.placeName.setVisibility(View.VISIBLE);
+            holder.imageMarker.setVisibility(View.VISIBLE);
         } else {
             holder.placeName.setVisibility(View.GONE);
             holder.imageMarker.setVisibility(View.GONE);

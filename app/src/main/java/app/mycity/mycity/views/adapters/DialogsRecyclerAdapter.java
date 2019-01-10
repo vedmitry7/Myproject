@@ -1,7 +1,5 @@
 package app.mycity.mycity.views.adapters;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -26,7 +24,6 @@ import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.activities.ChatActivity;
-import app.mycity.mycity.views.activities.ChatActivity2;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -65,6 +62,14 @@ public class DialogsRecyclerAdapter extends RecyclerView.Adapter<DialogsRecycler
         holder.name.setText(name);
         holder.lastMessage.setText(dialogList.get(position).getText());
 
+
+        if(dialogList.get(position).getCountUnread()!=0){
+            holder.unreadCount.setVisibility(View.VISIBLE);
+            holder.unreadCount.setText("" + dialogList.get(position).getCountUnread());
+        } else {
+            holder.unreadCount.setVisibility(View.GONE);
+        }
+
         if(dialogList.get(position).getDate()!=null){
             holder.time.setText(Util.getDatePretty(dialogList.get(position).getDate()));
         } else {
@@ -81,7 +86,7 @@ public class DialogsRecyclerAdapter extends RecyclerView.Adapter<DialogsRecycler
 
 
 
-        if(SharedManager.getProperty("unread_" + dialogList.get(position).getId())!=null && !SharedManager.getProperty("unread_" + dialogList.get(position).getId()).equals("0")){
+        /*if(SharedManager.getProperty("unread_" + dialogList.get(position).getId())!=null && !SharedManager.getProperty("unread_" + dialogList.get(position).getId()).equals("0")){
             holder.unreadCount.setVisibility(View.VISIBLE);
             holder.unreadCount.setText(SharedManager.getProperty("unread_" + dialogList.get(position).getId()));
             Log.d("TAG21", name + " COUNT " + SharedManager.getProperty("unread_" + dialogList.get(position).getId()));
@@ -89,7 +94,7 @@ public class DialogsRecyclerAdapter extends RecyclerView.Adapter<DialogsRecycler
         else {
             holder.unreadCount.setVisibility(View.GONE);
         }
-
+*/
         Picasso.get().load(dialogList.get(position).getPhoto130()).into(holder.image);
     }
 
@@ -124,7 +129,9 @@ public class DialogsRecyclerAdapter extends RecyclerView.Adapter<DialogsRecycler
                     SharedManager.addProperty("unread_" + dialogList.get(getAdapterPosition()).getId(), "0");
                     notifyItemChanged(getAdapterPosition());
 
-                    Intent intent = new Intent(context, ChatActivity2.class);
+                    dialogList.get(getAdapterPosition()).setCountUnread(0);
+
+                    Intent intent = new Intent(context, ChatActivity.class);
                     intent.putExtra("user_id", dialogList.get(getAdapterPosition()).getId());
                     intent.putExtra("image", dialogList.get(getAdapterPosition()).getPhoto130());
                     intent.putExtra("name", dialogList.get(getAdapterPosition()).getTitle());

@@ -55,7 +55,7 @@
         app:layout_constraintEnd_toEndOf="@+id/userPhoto"
         app:layout_constraintStart_toStartOf="@+id/userPhoto"
         app:layout_constraintTop_toTopOf="@+id/commentText"
-        app:srcCompat="@drawable/ic_like_heart" />
+        app:srcCompat="@drawable/ic_like_heart_vector_red" />
 
     <TextView
         android:id="@+id/commentText"

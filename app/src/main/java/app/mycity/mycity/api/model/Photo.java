@@ -29,18 +29,19 @@ public class Photo {
     @SerializedName("can_edit")
     @Expose
     private Integer canEdit;
-    @SerializedName("photo_50")
-    @Expose
-    private String photo50;
-    @SerializedName("photo_70")
-    @Expose
-    private String photo70;
     @SerializedName("photo_130")
     @Expose
     private String photo130;
+    @SerializedName("photo_550")
+    @Expose
+    private String photo550;
     @SerializedName("photo_780")
     @Expose
     private String photo780;
+
+    @SerializedName("photo_360")
+    @Expose
+    private String photo360;
     @SerializedName("photo_orig")
     @Expose
     private String photoOrig;
@@ -50,6 +51,22 @@ public class Photo {
     @SerializedName("comments")
     @Expose
     private Comments comments;
+
+    public String getPhoto550() {
+        return photo550;
+    }
+
+    public void setPhoto550(String photo550) {
+        this.photo550 = photo550;
+    }
+
+    public String getPhoto360() {
+        return photo360;
+    }
+
+    public void setPhoto360(String photo360) {
+        this.photo360 = photo360;
+    }
 
     public Likes getLikes() {
         return likes;
@@ -129,22 +146,6 @@ public class Photo {
 
     public void setCanEdit(Integer canEdit) {
         this.canEdit = canEdit;
-    }
-
-    public String getPhoto50() {
-        return photo50;
-    }
-
-    public void setPhoto50(String photo50) {
-        this.photo50 = photo50;
-    }
-
-    public String getPhoto70() {
-        return photo70;
-    }
-
-    public void setPhoto70(String photo70) {
-        this.photo70 = photo70;
     }
 
     public String getPhoto130() {

@@ -44,7 +44,7 @@ public class PlacesByCoordinatesRecyclerAdapter extends RecyclerView.Adapter<Pla
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        Picasso.get().load(placeList.get(position).getPhoto780()).into(holder.image);
+        Picasso.get().load(placeList.get(position).getPhoto360()).into(holder.image);
 
         holder.name.setText(placeList.get(position).getName());
 

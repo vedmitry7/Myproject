@@ -14,7 +14,6 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
-import android.view.View;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
@@ -35,12 +34,7 @@ import app.mycity.mycity.api.model.Message;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.activities.ChatActivity;
-import app.mycity.mycity.views.fragments.DialogsFragment;
-import app.mycity.mycity.views.fragments.subscribers.SubscribersFragment;
-import butterknife.OnClick;
 import io.realm.Realm;
-import io.realm.RealmList;
-import io.realm.RealmResults;
 
 public class TestService extends Service {
 

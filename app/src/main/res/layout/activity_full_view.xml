@@ -12,8 +12,6 @@
         android:id="@+id/photo_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="63dp"
-        tools:layout_editor_absoluteY="130dp"
         tools:ignore="MissingConstraints" />
 
     <android.support.constraint.ConstraintLayout

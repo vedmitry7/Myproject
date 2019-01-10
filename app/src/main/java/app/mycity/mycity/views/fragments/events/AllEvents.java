@@ -52,7 +52,7 @@ public class AllEvents extends android.support.v4.app.Fragment implements TabSta
     AllEventRecyclerAdapter adapter;
 
     List<Post> postList;
-    Map groups = new HashMap<Long, Group>();
+    HashMap<String, Group> groups = new HashMap<String, Group>();
 
     boolean isLoading;
     int totalCount;
@@ -60,6 +60,9 @@ public class AllEvents extends android.support.v4.app.Fragment implements TabSta
     Storage storage;
 
     boolean mayRestore;
+
+    LinearLayoutManager layoutManager;
+    private int position;
 
     @Nullable
     @Override
@@ -84,7 +87,7 @@ public class AllEvents extends android.support.v4.app.Fragment implements TabSta
 
         adapter = new AllEventRecyclerAdapter(postList, groups);
 
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager = new LinearLayoutManager(getActivity());
 
         RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
             @Override
@@ -117,7 +120,9 @@ public class AllEvents extends android.support.v4.app.Fragment implements TabSta
         Log.d("TAG21", "LOAD EVENTS");
 
         if(mayRestore){
+            Log.d("TAG21", "Events restore. pos - " + position);
             adapter.update(postList, groups);
+            layoutManager.scrollToPosition(position);
         } else {
             ApiFactory.getApi().getAllEvents(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),"1", offset).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
                 @Override
@@ -161,7 +166,7 @@ public class AllEvents extends android.support.v4.app.Fragment implements TabSta
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+        @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(final EventBusMessages.LikePost event) {
         Log.d("TAG21", "Like itemId - " + event.getItemId() + " owner - " +  postList.get(event.getAdapterPosition()).getOwnerId().toString());
 
@@ -181,7 +186,6 @@ public class AllEvents extends android.support.v4.app.Fragment implements TabSta
                         postList.get(event.getAdapterPosition()).getLikes().setUserLikes(0);
                         adapter.notifyItemChanged(event.getAdapterPosition());
                     }
-
                 }
 
                 @Override
@@ -277,8 +281,7 @@ public class AllEvents extends android.support.v4.app.Fragment implements TabSta
         storage = (Storage) context;
 
         postList = (List<Post>) storage.getDate(getArguments().get("name")+ "_eventsPostList");
-        groups = (Map) storage.getDate(getArguments().get("name")+ "_eventsGroups");
-
+        groups = (HashMap<String, Group>) storage.getDate(getArguments().get("name")+ "_eventsGroups");
 
         if(postList==null){
             Log.d("TAG21", "restore null");
@@ -286,6 +289,7 @@ public class AllEvents extends android.support.v4.app.Fragment implements TabSta
             groups = new HashMap();
         } else {
             Log.d("TAG21", "restore ok - " + postList.size());
+            position = (int) storage.getDate(getArguments().getString("name") + "_eventsScrollPosition");
             mayRestore = true;
         }
 
@@ -300,10 +304,11 @@ public class AllEvents extends android.support.v4.app.Fragment implements TabSta
     @Override
     public void onStop() {
         EventBus.getDefault().unregister(this);
-        Log.d("TAG21", "Stop EVENTS FRAGMENT Save " + getArguments().getString("name"));
-        storage.setDate(getArguments().get("name") + "_eventsPostList", postList);
-        storage.setDate(getArguments().get("name") + "_eventsGroups", groups);
-
+        if(storage!=null){
+            storage.setDate(getArguments().getString("name") + "_eventsPostList", postList);
+            storage.setDate(getArguments().getString("name") + "_eventsGroups", groups);
+            storage.setDate(getArguments().getString("name") + "_eventsScrollPosition", layoutManager.findFirstVisibleItemPosition());
+        }
         super.onStop();
     }
 

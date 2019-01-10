@@ -48,9 +48,21 @@ dependencies {
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 
-    //Retrofit
-    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.1.0'
+    // https://github.com/ReactiveX/RxAndroid
+     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+     implementation 'io.reactivex.rxjava2:rxjava:2.1.10'
+
+//Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
+    //Retrofit for rx
+    implementation 'com.squareup.retrofit2:adapter-rxjava:2.4.0'
+    implementation 'com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0'
+
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+
+    // GSON body parser
+    implementation 'com.google.code.gson:gson:2.8.2'
 
     //Round Image View
     implementation 'com.makeramen:roundedimageview:2.3.0'
@@ -68,9 +80,7 @@ dependencies {
     //dexter
     implementation 'com.karumi:dexter:5.0.0'
 
-
     implementation 'com.squareup.okhttp3:logging-interceptor:3.5.0'
-
 /*
     implementation 'io.realm:realm-annotations:2.0.1'*/
 
@@ -84,7 +94,6 @@ dependencies {
 
 
     implementation 'com.github.ome450901:SimpleRatingBar:1.4.2'
-
 
     implementation 'com.google.android.gms:play-services-maps:15.0.1'
     implementation 'com.google.android.gms:play-services-location:15.0.1'

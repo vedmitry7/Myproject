@@ -28,7 +28,6 @@ import app.mycity.mycity.R;
 import app.mycity.mycity.api.model.Message;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.Util;
-import app.mycity.mycity.views.activities.ChatActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -40,6 +39,13 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
     public ChatRecyclerAdapter(List<Message> messages) {
         this.messages = messages;
         Log.d("TAG", "rec created");
+    }
+
+    String imageUrl = "";
+
+    public void setImageUrl(String imageUrl) {
+        Log.d("TAG25", "URL IMAGE - " + imageUrl);
+        this.imageUrl = imageUrl;
     }
 
     @NonNull
@@ -63,24 +69,14 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         DateFormat format = new SimpleDateFormat("HH:mm");
 
-      /*  try {
-            holder.messageTime.setText((CharSequence) format.parse(String.valueOf(messages.get(position).getTime()+"000")));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }*/
-
-      if(holder.icon != null){
-      }
-
-
         holder.messageTime.setText(Util.getTime(messages.get(position).getTime()));
 
         holder.message.setText(messages.get(position).getText());
         if(holder.indicator!=null && messages.get(position).getOut()==1){
             if(!messages.get(position).isWasSended()){
-                holder.indicator.setImageResource(R.drawable.ic_was_sended);
+                holder.indicator.setImageResource(R.drawable.ic_check);
             } else {
-                holder.indicator.setImageResource(R.drawable.ic_check_all_grey600_18dp);
+                holder.indicator.setImageResource(R.drawable.ic_check_double);
                 if (messages.get(position).isWasRead()){
                     holder.indicator.setColorFilter(context.getResources().getColor(R.color.colorAccent));
                 } else {
@@ -102,20 +98,27 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
             Log.d("chat22", tCur + "|" + tNext);
 
             if(!tCur.equals(tNext)) {
+                holder.lineDeliver.setVisibility(View.VISIBLE);
                 holder.dateDeliver.setVisibility(View.VISIBLE);
                 holder.dateDeliver.setText(Util.getDate_ddMMyyyy(messages.get(position - 1).getTime()));
             } else {
+                holder.lineDeliver.setVisibility(View.GONE);
                 holder.dateDeliver.setVisibility(View.GONE);
             }
         }
 
 
-     //   Log.d("TAG25", "Bind - " + messages.get(position).getText() + " id - " + messages.get(position).getId() +  " was read - " + messages.get(position).isWasRead());
+        //   Log.d("TAG25", "Bind - " + messages.get(position).getText() + " id - " + messages.get(position).getId() +  " was read - " + messages.get(position).isWasRead());
 
-
-        if(holder.icon !=null){
-            Picasso.get().load(ChatActivity.imageUrl).into(holder.icon);
+        if(holder.icon!=null){
+            if(!imageUrl.equals("")){
+                holder.icon.setVisibility(View.VISIBLE);
+                Picasso.get().load(imageUrl).into(holder.icon);
+            } else {
+                holder.icon.setVisibility(View.GONE);
+            }
         }
+
     }
 
 
@@ -126,26 +129,28 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-     @BindView(R.id.message_text)
-     TextView message;
-     @BindView(R.id.messageTime)
-     TextView messageTime;
-     @Nullable
-     @BindView(R.id.message_indicator)
-     ImageView indicator;
+        @BindView(R.id.message_text)
+        TextView message;
+        @BindView(R.id.messageTime)
+        TextView messageTime;
+        @Nullable
+        @BindView(R.id.message_indicator)
+        ImageView indicator;
 
-     @Nullable
-     @BindView(R.id.icon)
-     ImageView icon;
+        @BindView(R.id.messageDeliverLine)
+        View lineDeliver;
+        @Nullable
+        @BindView(R.id.icon)
+        ImageView icon;
 
-     @BindView(R.id.messageContentBottomPadding)
-     View messageContentBottomPadding;
+        @BindView(R.id.messageContentBottomPadding)
+        View messageContentBottomPadding;
 
-     @BindView(R.id.messageContent)
-     CardView messageContent;
+        @BindView(R.id.messageContent)
+        CardView messageContent;
 
-     @BindView(R.id.dateDeliver)
-     TextView dateDeliver;
+        @BindView(R.id.dateDeliver)
+        TextView dateDeliver;
 
 
   /*
@@ -169,41 +174,41 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
                 }
             });*/
 
-          messageContent.setOnLongClickListener(new View.OnLongClickListener() {
-              @Override
-              public boolean onLongClick(View v) {
-                  Log.d("TAG25", "loooooooooooooooooong click");
-                  final PopupMenu popupMenu = new PopupMenu(itemView.getContext(), v);
-                  popupMenu.getMenuInflater().inflate(R.menu.popupmenu_message, popupMenu.getMenu());
+            messageContent.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    Log.d("TAG25", "loooooooooooooooooong click");
+                    final PopupMenu popupMenu = new PopupMenu(itemView.getContext(), v);
+                    popupMenu.getMenuInflater().inflate(R.menu.popupmenu_message, popupMenu.getMenu());
 
-                  MenuItem delete = popupMenu.getMenu().findItem(R.id.deleteMessage);
-                  if(messages.get(getAdapterPosition()).getOut()==1){
-                      delete.setVisible(true);
-                  }
+                    MenuItem delete = popupMenu.getMenu().findItem(R.id.deleteMessage);
+                    if(messages.get(getAdapterPosition()).getOut()==1){
+                        delete.setVisible(true);
+                    }
 
-                  popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                      @Override
-                      public boolean onMenuItemClick(MenuItem menuItem) {
-                          switch (menuItem.getItemId()) {
-                              // Handle the non group menu items here
+                    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem menuItem) {
+                            switch (menuItem.getItemId()) {
+                                // Handle the non group menu items here
 
-                              case R.id.copyMessage:
-                                  ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                                  ClipData clip = ClipData.newPlainText("", messages.get(getAdapterPosition()).getText());
-                                  clipboard.setPrimaryClip(clip);
-                                  break;
-                              case R.id.deleteMessage:
-                                  EventBus.getDefault().post(new EventBusMessages.DeleteChatMessage(messages.get(getAdapterPosition()).getId()));
-                                  break;
-                          }
-                          return true;
-                      }
-                  });
+                                case R.id.copyMessage:
+                                    ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                                    ClipData clip = ClipData.newPlainText("", messages.get(getAdapterPosition()).getText());
+                                    clipboard.setPrimaryClip(clip);
+                                    break;
+                                case R.id.deleteMessage:
+                                    EventBus.getDefault().post(new EventBusMessages.DeleteChatMessage(messages.get(getAdapterPosition()).getId()));
+                                    break;
+                            }
+                            return true;
+                        }
+                    });
 
-                  popupMenu.show();
-                  return true;
-              }
-          });
+                    popupMenu.show();
+                    return true;
+                }
+            });
         }
     }
 

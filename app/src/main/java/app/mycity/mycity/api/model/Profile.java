@@ -29,10 +29,44 @@ public class Profile {
     @SerializedName("photo_780")
     @Expose
     private String photo780;
+    @SerializedName("photo_360")
+    @Expose
+    private String photo360;
+    @SerializedName("photo_550")
+    @Expose
+    private String photo550;
 
     @SerializedName("comment")
     @Expose
     private Comment comment;
+
+    @SerializedName("is_subscription")
+    @Expose
+    private Integer isSubscription;
+
+    public Integer getIsSubscription() {
+        return isSubscription;
+    }
+
+    public void setIsSubscription(Integer isSubscription) {
+        this.isSubscription = isSubscription;
+    }
+
+    public String getPhoto360() {
+        return photo360;
+    }
+
+    public void setPhoto360(String photo360) {
+        this.photo360 = photo360;
+    }
+
+    public String getPhoto550() {
+        return photo550;
+    }
+
+    public void setPhoto550(String photo550) {
+        this.photo550 = photo550;
+    }
 
     public Comment getComment() {
         return comment;

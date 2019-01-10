@@ -80,6 +80,6 @@
         tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="0dp" />
 
-    <include layout="@layout/navigation_bottom_buttons" />
+    <include layout="@layout/new_bottom_nav_bar"/>
 
 </android.support.constraint.ConstraintLayout>

@@ -125,8 +125,8 @@ public class FeedPlacesCheckinFragment extends android.support.v4.app.Fragment i
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 
-        Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
-        Util.setOnTabClick(view);
+        Util.setNawBarClickListener(view);
+        Util.setNawBarIconColor(getContext(), view, -1);
 
         event =  EventBus.getDefault().getStickyEvent((EventBusMessages.OpenPlacePhoto2.class));
 
@@ -205,6 +205,11 @@ public class FeedPlacesCheckinFragment extends android.support.v4.app.Fragment i
         //super.onViewCreated(view, savedInstanceState);
     }
 
+    @OnClick(R.id.backButton)
+    public void back(View v){
+        getActivity().onBackPressed();
+    }
+
     private void loadMedia(final int offset) {
 
         if(mayRestore){
@@ -254,11 +259,9 @@ public class FeedPlacesCheckinFragment extends android.support.v4.app.Fragment i
 
                 @Override
                 public void onFailure(Call<ResponseContainer<ResponseWall>> call, Throwable t) {
-
                 }
             });
         }
-
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -282,13 +285,13 @@ public class FeedPlacesCheckinFragment extends android.support.v4.app.Fragment i
 
     void setLiked(boolean b){
         if(b){
-            likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart_black_18dp));
-            likeIcon.setColorFilter(getResources().getColor(R.color.colorAccentRed));
-            likesCount.setTextColor(getResources().getColor(R.color.colorAccentRed));
+            likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_like_heart_vector_red));
+         //   likeIcon.setColorFilter(getResources().getColor(R.color.colorAccentRed));
+          //  likesCount.setTextColor(getResources().getColor(R.color.colorAccentRed));
         } else {
-            likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart_outline_grey600_18dp));
-            likeIcon.setColorFilter(getResources().getColor(R.color.grey600));
-            likesCount.setTextColor(getResources().getColor(R.color.black_67percent));
+            likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_like_heart_vector_grey));
+         //   likeIcon.setColorFilter(getResources().getColor(R.color.grey600));
+          //  likesCount.setTextColor(getResources().getColor(R.color.black_67percent));
         }
     }
 

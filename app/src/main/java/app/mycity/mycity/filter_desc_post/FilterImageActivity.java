@@ -1,49 +1,49 @@
 package app.mycity.mycity.filter_desc_post;
 
-import android.Manifest;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.MultiplePermissionsReport;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.zomato.photofilters.imageprocessors.Filter;
 import com.zomato.photofilters.imageprocessors.subfilters.BrightnessSubFilter;
 import com.zomato.photofilters.imageprocessors.subfilters.ContrastSubFilter;
 import com.zomato.photofilters.imageprocessors.subfilters.SaturationSubfilter;
 
-import java.io.File;
-import java.net.URI;
-import java.util.List;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.File;
+import java.io.IOException;
+
+import app.mycity.mycity.App;
+import app.mycity.mycity.PublicationService;
 import app.mycity.mycity.R;
 import app.mycity.mycity.util.BitmapUtils;
+import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.Util;
-import app.mycity.mycity.views.activities.MainActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+
+import static okhttp3.RequestBody.create;
 
 public class FilterImageActivity extends AppCompatActivity implements FiltersListFragment.FiltersListFragmentListener, FilterEditImageFragment.EditImageFragmentListener {
 
@@ -57,9 +57,6 @@ public class FilterImageActivity extends AppCompatActivity implements FiltersLis
 
     @BindView(R.id.viewpager)
     ViewPager viewPager;
-
-    @BindView(R.id.coordinator_layout)
-    CoordinatorLayout coordinatorLayout;
 
     Filter selectedFilter;
     Filter editFilter;
@@ -85,6 +82,9 @@ public class FilterImageActivity extends AppCompatActivity implements FiltersLis
 
     String path;
 
+    long startTime;
+    long finishTime;
+
     private static final int REQUEST_CODE = 1;
     private int REQUEST_ACTIVITY_DESCRIPTION = 3;
 
@@ -94,6 +94,7 @@ public class FilterImageActivity extends AppCompatActivity implements FiltersLis
     }
 
     private String saveImagePath;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,10 +104,10 @@ public class FilterImageActivity extends AppCompatActivity implements FiltersLis
 
         Log.d("TAG21", "MAin OnCreate");
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+/*        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(getString(R.string.activity_title_main));
+        getSupportActionBar().setTitle(getString(R.string.activity_title_main));*/
 
 
 /*        path = "/storage/emulated/0/test.jpg";
@@ -128,6 +129,7 @@ public class FilterImageActivity extends AppCompatActivity implements FiltersLis
 
     @Override
     protected void onResume() {
+        Log.d("Test2", "RESUME FILTER" );
         super.onResume();
 
     }
@@ -142,8 +144,45 @@ public class FilterImageActivity extends AppCompatActivity implements FiltersLis
     private void loadImage() {
         Log.d("TAG21", "path - " + path);
 
-        Bitmap bitmap =  BitmapFactory.decodeFile(path, new BitmapFactory.Options());
-        Log.d("TAG21", "come - " + bitmap.getWidth() + " : " + bitmap.getHeight());
+        Bitmap rotatedBitmap = BitmapFactory.decodeFile(path, new BitmapFactory.Options());
+        Bitmap bitmap =  null;
+        Log.d("TAG21", "come - " + rotatedBitmap.getWidth() + " : " + rotatedBitmap.getHeight());
+
+
+        ExifInterface ei = null;
+        try {
+            ei = new ExifInterface(path);
+            Log.d("TAG21", "e good ");
+        } catch (IOException e) {
+            Log.d("TAG21", "e - " + e.getLocalizedMessage());
+            e.printStackTrace();
+        }
+        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_UNDEFINED);
+        Log.d("TAG21", "or - " + orientation);
+        switch(orientation) {
+
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                Log.d("TAG21", "ORIENTATION 90");
+                bitmap = rotateImage(rotatedBitmap, 90);
+                break;
+
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                Log.d("TAG21", "ORIENTATION 180");
+                bitmap = rotateImage(rotatedBitmap, 180);
+                break;
+
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                Log.d("TAG21", "ORIENTATION 270");
+                bitmap = rotateImage(rotatedBitmap, 270);
+                break;
+
+            case ExifInterface.ORIENTATION_NORMAL:
+            default:
+                bitmap = rotatedBitmap;
+                Log.d("TAG21", "DEFAULT " + (bitmap==null));
+
+        }
 
         originalImage = Bitmap.createScaledBitmap(bitmap,(int) bitmap.getWidth()/4, (int) bitmap.getHeight()/4, false);
         Log.d("TAG21", "S will using = " + originalImage.getWidth() + " : " + originalImage.getHeight());
@@ -166,10 +205,19 @@ public class FilterImageActivity extends AppCompatActivity implements FiltersLis
             outHeight = inHeight / (inWidth/maxSize);
         }
 
-        superOriginalImage = Bitmap.createScaledBitmap(bitmap,(int) outWidth, (int) outHeight, false);
+        superOriginalImage = Bitmap.createScaledBitmap(bitmap,(int) outWidth/2, (int) outHeight/2, false);
         Log.d("TAG21", "S  super orig = " + superOriginalImage.getWidth() + " : " + superOriginalImage.getHeight());
         outFinalImage = superOriginalImage.copy(Bitmap.Config.ARGB_8888, true);
         outFilteredImage = superOriginalImage.copy(Bitmap.Config.ARGB_8888, true);
+    }
+
+
+
+    public static Bitmap rotateImage(Bitmap source, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
+                matrix, true);
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -202,8 +250,6 @@ public class FilterImageActivity extends AppCompatActivity implements FiltersLis
         // preview filtered image
         imagePreview.setImageBitmap(filter.processFilter(filteredImage));
         finalImage = filteredImage.copy(Bitmap.Config.ARGB_8888, true);
-
-
     }
 
     @Override
@@ -258,8 +304,6 @@ public class FilterImageActivity extends AppCompatActivity implements FiltersLis
         Log.d("TAG21", file.getAbsolutePath());
         fileUri = Uri.fromFile(file);
 
-
-
         Uri imageUri = FileProvider.getUriForFile(
                 this,
                 "app.mycity.mycity.provider", //(use your app signature + ".provider" )
@@ -275,13 +319,17 @@ public class FilterImageActivity extends AppCompatActivity implements FiltersLis
         if(selectedFilter!=null)
             selectedFilter.processFilter(outFilteredImage);
         outFinalImage = outFilteredImage.copy(Bitmap.Config.ARGB_8888, true);
+
         final Bitmap bitmap = outFilteredImage.copy(Bitmap.Config.ARGB_8888, true);
         if(editFilter!=null)
         outFinalImage = editFilter.processFilter(bitmap);
 
         saveImagePath = Util.getExternalFileName();
         BitmapUtils.storeImage(outFinalImage, saveImagePath);
-        startDescriptionActivity(saveImagePath);
+
+        Log.d("TAG23", "photo saved" + (System.currentTimeMillis() - startTime));
+        //startDescriptionActivity(saveImagePath);
+        post(saveImagePath);
     }
 
     // opening image in default image viewer app
@@ -334,6 +382,37 @@ public class FilterImageActivity extends AppCompatActivity implements FiltersLis
         return true;
     }
 
+    @OnClick(R.id.makeCheckinAgain)
+    public void checkinAgain(View v){
+        makeCheckin();
+    }
+
+    @OnClick(R.id.nextButton)
+    public void publish(View v){
+
+        if(App.isOnline(this)){
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("Публикация");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+
+            startTime = System.currentTimeMillis();
+            saveImageToGallery();
+        } else {
+            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+            alertDialog.setMessage("Отсутствует интернет подключение");
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+        }
+
+
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -347,16 +426,81 @@ public class FilterImageActivity extends AppCompatActivity implements FiltersLis
         if (id == R.id.action_save) {
             saveImageToGallery();
             Log.d("TAG21", "click  ");
-
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void publicationComplete(EventBusMessages.PublicationComplete event){
+        Log.i("Test2", "Event finish dfgdfs");
+        Log.d("TAG23", "load finished" + (System.currentTimeMillis() - startTime));
+        EventBus.getDefault().removeStickyEvent(event);
+        Log.i("Test2", "hide dialog");
+        progressDialog.hide();
+        this.finish();
+    }
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void publicationError(EventBusMessages.PublicationError event){
+        Log.d("TAG23", "publication error" );
+
+        progressDialog.hide();
+
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setMessage("Во время публикации чекина произошла ошибка");
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
+
+        EventBus.getDefault().removeStickyEvent(event);
+    }
+
+/*
     void startDescriptionActivity(String path){
         Intent intent = new Intent(this, DescriptionActivity.class);
         intent.putExtra("path", path);
         startActivityForResult(intent, REQUEST_ACTIVITY_DESCRIPTION);
+    }
+*/
+
+    public void post(String saveImagePath){
+        Log.i("Test2", "start service");
+        Intent serviceIntent = new Intent(this, PublicationService.class);
+        serviceIntent.putExtra("path", saveImagePath);
+        startService(serviceIntent);
+    }
+
+    @Override
+    public void onStart() {
+        Log.i("Test2", "start filters");
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        Log.i("Test2", "Stop filters");
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.i("Test2", "back click");
+
+
+        //??
+        if(progressDialog!=null && progressDialog.isShowing()){
+            Log.i("Test2", "progressDialog.isShowing ");
+        } else {
+            Log.i("Test2", "progressDialog.is not Showing ");
+        }
+        super.onBackPressed();
     }
 }

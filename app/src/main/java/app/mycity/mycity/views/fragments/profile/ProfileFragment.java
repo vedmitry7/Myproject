@@ -1,5 +1,6 @@
 package app.mycity.mycity.views.fragments.profile;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -11,6 +12,7 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,10 +23,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
@@ -35,14 +43,16 @@ import org.json.JSONException;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.Map;
 
 import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
+import app.mycity.mycity.api.ApiRetrofitFactory;
+import app.mycity.mycity.api.model.Group;
+import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.api.model.ResponseLike;
-import app.mycity.mycity.filter_desc_post.ExpandableLayout;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.model.Post;
 import app.mycity.mycity.api.model.ResponseWall;
@@ -65,6 +75,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import fr.arnaudguyon.tabstacker.TabStacker;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -106,9 +120,6 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
     @BindView(R.id.someOneProfileFragRecyclerView)
     RecyclerView recyclerView;
 
-
-
-
     @BindView(R.id.profilePlaceHolder)
     ConstraintLayout placeHolder;
 
@@ -135,7 +146,10 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
    Storage storage;
    boolean mayRestore;
 
-   boolean linearLayout;
+    Map groups;
+
+    Profile profile;
+    private View fragmentView;
 
     public void showContent(){
 
@@ -177,13 +191,23 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
         EventBus.getDefault().post(new EventBusMessages.OpenUserPlace(SharedManager.getProperty(Constants.KEY_MY_ID)));
     }
 
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onEvent(EventBusMessages.UnreadCountUpdate event){
+        Util.setUnreadCount(fragmentView);
+        Log.d("TAG25", "Update TOTAL UNREAD COUNT   -  Chronics");
+    }
+
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        fragmentView = view;
+
         placeHolder.setVisibility(View.VISIBLE);
 
-        Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
-        Util.setOnTabClick(view);
+        Util.setNawBarClickListener(view);
+        Util.setNawBarIconColor(getContext(), view, 1);
+        Util.setUnreadCount(view);
 
         if(getArguments().getInt("stackPos")==0){
             toolBar.setVisibility(View.GONE);
@@ -201,23 +225,10 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
             postList = new ArrayList<>();
         }
 
-        adapter = new CheckinRecyclerAdapter(postList);
+        adapter = new CheckinRecyclerAdapter(postList, groups);
         adapter.setImageClickListener(this);
 
-
-        if(linearLayout){
-            Log.i("TAG21","QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
-            mLayoutManager = new LinearLayoutManager(this.getActivity());
-            recyclerView.setLayoutManager(mLayoutManager);
-            if(recyclerView.getItemDecorationCount()==1)
-                recyclerView.removeItemDecorationAt(0);
-
-            adapter.setLayout(CheckinRecyclerAdapter.LINEAR_LAYOUT);
-            recyclerView.setAdapter(adapter);
-        } else {
-            Log.i("TAG21","NOT QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
-            recyclerView.setAdapter(adapter);
-        }
+        recyclerView.setAdapter(adapter);
 
         getInfo();
         getSubscriberCount();
@@ -227,36 +238,9 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
         Log.i("TAG3","Profile created");
     }
 
-    @OnClick(R.id.profileFragListRecyclerLayout)
-    public void listView(View v){
-        Log.i("TAG", "list view");
-        linearLayout = true;
-        mLayoutManager = new LinearLayoutManager(this.getActivity());
-        recyclerView.setLayoutManager(mLayoutManager);
-        if(recyclerView.getItemDecorationCount()==1)
-        recyclerView.removeItemDecorationAt(0);
-
-        adapter.setLayout(CheckinRecyclerAdapter.LINEAR_LAYOUT);
-        recyclerView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
-    }
-
-    @OnClick(R.id.profileFragGridRecyclerLayout)
+ /*   @OnClick(R.id.profileFragGridRecyclerLayout)
     public void gridView(View v){
-        linearLayout = false;
-        Log.i("TAG", "grid view");
-        mLayoutManager = new GridLayoutManager(this.getActivity(), 3);
-        if(recyclerView.getItemDecorationCount()==0) {
-            recyclerView.addItemDecoration(spaceDecoration);
-        }
-        recyclerView.setLayoutManager(mLayoutManager);
-
-        adapter.setLayout(CheckinRecyclerAdapter.GRID_LAYOUT);
-        recyclerView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
-    }
-
-
+    }*/
 
     @Override
     public void onAttach(Context context) {
@@ -266,11 +250,15 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
         activity = (MainAct) context;
         storage = (Storage) context;
         postList = (List<Post>)storage.getDate(getArguments().get("name") + "_posts");
+        groups = (Map) storage.getDate(getArguments().get("name")+ "_groups");
 
         if(postList!=null) {
             Log.i("TAG21", "Post size " + postList.size());
             mayRestore = true;
-            linearLayout = (boolean) storage.getDate(getArguments().get("name") + "_recycler_layout");
+        }
+
+        if(groups==null){
+            groups = new HashMap();
         }
         else{
             Log.i("TAG21", "Post null ");
@@ -289,34 +277,79 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
     }
 
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void openPlace(EventBusMessages.ShowImage event){
+        storage.setDate(getArguments().getString("name") + "checkins", postList);
+        storage.setDate(getArguments().getString("name") + "groups", groups);
+        storage.setDate(getArguments().getString("name") + "profile", profile);
+
+        EventBus.getDefault().post(new EventBusMessages.OpenCheckinProfileContent(postList.get(event.getPosition()).getId(), getArguments().getString("name")));
+    }
+
+
     @OnClick(R.id.profileFragBackButtonContainer)
     public void back(View v){
         getActivity().onBackPressed();
     }
 
 
+/*    public Observable<ResponseContainer<Profile>> getObservable(){
+        return ApiRetrofitFactory.getApi()
+                .getUser(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "photo_550,photo_130")
+                .subscribeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread());
+    }*/
+
+    public DisposableObserver<ResponseContainer<Profile>> getObserver(){
+        return new DisposableObserver<ResponseContainer<Profile>>() {
+            @Override
+            public void onNext(ResponseContainer<Profile> response) {
+                Log.i("TAG21", response.getResponse().getFirstName());
+                Log.i("TAG21", response.getResponse().getLastName());
+                Log.i("TAG21", response.getResponse().getPhoto550());
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+                Log.i("TAG21", "onComplete()");
+
+            }
+        };
+    }
+
+
+    private void getInfoViaRetrofit(){
+      //  getObservable().subscribeWith(getObserver());
+    }
+
+
     private void getInfo(){
         Log.i("TAG21", "Get Info");
-        ApiFactory.getApi().getUser(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "photo_780,photo_130").enqueue(new retrofit2.Callback<ResponseContainer<User>>() {
+        ApiFactory.getApi().getUser(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "photo_550,photo_130").enqueue(new retrofit2.Callback<ResponseContainer<Profile>>() {
             @Override
-            public void onResponse(retrofit2.Call<ResponseContainer<User>> call, retrofit2.Response<ResponseContainer<User>> response) {
-                User user = response.body().getResponse();
-                if(user != null){
-                    Log.i("TAG", user.getFirstName());
-                    Log.i("TAG", user.getLastName());
-                    Log.i("TAG", user.getPhoto780());
+            public void onResponse(retrofit2.Call<ResponseContainer<Profile>> call, retrofit2.Response<ResponseContainer<Profile>> response) {
+                profile = response.body().getResponse();
+                if(profile != null){
+                    Log.i("TAG", profile.getFirstName());
+                    Log.i("TAG", profile.getLastName());
+                    Log.i("TAG", profile.getPhoto550());
 
-                    name.setText(user.getFirstName() + " " + user.getLastName());
+                    name.setText(profile.getFirstName() + " " + profile.getLastName());
 
                     infoLoad = true;
                     showContent();
-                    Picasso.get().load(user.getPhoto780()).into(imageView);
+                    Picasso.get().load(profile.getPhoto550()).into(imageView);
                     Log.i("TAG21", "130 " + response.body().getResponse().getPhoto130());
                     SharedManager.addProperty(Constants.KEY_PHOTO_130, response.body().getResponse().getPhoto130());
                     if(progressDialog!=null){
                         progressDialog.hide();
                     }
-                    SharedManager.addProperty(Constants.KEY_MY_FULL_NAME, user.getFirstName() + " " + user.getLastName());
+                    SharedManager.addProperty(Constants.KEY_MY_FULL_NAME, profile.getFirstName() + " " + profile.getLastName());
 
                 } else {
 
@@ -324,7 +357,7 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
             }
 
             @Override
-            public void onFailure(retrofit2.Call<ResponseContainer<User>> call, Throwable t) {
+            public void onFailure(retrofit2.Call<ResponseContainer<Profile>> call, Throwable t) {
 
             }
         });
@@ -373,7 +406,7 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
 
         if(!mayRestore){
             Log.i("TAG21", "Cant restore checkins");
-            ApiFactory.getApi().getWall(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN)).enqueue(new Callback<ResponseContainer<ResponseWall>>() {
+            ApiFactory.getApi().getWallExtended(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), 0, 50, "1").enqueue(new Callback<ResponseContainer<ResponseWall>>() {
                 @Override
                 public void onResponse(Call<ResponseContainer<ResponseWall>> call, Response<ResponseContainer<ResponseWall>> response) {
                     Log.d("TAG21", "resp = " + response.body().getResponse().getCount());
@@ -388,6 +421,12 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
                     photoList.add(p.getAttachments().get(0));
                     likeList.add(p.getLikes());
                 }*/
+
+                    for (Group g:response.body().getResponse().getGroups()
+                         ) {
+                        Log.i("TAG21", "                    . GROUP - " + g.getName());
+                        groups.put(g.getId(), g);
+                    }
                     adapter.notifyDataSetChanged();
                     checkinLoad = true;
                     showContent();
@@ -395,7 +434,7 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
 
                 @Override
                 public void onFailure(Call<ResponseContainer<ResponseWall>> call, Throwable t) {
-                    Log.d("TAG21", "fail get wall");
+                    Log.d("TAG21", "fail get wall - " + t.getLocalizedMessage());
                 }
             });
         } else {
@@ -449,45 +488,73 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
 
     @OnClick(R.id.profileFragSetImage)
     public void setAvatar(View v){
-        final Dialog dialog = new Dialog(this.getActivity());
 
-        //setting custom layout to dialog
-        dialog.setContentView(R.layout.dialog_change_avatar);
-        dialog.setTitle("Custom Dialog");
+        Dexter.withActivity(getActivity()).withPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
 
-        //adding button click event
-        Button chooseFromGallery = (Button) dialog.findViewById(R.id.chooseAvatarFromGallery);
-        chooseFromGallery.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent pickPhoto = new Intent(Intent.ACTION_PICK,
-                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(pickPhoto , 1);
-                dialog.dismiss();
-            }
-        });
-        Button makePhoto = (Button) dialog.findViewById(R.id.makeAvatarPhoto);
-        makePhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                file = new File("/storage/emulated/0/"+"test.jpg");
-                fileUri = Uri.fromFile(file);
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                startActivityForResult(intent, 0);
-                dialog.dismiss();
-            }
-        });
-        Button deleteAvatar = (Button) dialog.findViewById(R.id.deleteAvatar);
-        deleteAvatar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-        dialog.show();
-        Window window = dialog.getWindow();
-        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        if (report.areAllPermissionsGranted()) {
+                            final Dialog dialog = new Dialog(getActivity());
+
+                            //setting custom layout to dialog
+                            dialog.setContentView(R.layout.dialog_change_avatar);
+                            dialog.setTitle("Custom Dialog");
+
+                            //adding button click event
+                            Button chooseFromGallery = (Button) dialog.findViewById(R.id.chooseAvatarFromGallery);
+                            chooseFromGallery.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent pickPhoto = new Intent(Intent.ACTION_PICK,
+                                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                                    //pickPhoto.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+                                    startActivityForResult(pickPhoto , 122);
+                                    dialog.dismiss();
+                                }
+                            });
+                            Button makePhoto = (Button) dialog.findViewById(R.id.makeAvatarPhoto);
+                            makePhoto.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+
+                                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                    file = new File(Util.getExternalFileName());
+                                    Log.d("TAG21", file.getAbsolutePath());
+                                    Log.d("TAG21", file.getAbsolutePath());
+                                    fileUri = Uri.fromFile(file);
+
+                                    Uri imageUri = FileProvider.getUriForFile(
+                                            getContext(),
+                                            "app.mycity.mycity.provider", //(use your app signature + ".provider" )
+                                            file);
+                                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                                    startActivityForResult(intent, 0);
+
+                                    dialog.dismiss();
+                                }
+                            });
+                            Button deleteAvatar = (Button) dialog.findViewById(R.id.deleteAvatar);
+                            deleteAvatar.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+
+
+
+                                    dialog.dismiss();
+                                }
+                            });
+                            dialog.show();
+                            Window window = dialog.getWindow();
+                            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                        token.continuePermissionRequest();
+                    }
+                }).check();
     }
 
     @Override
@@ -504,7 +571,7 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
                     getUploadServer();
                 }
                 break;
-            case 1:
+            case 122:
                 if(resultCode == RESULT_OK){
                     Uri selectedImage = data.getData();
                     file = new File(getPath(selectedImage));
@@ -535,11 +602,14 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
     void getUploadServer(){
         Log.d("TAG21","get server " + SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN));
 
-        ApiFactory.getApi().getUploadServer(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN)).enqueue(new Callback<ResponseContainer<ResponseUploadServer>>() {
+        ApiFactory.getApi().getUploadServerAvatar(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN)).enqueue(new Callback<ResponseContainer<ResponseUploadServer>>() {
             @Override
             public void onResponse(Call<ResponseContainer<ResponseUploadServer>> call, Response<ResponseContainer<ResponseUploadServer>> response) {
                 ResponseUploadServer uploadServer = response.body().getResponse();
-                uploadFile();
+
+                uploadFile(response.body().getResponse().getBaseUrl(),
+                        response.body().getResponse().getAction(),
+                        response.body().getResponse().getUserId());
             }
 
             @Override
@@ -549,12 +619,12 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
         });
     }
 
-    private void uploadFile() {
+    private void uploadFile(String uploadServer, String uploadAction, String userId) {
         final MultipartBody.Part filePart = MultipartBody.Part.createFormData("0", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
-        final RequestBody action = RequestBody.create(MediaType.parse("text/plain"), "add_photo");
-        final RequestBody id = RequestBody.create(MediaType.parse("text/plain"), "3");
+        final RequestBody action = RequestBody.create(MediaType.parse("text/plain"), uploadAction);
+        final RequestBody id = RequestBody.create(MediaType.parse("text/plain"), userId);
 
-        ApiFactory.getmApiUploadServer("http://192.168.0.104/").upload(action, id, filePart).enqueue(new Callback<ResponseContainer<ResponseUploading>>() {
+        ApiFactory.getmApiUploadServer(uploadServer).upload(action, id, filePart).enqueue(new Callback<ResponseContainer<ResponseUploading>>() {
             @Override
             public void onResponse(Call<ResponseContainer<ResponseUploading>> call, Response<ResponseContainer<ResponseUploading>> response) {
 
@@ -639,7 +709,6 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
                         postList.get(event.getAdapterPosition()).getLikes().setUserLikes(0);
                         adapter.notifyItemChanged(event.getAdapterPosition());
                     }
-
                 }
 
                 @Override
@@ -712,6 +781,7 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
 
     @Override
     public void onStop() {
+        Log.i("TAG21", "Stop activity");
         EventBus.getDefault().unregister(this);
         super.onStop();
     }
@@ -742,11 +812,14 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
             mass[2] = subscriptionsCount.getText().toString();
             mass[3] = String.valueOf(scrollView.getScrollY());
             storage.setDate(getArguments().get("name_")+"info", mass);
-            storage.setDate(getArguments().get("name")+"_recycler_layout", linearLayout);
         } else {
             Log.i("TAG21", "Profile Fragment Delete Data");
             storage.remove( getArguments().get("name")+"_posts");
             storage.remove(getArguments().get("name")+"_info");
+
+            storage.remove(getArguments().getString("name") + "checkins");
+            storage.remove(getArguments().getString("name") + "groups");
+            storage.remove(getArguments().getString("name") + "profile");
         }
 
     }

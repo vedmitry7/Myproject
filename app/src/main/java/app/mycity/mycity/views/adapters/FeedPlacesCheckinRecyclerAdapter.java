@@ -48,7 +48,7 @@ public class FeedPlacesCheckinRecyclerAdapter extends RecyclerView.Adapter<FeedP
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Picasso.get()
-                .load(postList.get(position).getAttachments().get(0).getPhoto130())
+                .load(postList.get(position).getAttachments().get(0).getPhoto360())
                 .into(holder.photo);
     }
 
@@ -79,7 +79,7 @@ public class FeedPlacesCheckinRecyclerAdapter extends RecyclerView.Adapter<FeedP
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d("TAG21", "open780 - " + postList.get(getAdapterPosition()).getAttachments().get(0).getPhoto780());
+                    Log.d("TAG21", "open780 - " + postList.get(getAdapterPosition()).getAttachments().get(0).getPhoto550());
                     EventBus.getDefault().post(
                             new EventBusMessages.ShowImage(getAdapterPosition()));
                 }

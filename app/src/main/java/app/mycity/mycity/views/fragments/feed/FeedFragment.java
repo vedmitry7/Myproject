@@ -56,14 +56,19 @@ public class FeedFragment extends Fragment implements TabStacker.TabStackInterfa
         return fragment;
     }
 
+    @OnClick(R.id.backButton)
+    public void sadsa(View v){
+        getActivity().onBackPressed();
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
-        Util.setOnTabClick(view);
+        Util.setNawBarClickListener(view);
+        Util.setNawBarIconColor(getContext(), view, -1);
 
-        title.setText("Лента");
+        title.setText("Чекины");
 
         // Log.i("TAG21","Friends stack count - " + getActivity().getFragmentManager().getBackStackEntryCount());
      //   Log.i("TAG21","Friends Fragment - " + getActivity().getFragmentManager().getBackStackEntryCount());
@@ -81,19 +86,14 @@ public class FeedFragment extends Fragment implements TabStacker.TabStackInterfa
             Log.i("TAG","getChildFragmentManager !" +
                     " NULL");
         }
+
         FeedPagerAdapter pagerAdapter = new FeedPagerAdapter(getChildFragmentManager(), getArguments().getString("name"));
         viewPager.setAdapter(pagerAdapter);
-        viewPager.setOffscreenPageLimit(3);
+        viewPager.setOffscreenPageLimit(2);
         //viewPager.addOnPageChangeListener(pagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
         Log.d("TAG", "Start " + this.getClass().getSimpleName());
-    }
-
-    @OnClick(R.id.mainActAddBtn)
-    public void photo(View v){
-        Log.d("TAG21", "PHOTO - ");
-        EventBus.getDefault().post(new EventBusMessages.MakeCheckin());
     }
 
     @Override

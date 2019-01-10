@@ -35,6 +35,12 @@ public class User {
     @SerializedName("photo_130")
     @Expose
     private String photo130;
+    @SerializedName("photo_360")
+    @Expose
+    private String photo360;
+    @SerializedName("photo_550")
+    @Expose
+    private String photo550;
     @SerializedName("photo_780")
     @Expose
     private String photo780;
@@ -85,6 +91,22 @@ public class User {
     @SerializedName("place")
     @Expose
     private Place place;
+
+    public String getPhoto360() {
+        return photo360;
+    }
+
+    public void setPhoto360(String photo360) {
+        this.photo360 = photo360;
+    }
+
+    public String getPhoto550() {
+        return photo550;
+    }
+
+    public void setPhoto550(String photo550) {
+        this.photo550 = photo550;
+    }
 
     public Place getPlace() {
         return place;

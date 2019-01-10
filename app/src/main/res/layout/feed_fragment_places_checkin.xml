@@ -22,69 +22,40 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:id="@+id/mainActAddBtn" />
+            android:id="@+id/backButton" />
 
         <TextView
             android:id="@+id/toolBarTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
             android:text="Чекины"
             android:textColor="@android:color/white"
             android:textSize="19dp"
-            app:layout_constraintStart_toEndOf="@+id/mainActAddBtn"
+            app:layout_constraintStart_toEndOf="@+id/backButton"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/placeName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="-1dp"
             android:text="В гостях у пампушки"
             android:textColor="@android:color/white"
             android:textSize="13dp"
-            app:layout_constraintStart_toEndOf="@+id/mainActAddBtn"
-            app:layout_constraintTop_toBottomOf="@+id/toolBarTitle" />
-
-        <RelativeLayout
-
-            android:id="@+id/main_act_messages_container"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/main_act_notification_container"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:clickable="false"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:src="@drawable/ic_forum_white_24dp" />
-        </RelativeLayout>
-
-        <RelativeLayout
-
-            android:id="@+id/main_act_notification_container"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/backButton"
+            app:layout_constraintTop_toBottomOf="@+id/toolBarTitle" />
 
-            <ImageView
-
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:src="@drawable/ic_bell_white_24dp" />
-        </RelativeLayout>
 
     </android.support.constraint.ConstraintLayout>
 
@@ -100,114 +71,132 @@
         app:layout_constraintTop_toBottomOf="@+id/include" />
 
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/feedPhoto"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintDimensionRatio="H,1:1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/feedImage" />
-
-    <TextView
-        android:id="@+id/feedName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="16dp"
-        android:text="Name"
-        android:textColor="@color/black_67percent"
-        android:textSize="14dp"
-        app:layout_constraintEnd_toStartOf="@+id/imageView8"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/feedPhoto"
-        app:layout_constraintTop_toTopOf="@+id/feedPhoto"
-        tools:ignore="MissingConstraints" />
-
-    <TextView
-        android:id="@+id/feedPostTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="4dp"
-        android:text="Time"
-        android:textSize="12dp"
-        app:layout_constraintEnd_toStartOf="@+id/imageView8"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/feedPhoto"
-        app:layout_constraintTop_toBottomOf="@+id/feedName"
-        tools:ignore="MissingConstraints" />
-
-    <ImageView
-        android:id="@+id/commentButton"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:src="@drawable/ic_comments"
-        app:layout_constraintBottom_toTopOf="@+id/placesFragmentCheckinRecyclerView"
-        app:layout_constraintEnd_toStartOf="@+id/commentsCount"
-        app:layout_constraintTop_toBottomOf="@+id/feedImage" />
-
-
-    <ImageView
-        android:id="@+id/likeIcon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:src="@drawable/ic_heart_outline_grey600_18dp"
-        app:layout_constraintBottom_toTopOf="@+id/placesFragmentCheckinRecyclerView"
-        app:layout_constraintEnd_toStartOf="@+id/likesCount"
-        app:layout_constraintTop_toBottomOf="@+id/feedImage"
-        tools:ignore="MissingConstraints" />
-
-    <TextView
-        android:id="@+id/likesCount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:text="45"
-        android:textColor="@android:color/black"
-        android:textSize="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/placesFragmentCheckinRecyclerView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/feedImage"
-        tools:ignore="MissingConstraints" />
-
-    <TextView
-        android:id="@+id/commentsCount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:text="45"
-        android:textColor="@android:color/black"
-        android:textSize="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/placesFragmentCheckinRecyclerView"
-        app:layout_constraintEnd_toStartOf="@+id/likeIcon"
-        app:layout_constraintTop_toBottomOf="@+id/feedImage"
-        tools:ignore="MissingConstraints" />
-
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/placesFragmentCheckinRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toTopOf="@+id/include2"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/feedPhoto" />
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout6" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:src="@drawable/shadow_checkin_content"
+        app:layout_constraintBottom_toBottomOf="@+id/constraintLayout6" />
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/constraintLayout6"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/feedImage"
+        tools:layout_editor_absoluteX="0dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/feedPhoto"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginStart="12dp"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="H,1:1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/feedName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="16dp"
+            android:text="Name"
+            android:textColor="@android:color/white"
+            android:textSize="14dp"
+            app:layout_constraintEnd_toStartOf="@+id/imageView8"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/feedPhoto"
+            app:layout_constraintTop_toTopOf="@+id/feedPhoto"
+            tools:ignore="MissingConstraints" />
+
+        <TextView
+            android:id="@+id/feedPostTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="16dp"
+            android:text="Time"
+            android:textColor="@android:color/white"
+            android:textSize="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/imageView8"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/feedPhoto"
+            app:layout_constraintTop_toBottomOf="@+id/feedName"
+            tools:ignore="MissingConstraints" />
+
+
+        <ImageView
+            android:id="@+id/commentButton"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:padding="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/commentsCount"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_comments_vector_grey"
+
+            />
+
+        <ImageView
+            android:id="@+id/likeIcon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:padding="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/likesCount"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_like_heart_vector_grey"
+            tools:ignore="MissingConstraints" />
+
+        <TextView
+            android:id="@+id/likesCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:text="45"
+            android:textColor="@android:color/white"
+            android:textSize="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="MissingConstraints" />
+
+        <TextView
+            android:id="@+id/commentsCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="45"
+            android:textColor="@android:color/white"
+
+            android:textSize="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/likeIcon"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="MissingConstraints" />
+
+
+    </android.support.constraint.ConstraintLayout>
 
 
     <View
@@ -220,9 +209,12 @@
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="MissingConstraints" />
 
+
+
+
     <include
         android:id="@+id/include2"
-        layout="@layout/navigation_bottom_buttons"
+   layout="@layout/new_bottom_nav_bar"
         tools:ignore="MissingConstraints" />
 
 

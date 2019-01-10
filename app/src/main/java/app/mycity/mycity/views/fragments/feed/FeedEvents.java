@@ -49,7 +49,7 @@ public class FeedEvents extends android.support.v4.app.Fragment implements TabSt
     PlacesEventRecyclerAdapter adapter;
 
     List<Post> postList;
-    Map groups = new HashMap<Long, Group>();
+    HashMap<String, Group> groups = new HashMap<String, Group>();
 
     boolean isLoading;
     int totalCount;

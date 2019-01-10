@@ -8,6 +8,7 @@ import android.util.Log;
 import app.mycity.mycity.api.model.Place;
 import app.mycity.mycity.views.fragments.places.PhotoAlbumsFragment;
 import app.mycity.mycity.views.fragments.SimpleFragment;
+import app.mycity.mycity.views.fragments.places.PlaceActions;
 import app.mycity.mycity.views.fragments.places.PlaceEvents;
 import app.mycity.mycity.views.fragments.places.PlaceInfoFragment;
 import app.mycity.mycity.views.fragments.places.PlacesCheckinFragment;
@@ -37,13 +38,15 @@ public class PlacePagerAdapter extends FragmentPagerAdapter {
                 return PhotoAlbumsFragment.createInstance(tabName, place.getId());
             case 3:
                 return PlaceEvents.createInstance(tabName, place.getId());
+            case 4:
+                return PlaceActions.createInstance(tabName, place.getId());
         }
         return new SimpleFragment();
     }
 
     @Override
     public int getCount() {
-        return 4;
+        return 5;
     }
 
     @Override
@@ -57,6 +60,8 @@ public class PlacePagerAdapter extends FragmentPagerAdapter {
                 return "Фотоотчеты";
             case 3:
                 return "События";
+            case 4:
+                return "Акции";
         }
         return null;
     }

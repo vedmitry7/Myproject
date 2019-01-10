@@ -1,9 +1,11 @@
 package app.mycity.mycity;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -21,18 +23,16 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import org.greenrobot.eventbus.EventBus;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.Place;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.UsersContainer;
+import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
-import app.mycity.mycity.views.activities.MainActivity2;
+import app.mycity.mycity.views.activities.MainActivity3;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -44,12 +44,8 @@ public class LocationService extends Service  implements GoogleApiClient.Connect
     GoogleApiClient apiClient = null;
     LocationRequest mLocationRequest = null;
     private int locationInterval, fastedInterval;
+    private int second;
 
-    List<Place> basePlaces = new ArrayList<>();
-
-    Map<Integer, Integer> counterMap = new HashMap<>();
-
-    boolean check;
 
     public LocationService() {
         Log.d("TAG23", "Location Service constructor" );
@@ -67,22 +63,41 @@ public class LocationService extends Service  implements GoogleApiClient.Connect
     public void onCreate() {
         Log.i("TAG23", "LocationService: onCreate");
 
-        locationInterval = 60*1000;
-        fastedInterval = 60*1000;
+        EventBus.getDefault().register(this);
+
+        locationInterval = 60*10000;
+        fastedInterval = 60*10000;
         setLocationLocationRequest();
+
+        Intent ishintent = new Intent(this, LocationService.class);
+        ishintent.putExtra("data", "alarm");
+        PendingIntent pintent = PendingIntent.getService(this, 7, ishintent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+
+        alarm.setRepeating(AlarmManager.RTC, System.currentTimeMillis(),5000, pintent);
+
+ /*       new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Log.i("TAG23", "Location count: " + second++ + ", state - " + apiClient.isConnected());
+            }
+        }, 0, 1000);*/
     }
+
+
 
 
     private void setLocationLocationRequest() {
 
         try {
             apiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
-
             mLocationRequest = new LocationRequest();
             mLocationRequest.setInterval(locationInterval);
             mLocationRequest.setFastestInterval(fastedInterval);
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            apiClient.connect();
+            if(App.isOnline(getApplicationContext())){
+                apiClient.connect();
+            }
 
         } catch (Exception e) {
             Log.d("TAG23", e.getMessage() == null ? "" : e.getMessage());
@@ -110,7 +125,7 @@ public class LocationService extends Service  implements GoogleApiClient.Connect
     void notifyUser(Place place){
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext());
 
-        Intent intent = new Intent(this, MainActivity2.class);
+        Intent intent = new Intent(this, MainActivity3.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("place", place.getName());
@@ -135,12 +150,31 @@ public class LocationService extends Service  implements GoogleApiClient.Connect
 
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(EventBusMessages.UpdateCoordinates event){
+        Log.d("TAG23", "Location Location Changed");
+        this.apiClient.disconnect();
+        apiClient.connect();
+    }
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onEvent(EventBusMessages.LocationStop event){
+        Log.d("TAG23", "Location Stop");
+        this.apiClient.disconnect();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(EventBusMessages.LocationResume event){
+        Log.d("TAG23", "Location Resume");
+        apiClient.connect();
+    }
 
     @Override
     public void onLocationChanged(Location location) {
         // After your desired interval This api will give you the Location Object.
         Log.d("TAG23", "Location Location Changed ");
         Log.d("TAG23", "Long - " + location.getLongitude() + " lat - " + location.getLatitude());
+        Log.d("Test", "Long - " + location.getLongitude() + " lat - " + location.getLatitude());
 
 
         SharedManager.addProperty("latitude", String.valueOf(location.getLatitude()));
@@ -172,7 +206,7 @@ public class LocationService extends Service  implements GoogleApiClient.Connect
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-
+        Log.d("TAG23", "ConnectionFailed");
     }
 
     @Override
@@ -180,5 +214,6 @@ public class LocationService extends Service  implements GoogleApiClient.Connect
         // Your need of location update is done. So you have to stop the apiClient.
         super.onDestroy();
         this.apiClient.disconnect();
+        EventBus.getDefault().unregister(this);
     }
 }

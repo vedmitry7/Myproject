@@ -3,6 +3,7 @@ package app.mycity.mycity.views.fragments.feed;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,12 +39,16 @@ import app.mycity.mycity.views.adapters.NewFeedRecyclerAdapter;
 import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import fr.arnaudguyon.tabstacker.TabStacker;
 
-public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment {
+public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment implements TabStacker.TabStackInterface {
 
 
     @BindView(R.id.feedFragmentRecyclerView)
     RecyclerView recyclerView;
+
+    @BindView(R.id.progressBarPlaceHolder)
+    ConstraintLayout placeHolder;
 
     NewFeedRecyclerAdapter adapter;
 
@@ -69,11 +74,12 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment {
         return view;
     }
 
-    public static FeedCheckinFragmentNew createInstance(String name) {
+    public static FeedCheckinFragmentNew createInstance(String name, String filter) {
         FeedCheckinFragmentNew fragment = new FeedCheckinFragmentNew();
-        Log.i("TAG21", "Create Subscribers LIST " + name);
+        Log.i("TAG21", "Create Subscribers LIST " + filter);
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
+        bundle.putString("filter", filter);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -149,13 +155,16 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment {
             mayRestore = false;
             adapter.update(postList, profiles, groups);
             recyclerView.scrollToPosition(scrollPos);
+            placeHolder.setVisibility(View.GONE);
         } else {
-            ApiFactory.getApi().getFeed(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "1", offset, "photo_130").enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
+            ApiFactory.getApi().getFeed(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "1", offset, "photo_130", getArguments().getString("filter")).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
                 @Override
                 public void onResponse(retrofit2.Call<ResponseContainer<ResponseWall>> call, retrofit2.Response<ResponseContainer<ResponseWall>> response) {
 
                     if(response.body().getResponse()!=null && response.body().getResponse().getCount()!=0){
                         Log.d("TAG21", "RESPONSE FEED OK !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+                        placeHolder.setVisibility(View.GONE);
 
                         totalCount = response.body().getResponse().getCount();
 
@@ -259,13 +268,35 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment {
 
     @Override
     public void onStop() {
+/*
         storage.setDate(getArguments().get("name") + "_postList", postList);
         storage.setDate(getArguments().get("name") + "_postListTotalCount", totalCount);
         storage.setDate(getArguments().get("name") + "_profiles", profiles);
         storage.setDate(getArguments().get("name") + "_groups", groups);
         storage.setDate(getArguments().get("name") + "_scrollPosition", ((LinearLayoutManager)recyclerView.getLayoutManager()).findFirstVisibleItemPosition());
+*/
 
         EventBus.getDefault().unregister(this);
         super.onStop();
+    }
+
+    @Override
+    public void onTabFragmentPresented(TabStacker.PresentReason presentReason) {
+
+    }
+
+    @Override
+    public void onTabFragmentDismissed(TabStacker.DismissReason dismissReason) {
+
+    }
+
+    @Override
+    public View onSaveTabFragmentInstance(Bundle bundle) {
+        return null;
+    }
+
+    @Override
+    public void onRestoreTabFragmentInstance(Bundle bundle) {
+
     }
 }

@@ -1,29 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
+    android:id="@+id/rootLayout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/constraintLayout4"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/colorAccent">
+
+        <TextView
+            android:id="@+id/toolBarTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:text="MY CITY"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.517" />
+
+        <ImageView
+            android:id="@+id/settingsButton"
+            android:padding="4dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            app:srcCompat="@drawable/ic_settings_vector"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </android.support.constraint.ConstraintLayout>
+
+    <View
+        android:id="@+id/top_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@drawable/toolbar_down_shadow_light"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout4"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="0dp" />
 
     <LinearLayout
-        android:orientation="vertical"
+        android:padding="8dp"
+        android:id="@+id/linearLayout4"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/include5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout4">
 
         <LinearLayout
-            android:layout_weight="1"
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal">
 
             <android.support.v7.widget.CardView
-                android:layout_margin="@dimen/main_fragment_card_margin"
-                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius"
-                android:layout_weight="1"
+                android:id="@+id/cardViewCheckins"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/main_fragment_card_margin"
+                android:layout_weight="1"
+                app:cardElevation="5dp"
+                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius">
 
                 <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
@@ -33,8 +87,8 @@
                         android:id="@+id/textView14"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginStart="12dp"
                         android:layout_marginTop="8dp"
                         android:text="Чекины"
                         android:textColor="@android:color/black"
@@ -48,10 +102,10 @@
                         android:layout_height="0dp"
                         android:layout_marginBottom="8dp"
                         android:layout_marginEnd="8dp"
-                        android:layout_marginLeft="8dp"
+                        android:layout_marginLeft="12dp"
                         android:layout_marginRight="8dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="16dp"
                         app:layout_constraintBottom_toTopOf="@+id/textView15"
                         app:layout_constraintDimensionRatio="1:1"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -65,8 +119,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginStart="12dp"
                         android:text="245"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent" />
@@ -76,11 +130,13 @@
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
-                android:layout_margin="@dimen/main_fragment_card_margin"
-                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius"
-                android:layout_weight="1"
+                android:id="@+id/cardViewChronics"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/main_fragment_card_margin"
+                android:layout_weight="1"
+                app:cardElevation="5dp"
+                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius">
 
                 <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
@@ -90,8 +146,8 @@
                         android:id="@+id/textView14"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginStart="12dp"
                         android:layout_marginTop="8dp"
                         android:text="Хроники"
                         android:textColor="@android:color/black"
@@ -105,10 +161,10 @@
                         android:layout_height="0dp"
                         android:layout_marginBottom="8dp"
                         android:layout_marginEnd="8dp"
-                        android:layout_marginLeft="8dp"
+                        android:layout_marginLeft="12dp"
                         android:layout_marginRight="8dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="16dp"
                         app:layout_constraintBottom_toTopOf="@+id/textView15"
                         app:layout_constraintDimensionRatio="1:1"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -122,8 +178,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginStart="12dp"
                         android:text="245"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent" />
@@ -136,17 +192,19 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_weight="1"
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal">
 
             <android.support.v7.widget.CardView
-                android:layout_margin="@dimen/main_fragment_card_margin"
-                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius"
-                android:layout_weight="1"
+                android:id="@+id/cardViewPlaces"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/main_fragment_card_margin"
+                android:layout_weight="1"
+                app:cardElevation="5dp"
+                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius">
 
                 <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
@@ -156,8 +214,8 @@
                         android:id="@+id/textView14"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginStart="12dp"
                         android:layout_marginTop="8dp"
                         android:text="Места"
                         android:textColor="@android:color/black"
@@ -171,10 +229,10 @@
                         android:layout_height="0dp"
                         android:layout_marginBottom="8dp"
                         android:layout_marginEnd="8dp"
-                        android:layout_marginLeft="8dp"
+                        android:layout_marginLeft="12dp"
                         android:layout_marginRight="8dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="16dp"
                         app:layout_constraintBottom_toTopOf="@+id/textView15"
                         app:layout_constraintDimensionRatio="1:1"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -188,8 +246,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginStart="12dp"
                         android:text="245"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent" />
@@ -199,11 +257,13 @@
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
-                android:layout_margin="@dimen/main_fragment_card_margin"
-                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius"
-                android:layout_weight="1"
+                android:id="@+id/cardViewPeoples"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/main_fragment_card_margin"
+                android:layout_weight="1"
+                app:cardElevation="5dp"
+                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius">
 
                 <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
@@ -213,8 +273,8 @@
                         android:id="@+id/textView14"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginStart="12dp"
                         android:layout_marginTop="8dp"
                         android:text="Люди"
                         android:textColor="@android:color/black"
@@ -228,10 +288,10 @@
                         android:layout_height="0dp"
                         android:layout_marginBottom="8dp"
                         android:layout_marginEnd="8dp"
-                        android:layout_marginLeft="8dp"
+                        android:layout_marginLeft="12dp"
                         android:layout_marginRight="8dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="16dp"
                         app:layout_constraintBottom_toTopOf="@+id/textView15"
                         app:layout_constraintDimensionRatio="1:1"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -245,8 +305,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginStart="12dp"
                         android:text="245"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent" />
@@ -256,21 +316,22 @@
             </android.support.v7.widget.CardView>
 
 
-
         </LinearLayout>
 
         <LinearLayout
-            android:layout_weight="1"
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal">
 
             <android.support.v7.widget.CardView
-                android:layout_margin="@dimen/main_fragment_card_margin"
-                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius"
-                android:layout_weight="1"
+                android:id="@+id/cardViewEvents"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/main_fragment_card_margin"
+                android:layout_weight="1"
+                app:cardElevation="5dp"
+                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius">
 
                 <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
@@ -280,8 +341,8 @@
                         android:id="@+id/textView14"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginStart="12dp"
                         android:layout_marginTop="8dp"
                         android:text="События"
                         android:textColor="@android:color/black"
@@ -295,10 +356,10 @@
                         android:layout_height="0dp"
                         android:layout_marginBottom="8dp"
                         android:layout_marginEnd="8dp"
-                        android:layout_marginLeft="8dp"
+                        android:layout_marginLeft="12dp"
                         android:layout_marginRight="8dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="16dp"
                         app:layout_constraintBottom_toTopOf="@+id/textView15"
                         app:layout_constraintDimensionRatio="1:1"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -312,8 +373,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginStart="12dp"
                         android:text="245"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent" />
@@ -322,17 +383,82 @@
 
             </android.support.v7.widget.CardView>
 
-            <RelativeLayout
-                android:layout_weight="1"
+            <android.support.v7.widget.CardView
+                android:id="@+id/cardViewServices"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/main_fragment_card_margin"
+                android:layout_weight="1"
+                app:cardElevation="5dp"
+                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius">
 
-            </RelativeLayout>
+                <android.support.constraint.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:id="@+id/textView14"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="8dp"
+                        android:text="Услуги"
+                        android:textColor="@android:color/black"
+                        android:textSize="18dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/imageView11"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_marginBottom="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="16dp"
+                        app:layout_constraintBottom_toTopOf="@+id/textView15"
+                        app:layout_constraintDimensionRatio="1:1"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.0"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textView14"
+                        app:srcCompat="@drawable/ic_promotion" />
+
+                    <TextView
+                        android:id="@+id/textView15"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginStart="12dp"
+                        android:text="245"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                </android.support.constraint.ConstraintLayout>
+
+            </android.support.v7.widget.CardView>
 
         </LinearLayout>
 
     </LinearLayout>
 
+    <View
+        android:id="@+id/up_navbar_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@drawable/toolbar_up_shadow"
+        app:layout_constraintBottom_toTopOf="@+id/include5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints" />
 
+    <include
+        android:id="@+id/include5"
+        layout="@layout/new_bottom_nav_bar" />
 
 </android.support.constraint.ConstraintLayout>

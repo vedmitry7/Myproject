@@ -51,7 +51,7 @@ public class PlacesCheckinRecyclerAdapter extends RecyclerView.Adapter<PlacesChe
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Picasso.get()
-                .load(postList.get(position).getAttachments().get(0).getPhoto780())
+                .load(postList.get(position).getAttachments().get(0).getPhoto360())
                 .into(holder.photo);
     }
 
@@ -78,6 +78,13 @@ public class PlacesCheckinRecyclerAdapter extends RecyclerView.Adapter<PlacesChe
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+
+            photo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EventBus.getDefault().post(new EventBusMessages.OpenPlaceContent(postList.get(getAdapterPosition()).getId()));
+                }
+            });
         }
 
     }

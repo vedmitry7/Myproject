@@ -58,6 +58,8 @@ public class NotificationsFragment extends Fragment implements TabStacker.TabSta
     MainAct activity;
     private boolean isLoading;
     private int totalCount;
+    private View fragmentView;
+
 
     @Nullable
     @Override
@@ -80,11 +82,13 @@ public class NotificationsFragment extends Fragment implements TabStacker.TabSta
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        fragmentView = view;
 
         Log.i("TAG21","onViewCreated Dialogs " + getArguments().getInt("tabPos"));
 
-        Util.indicateTabImageView(getContext(), view, getArguments().getInt("tabPos"));
-        Util.setOnTabClick(view);
+        Util.setNawBarClickListener(view);
+        Util.setNawBarIconColor(getContext(), view, 3);
+        Util.setUnreadCount(view);
 
         notificationList = new ArrayList<>();
 
@@ -117,6 +121,13 @@ public class NotificationsFragment extends Fragment implements TabStacker.TabSta
 
         loadDialogs(notificationList.size());
     }
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onEvent(EventBusMessages.UnreadCountUpdate event){
+        Util.setUnreadCount(fragmentView);
+        Log.d("TAG25", "Update TOTAL UNREAD COUNT   -  Chronics");
+    }
+
 
     @Override
     public void onStart() {

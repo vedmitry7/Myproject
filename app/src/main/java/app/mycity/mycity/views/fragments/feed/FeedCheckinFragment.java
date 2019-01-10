@@ -141,7 +141,7 @@ public class FeedCheckinFragment extends android.support.v4.app.Fragment {
             adapter.update(postList, profiles, groups);
             recyclerView.scrollToPosition(scrollPos);
         } else {
-            ApiFactory.getApi().getFeed(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "1", offset, "photo_130").enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
+            ApiFactory.getApi().getFeed(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "1", offset, "photo_130", "").enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
                 @Override
                 public void onResponse(retrofit2.Call<ResponseContainer<ResponseWall>> call, retrofit2.Response<ResponseContainer<ResponseWall>> response) {
 

@@ -2,7 +2,9 @@ package app.mycity.mycity.util;
 
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.os.Environment;
+import android.support.constraint.ConstraintLayout;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.util.Base64;
@@ -10,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -31,32 +34,93 @@ import app.mycity.mycity.api.model.Place;
 
 public class Util {
 
-    public static void indicateTabImageView(Context context, View v, int pos){
-        ImageView imageView;
-        for (int i = 0; i < 4; i++) {
-            imageView = v.findViewById(Constants.navButtonsIcons[i]);
-            if(i==pos){
-                imageView.setColorFilter(context.getResources().getColor(R.color.colorAccent));
-            } else {
-                imageView.setColorFilter(context.getResources().getColor(R.color.colorDefaultButton));
-            }
-        }
 
+    int countLineBreaks(final TextView textView, final String toMeasure) {
+
+        final Paint paint = textView.getPaint(); // Get the paint used by the TextView
+        int startPos = 0;
+        int breakCount = 0;
+        final int endPos = toMeasure.length();
+
+        int lineCount = 0;
+
+        // Loop through the string, moving along the number of characters that will
+        // fit on a line in the TextView. The number of iterations = the number of line breaks
+
+        while (startPos < endPos) {
+            startPos += paint.breakText(toMeasure.substring(startPos, endPos),
+                    true,  textView.getWidth(),(float[]) null);
+            lineCount++;
+        }
+        // Line count will now equal the number of line-breaks the string will require
+        return lineCount;
     }
 
-    public static void setOnTabClick(View v){
-        RelativeLayout layout;
+    public static void setNawBarClickListener(View v){
+        ImageView imageView = v.findViewById(R.id.makeCheckinPhoto);
+        
+
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventBus.getDefault().post(new EventBusMessages.MakeCheckin());
+            }
+        });
+
+        ConstraintLayout layout;
         for (int i = 0; i < 4; i++) {
-            layout = v.findViewById(Constants.navButtons[i]);
+            layout = v.findViewById(Constants.newNavButtons[i]);
             final int finalI = i;
             layout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    EventBus.getDefault().post(new EventBusMessages.SwichTab(finalI));
+                    switch (finalI){
+                        case 0:
+                            EventBus.getDefault().post(new EventBusMessages.OpenMenu());
+                            Log.d("TAG21", "click open menu");
+                            break;
+                        case 1:
+                            EventBus.getDefault().post(new EventBusMessages.OpenProfile());
+                            Log.d("TAG21", "click open pr");
+                            break;
+                        case 2:
+                            EventBus.getDefault().post(new EventBusMessages.OpenChat());
+                            Log.d("TAG21", "click open chat");
+                            break;
+                        case 3:
+                            EventBus.getDefault().post(new EventBusMessages.OpenNotifications());
+                            Log.d("TAG21", "click open notif");
+                            break;
+                    }
                 }
             });
         }
+
+
     }
+
+    public static void setNawBarIconColor(Context context, View v, int pos){
+        ImageView imageView;
+        for (int i = 0; i < 4; i++) {
+            imageView = v.findViewById(Constants.newNavButtonsIcons[i]);
+            if(i==pos){
+                imageView.setColorFilter(context.getResources().getColor(R.color.colorAccent));
+            } else {
+                imageView.setColorFilter(context.getResources().getColor(R.color.black_67percent));
+            }
+        }
+    }
+
+  public static void setUnreadCount(View view){
+      TextView textView = view.findViewById(R.id.totalUnreadCount);
+      if(SharedManager.getIntProperty("totalUnreadCount")!=0){
+          textView.setText(" " + SharedManager.getIntProperty("totalUnreadCount"));
+          textView.setVisibility(View.VISIBLE);
+      } else {
+          textView.setVisibility(View.GONE);
+      }
+      Log.i("TAG25", "SHOW UNREAD - " + SharedManager.getIntProperty("totalUnreadCount"));
+  }
 
 
 
@@ -139,6 +203,14 @@ public class Util {
     public static String getTime(long time) {
         Date date = new Date(time*1000L); // *1000 is to convert seconds to milliseconds
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm"); // the format of your date
+        //sdf.setTimeZone(TimeZone.getTimeZone("GMT-2"));
+
+        return sdf.format(date);
+    }
+
+    public static String getTimeForLog(long time) {
+        Date date = new Date(time); // *1000 is to convert seconds to milliseconds
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM hh:mm"); // the format of your date
         //sdf.setTimeZone(TimeZone.getTimeZone("GMT-2"));
 
         return sdf.format(date);

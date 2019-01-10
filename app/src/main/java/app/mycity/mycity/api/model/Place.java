@@ -14,15 +14,12 @@ public class Place implements Serializable {
     @SerializedName("photo_id")
     @Expose
     private Integer photoId;
-    @SerializedName("photo_50")
-    @Expose
-    private String photo50;
-    @SerializedName("photo_70")
-    @Expose
-    private String photo70;
     @SerializedName("photo_130")
     @Expose
     private String photo130;
+    @SerializedName("photo_360")
+    @Expose
+    private String photo360;
     @SerializedName("photo_780")
     @Expose
     private String photo780;
@@ -47,15 +44,9 @@ public class Place implements Serializable {
     @SerializedName("cover_id")
     @Expose
     private Integer coverId;
-    @SerializedName("cover_50")
+    @SerializedName("cover_1250")
     @Expose
-    private String cover50;
-    @SerializedName("cover_70")
-    @Expose
-    private String cover70;
-    @SerializedName("cover_780")
-    @Expose
-    private String cover780;
+    private String cover1250;
     @SerializedName("cover_orig")
     @Expose
     private String coverOrig;
@@ -85,10 +76,7 @@ public class Place implements Serializable {
     private String instagram;
     @SerializedName("count_members")
     @Expose
-    private Integer countMembers;
-    @SerializedName("rate")
-    @Expose
-    private Integer rate;
+    private int countMembers;
     @SerializedName("count_rate")
     @Expose
     private Integer countRate;
@@ -124,6 +112,26 @@ public class Place implements Serializable {
     @Expose
     private Integer countMembersInPlace;
 
+    @SerializedName("rate")
+    @Expose
+    private Rate rate;
+
+    public String getPhoto360() {
+        return photo360;
+    }
+
+    public void setPhoto360(String photo360) {
+        this.photo360 = photo360;
+    }
+
+    public Rate getRate() {
+        return rate;
+    }
+
+    public void setRate(Rate rate) {
+        this.rate = rate;
+    }
+
     public Integer getCountMembersInPlace() {
         return countMembersInPlace;
     }
@@ -146,22 +154,6 @@ public class Place implements Serializable {
 
     public void setPhotoId(Integer photoId) {
         this.photoId = photoId;
-    }
-
-    public String getPhoto50() {
-        return photo50;
-    }
-
-    public void setPhoto50(String photo50) {
-        this.photo50 = photo50;
-    }
-
-    public String getPhoto70() {
-        return photo70;
-    }
-
-    public void setPhoto70(String photo70) {
-        this.photo70 = photo70;
     }
 
     public String getPhoto130() {
@@ -236,28 +228,12 @@ public class Place implements Serializable {
         this.coverId = coverId;
     }
 
-    public String getCover50() {
-        return cover50;
-    }
-
-    public void setCover50(String cover50) {
-        this.cover50 = cover50;
-    }
-
-    public String getCover70() {
-        return cover70;
-    }
-
-    public void setCover70(String cover70) {
-        this.cover70 = cover70;
-    }
-
-    public String getCover780() {
-        return cover780;
+    public String getCover1250() {
+        return cover1250;
     }
 
     public void setCover780(String cover780) {
-        this.cover780 = cover780;
+        this.cover1250 = cover780;
     }
 
     public String getCoverOrig() {
@@ -332,20 +308,12 @@ public class Place implements Serializable {
         this.instagram = instagram;
     }
 
-    public Integer getCountMembers() {
+    public int getCountMembers() {
         return countMembers;
     }
 
-    public void setCountMembers(Integer countMembers) {
+    public void setCountMembers(int countMembers) {
         this.countMembers = countMembers;
-    }
-
-    public Integer getRate() {
-        return rate;
-    }
-
-    public void setRate(Integer rate) {
-        this.rate = rate;
     }
 
     public Integer getCountRate() {

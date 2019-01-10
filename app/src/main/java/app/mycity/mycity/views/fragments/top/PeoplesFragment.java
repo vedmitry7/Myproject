@@ -54,8 +54,8 @@ public class PeoplesFragment extends Fragment implements TabStacker.TabStackInte
         super.onViewCreated(view, savedInstanceState);
 
 
-        Util.indicateTabImageView(getContext(), view, 2);
-        Util.setOnTabClick(view);
+        Util.setNawBarClickListener(view);
+        Util.setNawBarIconColor(getContext(), view, -1);
 
         title.setText("Люди");
 
