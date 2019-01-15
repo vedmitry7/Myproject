@@ -70,11 +70,7 @@ import app.mycity.mycity.views.fragments.events.EventContentFragment;
 import app.mycity.mycity.views.fragments.events.EventsFragment;
 import app.mycity.mycity.views.fragments.feed.ChronicsFragment;
 import app.mycity.mycity.views.fragments.feed.FeedFragment;
-import app.mycity.mycity.views.fragments.feed.FeedPhotoReportFragmentContent;
-import app.mycity.mycity.views.fragments.feed.FeedPhotoReportFragmentContent2;
 import app.mycity.mycity.views.fragments.feed.FeedPhotoReportFragmentContentNew;
-import app.mycity.mycity.views.fragments.feed.FeedPlacesCheckinFragment;
-import app.mycity.mycity.views.fragments.feed.FeedPlacesCheckinFragmentNew;
 import app.mycity.mycity.views.fragments.feed.FeedPlacesCheckinFragmentNew2;
 import app.mycity.mycity.views.fragments.feed.PhotoReportFragment;
 import app.mycity.mycity.views.fragments.places.PlaceFragment;
@@ -110,6 +106,13 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
         Tab(int buttonResId) {
             mButtonResId = buttonResId;
         }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        Log.i("TAG25", "new Intent - ");
+        Log.i("TAG25", "new Intent - " + intent.getAction());
+        super.onNewIntent(intent);
     }
 
     private enum CurrentFragment {
@@ -169,6 +172,21 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
             intent.setComponent(new ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity"));
             startActivity(intent);
         }*/
+
+
+        if(getIntent()!=null){
+            String event = getIntent().getStringExtra("data");
+            Log.i("TAG25", "INTENT " + event );
+            if(event!=null)
+            switch (event){
+                case "follow":
+                    openNotifications(new EventBusMessages.OpenNotifications());
+                    break;
+            }
+        }
+        else {
+            Log.i("TAG25", "INTENT null " );
+        }
     }
 
     public void setStatusBarColor() {

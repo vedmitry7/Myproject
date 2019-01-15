@@ -100,15 +100,16 @@
 
 
             <ImageView
-                app:srcCompat="@drawable/ic_user_shape_black_24dp"
                 android:id="@+id/imageViewAccount"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginStart="16dp"
+                android:padding="4dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_user_shape_black_24dp" />
 
             <TextView
                 android:textSize="16sp"
@@ -131,12 +132,13 @@
 
 
             <ImageView
-                android:src="@drawable/ic_security"
                 android:id="@+id/imageViewSecurity"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginStart="16dp"
+                android:padding="2dp"
+                android:src="@drawable/ic_security"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -161,13 +163,14 @@
             android:layout_height="@dimen/settingsRowSize">
 
 
-        <ImageView
-                android:src="@drawable/ic_black_list"
+            <ImageView
                 android:id="@+id/imageViewBlackList"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginStart="16dp"
+                android:padding="2dp"
+                app:srcCompat="@drawable/ic_black_list"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -187,13 +190,44 @@
 
         </android.support.constraint.ConstraintLayout>
 
-        <TextView
+
+
+        <android.support.constraint.ConstraintLayout
             android:id="@+id/logoutButton"
-            android:paddingLeft="@dimen/padding16"
-            android:text="Log Out"
-            android:textSize="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/settingsRowSize">
+
+            <ImageView
+                android:id="@+id/imageViewOut"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:padding="2dp"
+                app:srcCompat="@drawable/ic_log_out"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="16dp"
+                android:text="Выйти из аккаунта"
+                android:textSize="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/imageViewOut"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="MissingConstraints" />
+
+        </android.support.constraint.ConstraintLayout>
+
+
 
 
     </LinearLayout>

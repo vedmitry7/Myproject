@@ -53,16 +53,13 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment {
     List<Album> albumsList;
     Map<String, Group> groups = new HashMap<>();
 
-
-    boolean isLoading;
-
-    int totalCount = 0;
-
     Storage storage;
 
-    boolean mayRestore;
+    boolean isLoading;
+    int totalCount = 0;
 
-    int scrollPos;
+    boolean mayRestore;
+    private int firstVisibleItem = 0;
 
     @Nullable
     @Override
@@ -97,6 +94,7 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment {
                 super.onScrolled(recyclerView, dx, dy);
                 int totalItemCount = layoutManager.getItemCount();
                 int lastVisibleItems = layoutManager.findLastVisibleItemPosition();
+                firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
 
                 if (!isLoading) {
                     if ( lastVisibleItems >= totalItemCount -10 ) {
@@ -119,7 +117,7 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment {
         recyclerView.setAdapter(adapter);
         recyclerView.addOnScrollListener(scrollListener);
         Log.d("TAG21", "load feed FROM ON_CREATE");
-        loadFeed(0);
+        loadFeed(totalCount);
     }
 
     @Override
@@ -129,31 +127,34 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment {
         Log.d("TAG24", "storage - " + String.valueOf(storage == null) + totalCount);
 
 
-       albumsList = (List<Album>) storage.getDate(getArguments().get("name")+ "_albumsList");
-       groups = (Map) storage.getDate(getArguments().get("name")+ "_groups");
+       albumsList = (List<Album>) storage.getDate(getArguments().get("name")+ "_albumsList" + getArguments().get("subscriptionOnly"));
+       groups = (Map) storage.getDate(getArguments().get("name")+ "_groups" + getArguments().get("subscriptionOnly"));
 
         if(albumsList==null){
+            Log.d("TAG23", "not restore chronics - " + getArguments().get("subscriptionOnly"));
             albumsList = new ArrayList<>();
             groups = new HashMap<>();
             totalCount = 0;
         } else {
-            //totalCount = (int) storage.getDate_ddMMyyyy(getArguments().get("name")+ "_postListTotalCount");
-            Log.d("TAG24", "Scroll position - " + storage.getDate(getArguments().get("name")+ "_scrollPosition"));
-//            scrollPos = (Integer) storage.getDate(getArguments().get("name")+ "_scrollPosition");
+            Log.d("TAG23", "restore chronics - " + getArguments().get("subscriptionOnly"));
+            Log.d("TAG23", "Scroll position - " + storage.getDate(getArguments().get("name")+ "_scrollPosition" + getArguments().get("subscriptionOnly")));
+
+            firstVisibleItem = (int) storage.getDate(getArguments().get("name")+ "_scrollPosition" + getArguments().get("subscriptionOnly"));
+            totalCount = albumsList.size();
             mayRestore = true;
         }
-
     }
 
     private void loadFeed(int offset) {
         Log.d("TAG24", "loadFeed Albums - offset - " + offset);
         if(mayRestore){
-            Log.d("TAG24", "RESTORE date - ");
+            Log.d("TAG23", "RESTORE date - ");
             mayRestore = false;
             adapter.update(albumsList, groups);
-            recyclerView.scrollToPosition(scrollPos);
+            recyclerView.scrollToPosition(firstVisibleItem);
             placeHolder.setVisibility(View.GONE);
         } else {
+            Log.d("TAG23", "Load date...");
             ApiFactory.getApi().getAllGroupAlbums(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),  0, "1", getArguments().getString("subscriptionOnly"))
                     .enqueue(new Callback<ResponseContainer<ResponseAlbums>>() {
                         @Override
@@ -166,7 +167,7 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment {
                                     placeHolder.setVisibility(View.GONE);
 
                                     if(response.body().getResponse().getCount()==0){
-                                        //  placeHolderNoAlbums.setVisibility(View.VISIBLE);
+                                         holderInfo.setVisibility(View.VISIBLE);
                                     }
 
                                     for (Group g: response.body().getResponse().getGroups()){
@@ -205,9 +206,11 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment {
 
     @Override
     public void onStop() {
-        Log.i("TAG25","chronics save date");
-        storage.setDate(getArguments().get("name") + "_albumsList", albumsList);
-        storage.setDate(getArguments().get("name") + "_groups", groups);
+        Log.i("TAG23","chronics save date subscriptionOnly - " + getArguments().get("subscriptionOnly"));
+
+        storage.setDate(getArguments().get("name") + "_albumsList" + getArguments().get("subscriptionOnly"), albumsList);
+        storage.setDate(getArguments().get("name") + "_groups" + getArguments().get("subscriptionOnly"), groups);
+        storage.setDate(getArguments().get("name") + "_scrollPosition" + getArguments().get("subscriptionOnly"), firstVisibleItem);
         super.onStop();
     }
 }

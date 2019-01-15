@@ -7,8 +7,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -45,6 +43,7 @@ import app.mycity.mycity.api.model.ResponseSocketServer;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.activities.ChatActivity;
+import app.mycity.mycity.views.activities.MainActivity3;
 import io.realm.Realm;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -301,17 +300,24 @@ public class SocketService extends Service {
                     case 5: info = "dialog update "; break;
                     case 6: info = "read dialog   "; break;
                     case 7: info = "общее кол-во непрочит. "; break;
+                    case 21: info = "notification";
                 }
 
-                Log.i("TAG25", info + array.length() + ": " + array.toString());
+                Log.i("TAG25", info + " " + array.length() + " : " + array.toString());
+
+
                 int type = array.getInt(0);
+
+                /*
                 final long userId = array.getLong(2);
                 final long time = array.getLong(1);
+
                 int messageId = -1;
                 if(array.length()>3){
                     messageId = array.getInt(4);
                 }
 
+*/
                 Message message;
                 Message messageToSend;
 
@@ -321,10 +327,15 @@ public class SocketService extends Service {
                         break;
                     case 2:
                         Log.i("TAG25", "execute was read");
+
+                        int messageId = array.getInt(4);
                         EventBus.getDefault().post(new EventBusMessages.MessageWasRead(messageId));
                         break;
                     case 5:
                         //new message
+                        final long userId = array.getLong(2);
+                        final long time = array.getLong(1);
+                        int mId = array.getInt(4);
                         final String text = array.getString(5);
                         final int out = array.getInt(6);
                         incoming = array.getInt(6);
@@ -335,7 +346,7 @@ public class SocketService extends Service {
                         Log.i("TAG25", "execute dialog update out - " + out);
 
                         message = new Message();
-                        message.setId(messageId);
+                        message.setId(mId);
                         message.setUser(userId);
                         message.setTime(time);
                         message.setText(text);
@@ -350,11 +361,11 @@ public class SocketService extends Service {
                                 if(!((App) getApplicationContext()).getCurrentChatUser().equals(String.valueOf(userId))){
                                     Log.i("TAG21", "cur chat user - " + ((App) getApplicationContext()).getCurrentChatUser());
 
-                                    generateNotification(text, String.valueOf(userId));
+                                    generateNotificationNewMessage(text, String.valueOf(userId));
                                 }
                             } else {
                                 Log.i("TAG21", "chat not started");
-                                generateNotification(text, String.valueOf(userId));
+                                generateNotificationNewMessage(text, String.valueOf(userId));
                             }
 
                         }
@@ -370,6 +381,32 @@ public class SocketService extends Service {
                         SharedManager.addIntProperty("totalUnreadCount", array.getInt(2));
                         EventBus.getDefault().postSticky(new EventBusMessages.UnreadCountUpdate());
                         break;
+                    case 21:
+
+                        String event = array.getString(2);
+                        JSONObject obj = array.getJSONObject(3);
+                        String name = obj.getString("first_name") + " " + obj.getString("last_name");
+                        Log.i("TAG25", "NOTIFICATION - " + event + " " + name );
+
+                        switch (event){
+                            case "follow":{
+                                generateNotification("На вас подписались", name);
+                                break;
+                            }
+                            case "like_post":{
+                                generateNotification("Ваш чекин оценили", name);
+                                break;
+                            }
+                            case "like_comment":{
+                                generateNotification("Ваш комментарий оценили", name);
+                                break;
+                            }
+                            case "comment_post":{
+                                generateNotification("Комментарий к чекину", name);
+                                break;
+                            }
+                        }
+                        break;
                 }
             }
 
@@ -379,49 +416,6 @@ public class SocketService extends Service {
             Log.i("TAG25", "JSON GET RESPONSE ERROR");
         }
     }
-
-    public void sendNotification(String text, String userId) {
-
-        if(isNotificationVisible()){
-            Log.i("TAG21", "notification already exist");
-        } else {
-            Log.i("TAG21", "notification not exist");
-        }
-
-        Intent notificationIntent = new Intent(this, ChatActivity.class);
-        notificationIntent.putExtra("user_id", userId);
-
-        PendingIntent contentIntent = PendingIntent.getActivity(this,
-                0, notificationIntent,
-                PendingIntent.FLAG_CANCEL_CURRENT);
-
-        Resources res = this.getResources();
-
-        // до версии Android 8.0 API 26
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-
-        builder.setContentIntent(contentIntent)
-                // обязательные настройки
-                .setSmallIcon(R.mipmap.ic_main)
-                //.setContentTitle(res.getString(R.string.notifytitle)) // Заголовок уведомления
-                .setContentTitle("Сообщение от " + userId)
-                //.setContentText(res.getString(R.string.notifytext))
-                .setContentText(text) // Текст уведомления
-                // необязательные настройки
-                .setLargeIcon(BitmapFactory.decodeResource(res, R.mipmap.ic_main)) // большая
-                // картинка
-                //.setTicker(res.getString(R.string.warning)) // текст в строке состояния
-                //.setTicker("Последнее китайское предупреждение!")
-                .setWhen(System.currentTimeMillis())
-                .setAutoCancel(true); // автоматически закрыть уведомление после нажатия
-
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        // Альтернативный вариант
-        // NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.notify(23, builder.build());
-    }
-
 
     private void unreadCount(String userId){
         int num;
@@ -434,7 +428,45 @@ public class SocketService extends Service {
         SharedManager.addProperty("unread_" + userId, String.valueOf(++num));
     }
 
-    private void generateNotification(String text, String userId) {
+    private void generateNotification(String text, String userName) {
+
+
+        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.mipmap.ic_main)
+                        .setContentTitle(text)
+                        .setContentText(userName);
+        //  mBuilder.setSound(alarmSound);
+        mBuilder.setDefaults(Notification.DEFAULT_SOUND);
+        long[] vibrate = { 0, 200, 100, 100, 100, 50};
+        mBuilder.setVibrate(vibrate);
+
+        Intent resultIntent = new Intent(this, MainActivity3.class);
+        resultIntent.putExtra("data", "follow");
+        resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        resultIntent.setFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+
+        //resultIntent.putExtra("user_id", userId);
+
+        mBuilder.setAutoCancel(true);
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        stackBuilder.addParentStack(MainActivity3.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_ONE_SHOT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(25, mBuilder.build());
+
+    }
+
+    private void generateNotificationNewMessage(String text, String userId) {
         mRealm = Realm.getDefaultInstance();
         RealmUser user = mRealm.where(RealmUser.class).equalTo("id", userId).findFirst();
 
@@ -478,29 +510,8 @@ public class SocketService extends Service {
         mBuilder.setContentIntent(resultPendingIntent);
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-// mId allows you to update the notification later on.
         mNotificationManager.notify(Integer.parseInt(userId), mBuilder.build());
 
-
-
-/*       NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-// Sets an ID for the notification, so it can be updated
-        int notifyID = 1;
-        NotificationCompat.Builder mNotifyBuilder = new NotificationCompat.Builder(this)
-                .setContentTitle("New Message")
-                .setContentText("You've received new messages.")
-                .setSmallIcon(R.drawable.ic_check);
-       int numMessages = 5;
-// Start of a loop that processes data and then notifies the user
-
-        mNotifyBuilder.setContentText(text)
-                .setNumber(++numMessages);
-        // Because the ID remains unchanged, the existing notification is
-        // updated.
-        mNotificationManager.notify(
-                notifyID,
-                mNotifyBuilder.build());*/
     }
 
     private boolean isNotificationVisible() {

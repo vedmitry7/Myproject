@@ -172,12 +172,15 @@ public class ChronicsFragment extends Fragment implements TabStacker.TabStackInt
 
         Log.i("TAG25","chronics onTabFragmentDismissed");
         if(dismissReason== TabStacker.DismissReason.BACK){
-            Log.i("TAG25","chronics onTabFragmentDismissed BACK");
+            Log.i("TAG23","chronics onTabFragmentDismissed BACK");
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    storage.remove(getArguments().get("name") + "_albumsList");
-                    storage.remove(getArguments().get("name") + "_groups");
+                    storage.remove(getArguments().get("name") + "_albumsList0");
+                    storage.remove(getArguments().get("name") + "_groups0");
+
+                    storage.remove(getArguments().get("name") + "_albumsList1");
+                    storage.remove(getArguments().get("name") + "_groups1");
                 }
             }, 300);
 

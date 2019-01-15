@@ -111,8 +111,8 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
     @BindView(R.id.profileFragSubscriptionTv)
     TextView subscriptionsCount;
 
-    @BindView(R.id.checkinCount)
-    TextView checkinCount;
+ /*   @BindView(R.id.checkinCount)
+    TextView checkinCount;*/
 
     @BindView(R.id.profileFragCurrentPointContainer)
     RelativeLayout currentPoint;
@@ -413,7 +413,7 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
 
                     postList.addAll(response.body().getResponse().getItems());
 
-                    checkinCount.setText(String.valueOf(response.body().getResponse().getCount()));
+            //        checkinCount.setText(String.valueOf(response.body().getResponse().getCount()));
 
 
            /*     for (Post p:response.body().getResponse().getItems()

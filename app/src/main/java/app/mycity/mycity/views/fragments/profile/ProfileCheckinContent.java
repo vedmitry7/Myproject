@@ -161,15 +161,6 @@ public class ProfileCheckinContent extends android.support.v4.app.Fragment imple
         adapter = new FeedPlacesCheckinRecyclerAdapter(postList);
         recyclerView.setAdapter(adapter);
 
-
-      /*  for (int i = 0; i < postList.size(); i++) {
-            if(postList.get(i).getId()==getArguments().getString("postId")){
-                setLiked(postList.get(i).getLikes().getUserLikes()==1);
-                likesCount.setText(String.valueOf(postList.get(i).getLikes().getCount()));
-                currentPostIdPosition = i;
-            }
-        }*/
-
         CheckinSliderAdapter checkinSliderAdapter = new CheckinSliderAdapter(getContext(), postList);
         viewPager.setAdapter(checkinSliderAdapter);
 
@@ -181,6 +172,7 @@ public class ProfileCheckinContent extends android.support.v4.app.Fragment imple
             @Override
             public void onPageSelected(int position) {
                 setNumeration(position);
+                openPlace(new EventBusMessages.ShowImage(position));
             }
 
             @Override
@@ -242,9 +234,14 @@ public class ProfileCheckinContent extends android.support.v4.app.Fragment imple
         Log.d("TAG23", "groups size - " + groups.size());
 
         if(groups.containsKey(postList.get(currentPostIdPosition).getPlaceId())){
+            Log.i("TAG21", "cont key " + postList.get(currentPostIdPosition).getPlaceId());
             name.setText(groups.get(postList.get(currentPostIdPosition).getPlaceId()).getName());
             Picasso.get().load(groups.get(postList.get(currentPostIdPosition).getPlaceId()).getPhoto130()).into(photo);
+        } else {
+            Log.i("TAG21", "not cont key " + postList.get(currentPostIdPosition).getPlaceId());
         }
+        likesCount.setText(String.valueOf(postList.get(currentPostIdPosition).getLikes().getCount()));
+        setLiked(postList.get(currentPostIdPosition).getLikes().getCount()==1);
 
         time.setText(Util.getDatePretty(postList.get(currentPostIdPosition).getDate()));
 
@@ -359,6 +356,8 @@ public class ProfileCheckinContent extends android.support.v4.app.Fragment imple
         postList = (List<Post>) storage.getDate(getArguments().get("storageKey")+ "checkins");
         totalCount = postList.size();
         groups = (HashMap<String, Group>) storage.getDate(getArguments().getString("storageKey") + "groups");
+        Log.i("TAG21", "postList size - " + postList.size());
+        Log.i("TAG21", "groups size - " + groups.size());
         profile = (Profile) storage.getDate(getArguments().getString("storageKey") + "profile");
 
     }

@@ -331,9 +331,6 @@
                     android:background="@drawable/toolbar_up_shadow"
                     app:layout_constraintBottom_toTopOf="@+id/linearLayout" />
 
-                <include layout="@layout/profile_checkin_bar"/>
-
-
             </LinearLayout>
 
             <android.support.v7.widget.RecyclerView
@@ -364,11 +361,10 @@
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/profilePlaceHolder"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
         android:background="@android:color/white"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/navigationButtonsContainer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

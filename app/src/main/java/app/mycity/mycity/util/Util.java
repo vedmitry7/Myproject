@@ -113,7 +113,7 @@ public class Util {
 
   public static void setUnreadCount(View view){
       TextView textView = view.findViewById(R.id.totalUnreadCount);
-      if(SharedManager.getIntProperty("totalUnreadCount")!=0){
+      if(SharedManager.getIntProperty("totalUnreadCount")>0){
           textView.setText(" " + SharedManager.getIntProperty("totalUnreadCount"));
           textView.setVisibility(View.VISIBLE);
       } else {

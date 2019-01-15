@@ -141,7 +141,6 @@ public class MenuFragment extends Fragment implements TabStacker.TabStackInterfa
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        EventBus.getDefault().register(this);
     }
 
     @Override
@@ -153,6 +152,12 @@ public class MenuFragment extends Fragment implements TabStacker.TabStackInterfa
     @Override
     public void onResume() {
         super.onResume();
+    }
+
+    @Override
+    public void onStart() {
+        EventBus.getDefault().register(this);
+        super.onStart();
     }
 
     @Override

@@ -32,7 +32,7 @@
         android:layout_marginRight="16dp"
         android:layout_marginStart="16dp"
         android:background="@android:color/white"
-        android:visibility="invisible"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -41,11 +41,10 @@
             android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="50dp"
+            android:paddingTop="100dp"
             android:text="Нет альбомов для показа"
             android:textSize="16sp" />
 
     </RelativeLayout>
-
 
 </android.support.constraint.ConstraintLayout>

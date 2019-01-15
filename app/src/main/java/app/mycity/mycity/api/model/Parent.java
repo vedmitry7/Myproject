@@ -9,22 +9,22 @@ public class Parent {
 
     @SerializedName("id")
     @Expose
-    private Integer id;
+    private String id;
     @SerializedName("type")
     @Expose
     private String type;
     @SerializedName("from_id")
     @Expose
-    private Integer fromId;
+    private String fromId;
     @SerializedName("owner_id")
     @Expose
-    private Integer ownerId;
+    private String ownerId;
     @SerializedName("group_id")
     @Expose
-    private Integer groupId;
+    private String groupId;
     @SerializedName("from_group")
     @Expose
-    private Integer fromGroup;
+    private String fromGroup;
     @SerializedName("text")
     @Expose
     private String text;
@@ -44,11 +44,11 @@ public class Parent {
     @Expose
     private List<Photo> attachments = null;
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -60,35 +60,35 @@ public class Parent {
         this.type = type;
     }
 
-    public Integer getFromId() {
+    public String getFromId() {
         return fromId;
     }
 
-    public void setFromId(Integer fromId) {
+    public void setFromId(String fromId) {
         this.fromId = fromId;
     }
 
-    public Integer getOwnerId() {
+    public String getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(Integer ownerId) {
+    public void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
     }
 
-    public Integer getGroupId() {
+    public String getGroupId() {
         return groupId;
     }
 
-    public void setGroupId(Integer groupId) {
+    public void setGroupId(String groupId) {
         this.groupId = groupId;
     }
 
-    public Integer getFromGroup() {
+    public String getFromGroup() {
         return fromGroup;
     }
 
-    public void setFromGroup(Integer fromGroup) {
+    public void setFromGroup(String fromGroup) {
         this.fromGroup = fromGroup;
     }
 

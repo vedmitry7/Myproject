@@ -142,7 +142,7 @@ public class DialogsRecyclerAdapter extends RecyclerView.Adapter<DialogsRecycler
             image.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    EventBus.getDefault().post(new EventBusMessages.OpenUser("1"));
+                    EventBus.getDefault().post(new EventBusMessages.OpenUser(dialogList.get(getAdapterPosition()).getId()));
                 }
             });
 

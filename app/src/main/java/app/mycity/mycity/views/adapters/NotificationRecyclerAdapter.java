@@ -3,11 +3,13 @@ package app.mycity.mycity.views.adapters;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,15 +19,23 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
+import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
+import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.Notification;
 import app.mycity.mycity.api.model.Post;
+import app.mycity.mycity.api.model.ResponseContainer;
+import app.mycity.mycity.api.model.Success;
 import app.mycity.mycity.util.EventBusMessages;
+import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class NotificationRecyclerAdapter extends RecyclerView.Adapter<NotificationRecyclerAdapter.ViewHolder> {
 
@@ -64,7 +74,7 @@ public class NotificationRecyclerAdapter extends RecyclerView.Adapter<Notificati
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
 
         Notification notification = notifications.get(position);
 
@@ -73,6 +83,12 @@ public class NotificationRecyclerAdapter extends RecyclerView.Adapter<Notificati
         Picasso.get().load(notification.getFeedback().getPhoto130()).into(holder.photo);
 
         if(notification.getType().equals("follow")){
+            if(notifications.get(position).getFeedback().getIsSubscription()==1){
+                holder.subscribeButton.setText("Вы подписаны");
+                holder.subscribeButton.setClickable(false);
+            } else {
+                holder.subscribeButton.setText("Подписаться");
+            }
         }
 
         if(notification.getType().equals("like_post")){
@@ -80,11 +96,23 @@ public class NotificationRecyclerAdapter extends RecyclerView.Adapter<Notificati
         }
         if(notification.getType().equals("like_comment")){
             holder.commentText.setText(notification.getParents().get(0).getText());
+            holder.mainContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EventBus.getDefault().post(new EventBusMessages.OpenComments(notifications.get(position).getParents().get(0).getId(), notifications.get(position).getParents().get(0).getOwnerId(), "post"));
+                }
+            });
         }
         if(notification.getType().equals("comment_post")){
             Picasso.get().load(notification.getParents().get(0).getAttachments().get(0).getPhoto360()).into(holder.contentImage);
             holder.commentText.setText(notification.getFeedback().getComment().getText());
             Log.d("TAG21", "Comment post - " + notification.getFeedback().getComment().getText());
+            holder.mainContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EventBus.getDefault().post(new EventBusMessages.OpenComments(notifications.get(position).getParents().get(0).getId(), notifications.get(position).getParents().get(0).getOwnerId(), "post"));
+                }
+            });
         }
     }
 
@@ -111,6 +139,10 @@ public class NotificationRecyclerAdapter extends RecyclerView.Adapter<Notificati
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         @Nullable
+        @BindView(R.id.mainContainer)
+        ConstraintLayout mainContainer;
+
+        @Nullable
         @BindView(R.id.userName)
         TextView name;
         @Nullable
@@ -125,6 +157,9 @@ public class NotificationRecyclerAdapter extends RecyclerView.Adapter<Notificati
         @Nullable
         @BindView(R.id.contentImage)
         ImageView contentImage;
+        @Nullable
+        @BindView(R.id.subscribeButton)
+        Button subscribeButton;
 
         ViewHolder(final View itemView) {
             super(itemView);
@@ -140,6 +175,31 @@ public class NotificationRecyclerAdapter extends RecyclerView.Adapter<Notificati
             photo.setOnClickListener(openUser);
             name.setOnClickListener(openUser);
 
+            if(subscribeButton!=null){
+                subscribeButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ApiFactory.getApi().addSubscription(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), notifications.get(getAdapterPosition()).getFeedback().getId()).enqueue(new Callback<ResponseContainer<Success>>() {
+                            @Override
+                            public void onResponse(Call<ResponseContainer<Success>> call, Response<ResponseContainer<Success>> response) {
+                                Log.d("TAG21", "Add friends RESP");
+
+                                if(response.body()!=null){
+                                    if(response.body().getResponse().getSuccess()==1){
+                                        subscribeButton.setText("Вы подписаны");
+                                        subscribeButton.setClickable(false);
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<ResponseContainer<Success>> call, Throwable t) {
+                                Log.d("TAG21", "Add friends FAIL");
+                            }
+                        });
+                    }
+                });
+            }
         }
     }
 
