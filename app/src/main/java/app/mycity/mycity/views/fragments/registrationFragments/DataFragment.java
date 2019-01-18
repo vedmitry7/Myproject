@@ -1,4 +1,4 @@
-package app.mycity.mycity.fragments.registrationFragments;
+package app.mycity.mycity.views.fragments.registrationFragments;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -6,24 +6,40 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
+import app.mycity.mycity.api.ApiFactory;
+import app.mycity.mycity.api.model.City;
+import app.mycity.mycity.api.model.Country;
+import app.mycity.mycity.api.model.ResponseCities;
+import app.mycity.mycity.api.model.ResponseContainer;
+import app.mycity.mycity.api.model.ResponseCountries;
 import app.mycity.mycity.views.activities.RegisterActivityDataStore;
 import app.mycity.mycity.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DataFragment extends Fragment {
 
@@ -41,20 +57,32 @@ public class DataFragment extends Fragment {
     @BindView(R.id.dataFragSexRadioGroup)
     RadioGroup radioGroup;
 
+    @BindView(R.id.spinnerCountry)
+    Spinner spinnerCountry;
+
+
+    @BindView(R.id.spinnerCity)
+    Spinner spinnerCity;
+
     private String sex = "2";
+
+    Context context;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_date, container, false);
+        View view = inflater.inflate(R.layout.fragment_data, container, false);
 
         ButterKnife.bind(this, view);
         return view;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        loadCountries();
 
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -70,6 +98,84 @@ public class DataFragment extends Fragment {
             }
         });
 
+       context = getContext();
+
+    }
+
+    private void loadCountries() {
+
+        ApiFactory.getApi().getCountries().enqueue(new Callback<ResponseContainer<ResponseCountries>>() {
+            @Override
+            public void onResponse(Call<ResponseContainer<ResponseCountries>> call, Response<ResponseContainer<ResponseCountries>> response) {
+                ArrayList<String> data = new ArrayList<>();
+                data.add("Выберите страну");
+
+
+                final List<Country> list = response.body().getResponse().getItems();
+                for (int i = 0; i < response.body().getResponse().getItems().size(); i++) {
+                    data.add(list.get(i).getTitle());
+                }
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, data);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerCountry.setAdapter(adapter);
+
+                spinnerCountry.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                        if(position!=0)
+                        loadCities(list.get(position-1).getId());
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                    }
+                });
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseContainer<ResponseCountries>> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void loadCities(String countryId) {
+        ApiFactory.getApi().getCities(countryId).enqueue(new Callback<ResponseContainer<ResponseCities>>() {
+            @Override
+            public void onResponse(Call<ResponseContainer<ResponseCities>> call, Response<ResponseContainer<ResponseCities>> response) {
+                ArrayList<String> data = new ArrayList<>();
+                data.add("Выберите город");
+
+
+                final List<City> list = response.body().getResponse().getItems();
+                for (int i = 0; i < response.body().getResponse().getItems().size(); i++) {
+                    if(i!=0){
+                        data.add(list.get(i-1).getTitle());
+                    }
+                }
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, data);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerCity.setAdapter(adapter);
+
+                spinnerCity.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Call<ResponseContainer<ResponseCities>> call, Throwable t) {
+
+            }
+        });
     }
 
     @Override

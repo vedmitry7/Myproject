@@ -450,6 +450,9 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
                     storage.remove(getArguments().get("name")+ "_profiles");
                     Log.d("TAG21", "!!!!!!!!!!  remove " + getArguments().get("name")+ "_postList");
                     Log.d("TAG21", "!!!!!!!!!!  remove " + getArguments().get("name")+ "_profiles");
+
+                    storage.remove(getArguments().get("name") + "_actionsPostList");
+                    storage.remove(getArguments().get("name") + "_actionsGroups");
                 }
             }, 200);
 

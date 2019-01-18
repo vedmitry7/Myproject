@@ -16,6 +16,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+import com.vanniktech.emoji.EmojiEditText;
+import com.vanniktech.emoji.EmojiManager;
+import com.vanniktech.emoji.EmojiPopup;
+import com.vanniktech.emoji.google.GoogleEmojiProvider;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -59,7 +63,7 @@ public class ChatActivity extends AppCompatActivity {
     RecyclerView recyclerView;
 
     @BindView(R.id.chatEditText)
-    EditText editText;
+    EmojiEditText editText;
 
     @BindView(R.id.chatProfileImage)
     CircleImageView imageView;
@@ -79,6 +83,9 @@ public class ChatActivity extends AppCompatActivity {
     @BindView(R.id.placesProgressBar)
     ConstraintLayout progressBar;
 
+    @BindView(R.id.chatRootView)
+    ConstraintLayout chatRootView;
+
     final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 
     ChatRecyclerAdapter adapter;
@@ -89,16 +96,35 @@ public class ChatActivity extends AppCompatActivity {
 
     long lastMyMessageId;
 
+    EmojiPopup emojiPopup;
+
 
     List<Message> results = new ArrayList<>();
     String userId;
     public static String imageUrl = "";
     private boolean isLoading;
+
+    @OnClick(R.id.change)
+    public void change(View v){
+        if(emojiPopup.isShowing()){
+            emojiPopup.dismiss();
+        } else {
+            emojiPopup.toggle();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         ButterKnife.bind(this);
+
+
+        emojiPopup = EmojiPopup.Builder.fromRootView(chatRootView).build(editText);
+       // emojiPopup.toggle(); // Toggles visibility of the Popup.
+     /*   emojiPopup.dismiss(); // Dismisses the Popup.
+        emojiPopup.isShowing();*/
+
         Log.i("TAG25", "CHAT onCREATE" );
 
         mRealm = Realm.getDefaultInstance();

@@ -14,6 +14,12 @@ import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import com.vanniktech.emoji.EmojiManager;
+import com.vanniktech.emoji.google.GoogleEmojiProvider;
+import com.vanniktech.emoji.ios.IosEmojiProvider;
+import com.vanniktech.emoji.one.EmojiOneProvider;
+import com.vanniktech.emoji.twitter.TwitterEmojiProvider;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -36,6 +42,7 @@ public class App extends Application implements Application.ActivityLifecycleCal
         super.onCreate();
         SharedManager.init(this);
         initRealm();
+        EmojiManager.install(new IosEmojiProvider());
 
         registerActivityLifecycleCallbacks(this);
     }

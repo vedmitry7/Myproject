@@ -12,7 +12,9 @@ import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.api.model.RefreshTokenResponse;
 import app.mycity.mycity.api.model.ResponseAddComment;
 import app.mycity.mycity.api.model.ResponseAlbums;
+import app.mycity.mycity.api.model.ResponseCities;
 import app.mycity.mycity.api.model.ResponseComments;
+import app.mycity.mycity.api.model.ResponseCountries;
 import app.mycity.mycity.api.model.ResponseDeleteComment;
 import app.mycity.mycity.api.model.ResponseEventVisitors;
 import app.mycity.mycity.api.model.ResponseEvents;
@@ -608,5 +610,11 @@ public interface ApiInterface {
                                                 @Field("type") String service,
                                                 @Field("rate") int rate);
 
+    @POST("database.getCountries")
+    Call<ResponseContainer<ResponseCountries>> getCountries();
+
+    @FormUrlEncoded
+    @POST("database.getCities")
+    Call<ResponseContainer<ResponseCities>> getCities(@Field("country_id") String countryId);
 
 }

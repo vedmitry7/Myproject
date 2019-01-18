@@ -21,8 +21,8 @@ import java.io.IOException;
 
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.OkHttpClientFactory;
-import app.mycity.mycity.fragments.registrationFragments.DataFragment;
 import app.mycity.mycity.views.fragments.registrationFragments.ConfirmEmailFragment;
+import app.mycity.mycity.views.fragments.registrationFragments.DataFragment;
 import app.mycity.mycity.views.fragments.registrationFragments.EmailFragment;
 import app.mycity.mycity.views.fragments.registrationFragments.PasswordFragment;
 import butterknife.BindView;

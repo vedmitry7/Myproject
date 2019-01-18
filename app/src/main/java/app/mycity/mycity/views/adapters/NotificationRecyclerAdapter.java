@@ -76,7 +76,7 @@ public class NotificationRecyclerAdapter extends RecyclerView.Adapter<Notificati
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
 
-        Notification notification = notifications.get(position);
+        final Notification notification = notifications.get(position);
 
         holder.time.setText(Util.getDatePretty(notification.getDate()));
         holder.name.setText(notification.getFeedback().getFirstName() + " " + notification.getFeedback().getLastName());
@@ -99,17 +99,23 @@ public class NotificationRecyclerAdapter extends RecyclerView.Adapter<Notificati
             holder.mainContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    EventBus.getDefault().post(new EventBusMessages.OpenComments(notifications.get(position).getParents().get(0).getId(), notifications.get(position).getParents().get(0).getOwnerId(), "post"));
+                    if(notifications.get(position).getParents().get(0).getPost()!=null){
+                        EventBus.getDefault().post(new EventBusMessages.OpenComments(notifications.get(position).getParents().get(0).getPost().getId(), notifications.get(position).getParents().get(0).getOwnerId(), "post"));
+                    }
+                    if(notifications.get(position).getParents().get(0).getEvent()!=null){
+                        EventBus.getDefault().post(new EventBusMessages.OpenComments(notifications.get(position).getParents().get(0).getEvent().getId(), notifications.get(position).getParents().get(0).getOwnerId(), "event"));
+                    }
                 }
             });
         }
         if(notification.getType().equals("comment_post")){
+
             Picasso.get().load(notification.getParents().get(0).getAttachments().get(0).getPhoto360()).into(holder.contentImage);
             holder.commentText.setText(notification.getFeedback().getComment().getText());
-            Log.d("TAG21", "Comment post - " + notification.getFeedback().getComment().getText());
             holder.mainContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Log.i("TAG24", "comment_post postId " + notifications.get(position).getParents().get(0).getId() + " ownerId " + notifications.get(position).getParents().get(0).getOwnerId());
                     EventBus.getDefault().post(new EventBusMessages.OpenComments(notifications.get(position).getParents().get(0).getId(), notifications.get(position).getParents().get(0).getOwnerId(), "post"));
                 }
             });

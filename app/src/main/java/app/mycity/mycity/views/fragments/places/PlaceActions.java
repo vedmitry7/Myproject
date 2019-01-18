@@ -58,6 +58,9 @@ public class PlaceActions extends android.support.v4.app.Fragment{
 
     boolean mayRestore;
 
+    LinearLayoutManager layoutManager;
+    private int position;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -81,7 +84,7 @@ public class PlaceActions extends android.support.v4.app.Fragment{
 
         adapter = new AllActionRecyclerAdapter(postList, groups);
 
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager = new LinearLayoutManager(getActivity());
 
         RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
             @Override
@@ -270,8 +273,8 @@ public class PlaceActions extends android.support.v4.app.Fragment{
 
         storage = (Storage) context;
 
-        postList = (List<Post>) storage.getDate(getArguments().get("name")+ "_eventsPostList");
-        groups = (HashMap<String, Group>) storage.getDate(getArguments().get("name")+ "_eventsGroups");
+        postList = (List<Post>) storage.getDate(getArguments().get("name")+ "_actionsPostList");
+        groups = (HashMap<String, Group>) storage.getDate(getArguments().get("name")+ "_actionsGroups");
 
 
         if(postList==null){
@@ -281,6 +284,7 @@ public class PlaceActions extends android.support.v4.app.Fragment{
         } else {
             Log.d("TAG21", "restore ok - " + postList.size());
             mayRestore = true;
+            position = (int) storage.getDate(getArguments().get("name") + "_eventsScrollPosition");
         }
 
     }
@@ -294,9 +298,10 @@ public class PlaceActions extends android.support.v4.app.Fragment{
     @Override
     public void onStop() {
         EventBus.getDefault().unregister(this);
-        Log.d("TAG21", "Stop EVENTS FRAGMENT Save " + getArguments().getString("name"));
-      //  storage.setDate(getArguments().get("name") + "_eventsPostList", postList);
-      //  storage.setDate(getArguments().get("name") + "_eventsGroups", groups);
+        Log.d("TAG21", "Stop Actions FRAGMENT Save " + getArguments().getString("name"));
+        storage.setDate(getArguments().get("name") + "_actionsPostList", postList);
+        storage.setDate(getArguments().get("name") + "_actionsGroups", groups);
+        storage.setDate(getArguments().get("name") + "_actionsScrollPosition", layoutManager.findFirstVisibleItemPosition());
 
         super.onStop();
     }

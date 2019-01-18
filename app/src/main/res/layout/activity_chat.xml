@@ -2,11 +2,11 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/chatRootView"
     android:layout_width="match_parent"
-    android:background="@android:color/white"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     tools:context=".views.activities.ChatActivity">
-
 
 
     <android.support.constraint.ConstraintLayout
@@ -99,8 +99,8 @@
         android:id="@+id/up_shadow"
         android:layout_width="match_parent"
         android:layout_height="3dp"
-        android:visibility="gone"
         android:background="@drawable/toolbar_up_shadow"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/sendMessageContainer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -126,23 +126,24 @@
         android:layout_height="48dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteY="519dp">
 
 
-        <EditText
-            android:id="@+id/chatEditText"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
+        <com.vanniktech.emoji.EmojiEditText
             android:background="@android:color/white"
-            android:hint="Сообщение"
+            android:id="@+id/chatEditText"
+            android:hint="Сообщение..."
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionSend"
+            android:inputType="textCapSentences|textMultiLine"
+            android:maxLines="3"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/sendMessageButton"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toEndOf="@+id/change"
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <ImageButton
             android:id="@+id/sendMessageButton"
@@ -156,6 +157,18 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/change"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:padding="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_keyboard_outline" />
 
     </android.support.constraint.ConstraintLayout>
 
@@ -212,9 +225,9 @@
         android:layout_marginTop="8dp"
         android:maxWidth="200dp"
         android:visibility="visible"
-        app:cardElevation="0dp"
         app:cardBackgroundColor="#3f000000"
         app:cardCornerRadius="15dp"
+        app:cardElevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/top_shadow"
@@ -226,13 +239,13 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:minWidth="40dp"
-            android:textSize="13dp"
             android:paddingBottom="5dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:paddingTop="5dp"
             android:text="30.12.2018"
-            android:textColor="@android:color/black" />
+            android:textColor="@android:color/black"
+            android:textSize="13dp" />
 
     </android.support.v7.widget.CardView>
 
@@ -259,5 +272,7 @@
 
 
     </android.support.constraint.ConstraintLayout>
+
+
 
 </android.support.constraint.ConstraintLayout>

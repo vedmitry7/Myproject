@@ -44,6 +44,30 @@ public class Parent {
     @Expose
     private List<Photo> attachments = null;
 
+    @SerializedName("post")
+    @Expose
+    private Post post;
+
+    @SerializedName("event")
+    @Expose
+    private Post event;
+
+    public Post getEvent() {
+        return event;
+    }
+
+    public void setEvent(Post event) {
+        this.event = event;
+    }
+
+    public Post getPost() {
+        return post;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
+    }
+
     public String getId() {
         return id;
     }

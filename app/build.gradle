@@ -4,6 +4,7 @@ apply plugin: 'realm-android'
 android {
     compileSdkVersion 26
     defaultConfig {
+        multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
         applicationId "app.mycity.mycity"
         minSdkVersion 16
@@ -97,4 +98,15 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-maps:15.0.1'
     implementation 'com.google.android.gms:play-services-location:15.0.1'
+
+
+
+    implementation 'com.vanniktech:emoji-google:0.5.1'
+    implementation 'com.vanniktech:emoji-ios:0.5.1'
+    implementation 'com.vanniktech:emoji-one:0.5.1'
+    implementation 'com.vanniktech:emoji-twitter:0.5.1'
+
+
+    implementation 'com.android.support:multidex:1.0.3'
+
 }
