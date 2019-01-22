@@ -15,7 +15,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,10 +22,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
@@ -49,36 +46,31 @@ import java.util.Map;
 
 import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
-import app.mycity.mycity.api.ApiRetrofitFactory;
-import app.mycity.mycity.api.model.Group;
-import app.mycity.mycity.api.model.Profile;
-import app.mycity.mycity.api.model.ResponseLike;
 import app.mycity.mycity.R;
+import app.mycity.mycity.api.ApiFactory;
+import app.mycity.mycity.api.model.Group;
 import app.mycity.mycity.api.model.Post;
+import app.mycity.mycity.api.model.Profile;
+import app.mycity.mycity.api.model.ResponseContainer;
+import app.mycity.mycity.api.model.ResponseLike;
+import app.mycity.mycity.api.model.ResponseSavePhoto;
+import app.mycity.mycity.api.model.ResponseUploadServer;
+import app.mycity.mycity.api.model.ResponseUploading;
 import app.mycity.mycity.api.model.ResponseWall;
+import app.mycity.mycity.api.model.UsersContainer;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.activities.FullViewActivity;
-import app.mycity.mycity.views.activities.Storage;
-import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
-import app.mycity.mycity.api.ApiFactory;
-import app.mycity.mycity.api.model.ResponseContainer;
-import app.mycity.mycity.api.model.ResponseSavePhoto;
-import app.mycity.mycity.api.model.ResponseUploadServer;
-import app.mycity.mycity.api.model.ResponseUploading;
-import app.mycity.mycity.api.model.User;
-import app.mycity.mycity.api.model.UsersContainer;
 import app.mycity.mycity.views.activities.MainAct;
+import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.adapters.CheckinRecyclerAdapter;
+import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import fr.arnaudguyon.tabstacker.TabStacker;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableObserver;
-import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -143,8 +135,8 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
 
     boolean friendLoad, checkinLoad, infoLoad;
 
-   Storage storage;
-   boolean mayRestore;
+    Storage storage;
+    boolean mayRestore;
 
     Map groups;
 
@@ -324,7 +316,7 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
 
 
     private void getInfoViaRetrofit(){
-      //  getObservable().subscribeWith(getObserver());
+        //  getObservable().subscribeWith(getObserver());
     }
 
 
@@ -413,7 +405,7 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
 
                     postList.addAll(response.body().getResponse().getItems());
 
-            //        checkinCount.setText(String.valueOf(response.body().getResponse().getCount()));
+                    //        checkinCount.setText(String.valueOf(response.body().getResponse().getCount()));
 
 
            /*     for (Post p:response.body().getResponse().getItems()
@@ -422,11 +414,14 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
                     likeList.add(p.getLikes());
                 }*/
 
-                    for (Group g:response.body().getResponse().getGroups()
-                         ) {
-                        Log.i("TAG21", "                    . GROUP - " + g.getName());
-                        groups.put(g.getId(), g);
+                    if(response.body().getResponse().getGroups()!=null){
+                        for (Group g:response.body().getResponse().getGroups()
+                                ) {
+                            Log.i("TAG21", "                    . GROUP - " + g.getName());
+                            groups.put(g.getId(), g);
+                        }
                     }
+
                     adapter.notifyDataSetChanged();
                     checkinLoad = true;
                     showContent();

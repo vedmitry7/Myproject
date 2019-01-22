@@ -28,6 +28,7 @@
             android:value="AIzaSyDTmQkqAhO24D91VpWffWOJF8p-y3d4dbM" />
 
         <activity
+            android:windowSoftInputMode="adjustPan"
             android:name=".views.activities.RegistrationActivity"
             android:screenOrientation="portrait" />
         <activity
@@ -52,7 +53,6 @@
 
         <activity
             android:name=".views.activities.ChatActivity"
-
             android:windowSoftInputMode="stateUnspecified" />
 
         <activity android:name=".views.activities.LoadImageActivity" />

@@ -82,8 +82,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements Registe
     }
 
     @Override
-    public void setInfo(String firstName, String secondName, String birthday, String sex) {
-
+    public void setInfo(String firstName, String secondName, String birthday, String sex, String cityId, String countryId) {
     }
 
     @Override

@@ -11,28 +11,43 @@
 
 
 
-    <EditText
-        android:id="@+id/emailFragEmailEt"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/reg_item_height"
-        android:layout_marginTop="24dp"
-        android:background="@android:color/white"
-        android:hint="Email"
-        android:inputType="textEmailAddress"
-        android:paddingLeft="@dimen/padding16"
-        android:paddingRight="@dimen/padding16"
+    <android.support.design.widget.TextInputLayout
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView"
-        tools:ignore="MissingConstraints" />
+        android:id="@+id/containerEmailFragEmailEt"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        app:errorEnabled="true"
+        app:hintTextAppearance="@style/TextInputLayoutHintText"
+        tools:ignore="MissingConstraints">
+
+        <EditText
+            android:id="@+id/emailFragEmailEt"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/reg_item_height"
+            android:layout_marginTop="24dp"
+            android:background="@android:color/white"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
+            android:paddingLeft="@dimen/padding16"
+            android:paddingRight="@dimen/padding16"
+            tools:ignore="MissingConstraints" />
+
+    </android.support.design.widget.TextInputLayout>
+
+
+
+
 
     <View
         android:id="@+id/view"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@android:color/black"
-        app:layout_constraintTop_toBottomOf="@+id/emailFragEmailEt" />
+        app:layout_constraintTop_toBottomOf="@+id/containerEmailFragEmailEt" />
 
     <TextView
         android:textColor="@android:color/black"

@@ -11,8 +11,10 @@ import android.view.ViewGroup;
 
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
+import app.mycity.mycity.SocketService;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.activities.LoginActivity;
+import app.mycity.mycity.views.activities.MainActivity3;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import fr.arnaudguyon.tabstacker.TabStacker;
@@ -30,6 +32,8 @@ public class MainSettingsFragment extends Fragment implements TabStacker.TabStac
 
     @OnClick(R.id.logoutButton)
     public void logout(View v){
+        SharedManager.addBooleanProperty("login", false);
+        getActivity().stopService(new Intent(getContext(), SocketService.class));
         SharedManager.addProperty(Constants.KEY_ACCESS_TOKEN, "null");
         getActivity().finish();
         Intent intent = new Intent(getActivity(), LoginActivity.class);

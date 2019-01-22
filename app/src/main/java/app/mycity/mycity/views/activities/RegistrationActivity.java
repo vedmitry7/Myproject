@@ -10,6 +10,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -19,6 +20,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
+import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.OkHttpClientFactory;
 import app.mycity.mycity.views.fragments.registrationFragments.ConfirmEmailFragment;
@@ -43,11 +45,13 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
     private String sex, code;
     private String password, confirm;
 
+    private String cityId;
+
     private FragmentManager fragmentManager;
     private EmailFragment emailFragment;
     private ConfirmEmailFragment confirmEmailFragment;
     private PasswordFragment passwordFragment;
-
+    private String countryId;
 
 
     @Override
@@ -85,11 +89,13 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
     }
 
     @Override
-    public void setInfo(String firstName, String secondName, String birthday, String sex) {
+    public void setInfo(String firstName, String secondName, String birthday, String sex, String cityId, String countryId) {
         this.firstName = firstName;
         this.secondName = secondName;
         this.birthday = birthday;
         this.sex = sex;
+        this.cityId = cityId;
+        this.countryId = countryId;
     }
 
     @Override
@@ -128,7 +134,7 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
                 .add("email", email)
                 .build();
 
-        Request request = new Request.Builder().url("http://192.168.0.104/api/auth.emailExists")
+        Request request = new Request.Builder().url(Constants.URL_BASE + "auth.emailExists")
                 .post(body)
                 .build();
 
@@ -191,7 +197,7 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
         RequestBody body = new FormBody.Builder()
                 .add("email", email)
                 .build();
-        Request request = new Request.Builder().url("http://192.168.0.104/api/auth.reconfirm")
+        Request request = new Request.Builder().url(Constants.URL_BASE + "auth.reconfirm")
                 .post(body)
                 .build();
         okhttp3.Response response = null;
@@ -223,9 +229,11 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
                 .add("bdate", birthday)
                 .add("email", email)
                 .add("sex", sex)
+                .add("city_id", cityId)
+                .add("country_id", countryId)
                 .build();
 
-        Request request = new Request.Builder().url("http://192.168.0.104/api/auth.signUp")
+        Request request = new Request.Builder().url(Constants.URL_BASE + "auth.signUp")
                 .post(body)
                 .build();
 
@@ -238,7 +246,7 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
             @Override
             public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
                 String responseString = response.body().string();
-                Log.i("TAG", responseString);
+                Log.i("TAG", "resp string - " + responseString + ".!!!");
                 String responseClear = responseString.substring(1, responseString.length()-1);
                 Log.i("TAG", responseClear);
                 JSONObject jsonObject = null;
@@ -299,7 +307,7 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
                 .add("intro", "0")
                 .build();
 
-        Request request = new Request.Builder().url("http://192.168.0.104/api/auth.confirm")
+        Request request = new Request.Builder().url(Constants.URL_BASE + "auth.confirm")
                 .post(body)
                 .build();
 
@@ -371,6 +379,7 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
         Fragment currentFrag = fragmentManager.findFragmentById(R.id.fragmentContainer);
 
         if(currentFrag instanceof DataFragment){
+            Log.i("TAG", "Data fara");
             this.finish();
         }
 

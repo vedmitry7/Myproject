@@ -94,6 +94,13 @@ public class SocketService extends Service {
     @Override
     public void onCreate() {
         Log.i("Test", "Service: onCreate");
+
+        if(!SharedManager.getBooleanProperty("login")){
+            Log.i("Test", "Service: STOP SELF");
+            stopSelf();
+        }
+
+
         EventBus.getDefault().register(this);
         //  initRealm();
         mRealm = Realm.getDefaultInstance();
@@ -538,11 +545,13 @@ public class SocketService extends Service {
     public void onDestroy() {
 
         EventBus.getDefault().unregister(this);
-/*        Intent intent = new Intent(this, getClass());
-        intent.putExtra("data", "restart");
-        PendingIntent pintent = PendingIntent.getService(this, 0, intent, 0);
-        AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-        alarm.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), + 3000, pintent);*/
+        if(timerTask!=null)
+        timerTask.cancel();
+        if(mSocket!=null){
+            mSocket.off("history");
+            mSocket.disconnect();
+            mSocket.close();
+        }
         super.onDestroy();
         //  Log.i("Test", "Service: restart");
         Log.i("Test", "Service: onDestroy");

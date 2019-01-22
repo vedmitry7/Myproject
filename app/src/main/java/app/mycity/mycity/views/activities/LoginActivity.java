@@ -132,6 +132,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(Call<ResponseContainer<CheckTokenResponse>> call, Response<ResponseContainer<CheckTokenResponse>> response) {
                 if(response.body().getResponse()!=null){
                     if(response.body().getResponse().getSuccess()==1){
+                        SharedManager.addBooleanProperty("login", true);
                         launchApp();
                     }
                 } else {
@@ -250,6 +251,7 @@ public class LoginActivity extends AppCompatActivity {
                     SharedManager.addProperty(Constants.KEY_PASSWORD, finalPasswordText);
 
 
+                   // SharedManager.addBooleanProperty("login", true);
                     launchApp();
 
                 } else {
