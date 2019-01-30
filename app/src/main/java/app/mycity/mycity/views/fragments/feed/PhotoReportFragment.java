@@ -62,11 +62,10 @@ public class PhotoReportFragment extends android.support.v4.app.Fragment impleme
     private boolean mayRestore;
 
 
-    public static PhotoReportFragment createInstance(String name, int tabPos, String albumId, String albumName, Long albumDate) {
+    public static PhotoReportFragment createInstance(String name, String albumId, String albumName, Long albumDate) {
         PhotoReportFragment fragment = new PhotoReportFragment();
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
-        bundle.putInt("tabPos", tabPos);
         bundle.putString("albumId", albumId);
         bundle.putString("albumName", albumName);
         bundle.putLong("albumDate", albumDate);

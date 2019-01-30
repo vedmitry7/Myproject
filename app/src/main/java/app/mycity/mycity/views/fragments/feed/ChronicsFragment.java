@@ -53,12 +53,11 @@ public class ChronicsFragment extends Fragment implements TabStacker.TabStackInt
     }
 
 
-    public static ChronicsFragment createInstance(String name, int tabPos) {
+    public static ChronicsFragment createInstance(String name) {
         ChronicsFragment fragment = new ChronicsFragment();
         Log.i("TAG21", "Create FeedFragment " + name);
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
-        bundle.putInt("tabPos", tabPos);
         fragment.setArguments(bundle);
         return fragment;
     }

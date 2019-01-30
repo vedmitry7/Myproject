@@ -46,12 +46,11 @@ public class FeedFragment extends Fragment implements TabStacker.TabStackInterfa
     }
 
 
-    public static FeedFragment createInstance(String name, int tabPos) {
+    public static FeedFragment createInstance(String name) {
         FeedFragment fragment = new FeedFragment();
         Log.i("TAG21", "Create FeedFragment " + name);
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
-        bundle.putInt("tabPos", tabPos);
         fragment.setArguments(bundle);
         return fragment;
     }

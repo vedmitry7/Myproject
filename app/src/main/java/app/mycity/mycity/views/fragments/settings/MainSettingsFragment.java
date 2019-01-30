@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import app.mycity.mycity.Constants;
+import app.mycity.mycity.LocationService;
 import app.mycity.mycity.R;
 import app.mycity.mycity.SocketService;
 import app.mycity.mycity.util.SharedManager;
@@ -34,6 +35,7 @@ public class MainSettingsFragment extends Fragment implements TabStacker.TabStac
     public void logout(View v){
         SharedManager.addBooleanProperty("login", false);
         getActivity().stopService(new Intent(getContext(), SocketService.class));
+        getActivity().stopService(new Intent(getContext(), LocationService.class));
         SharedManager.addProperty(Constants.KEY_ACCESS_TOKEN, "null");
         getActivity().finish();
         Intent intent = new Intent(getActivity(), LoginActivity.class);

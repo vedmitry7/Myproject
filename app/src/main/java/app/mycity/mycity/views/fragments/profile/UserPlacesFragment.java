@@ -59,17 +59,16 @@ public class UserPlacesFragment extends Fragment implements TabStacker.TabStackI
         return view;
     }
 
-    @OnClick(R.id.profileFragBackButtonContainer)
-    public void backButton(View v){
+    @OnClick(R.id.backButton)
+    public void back(View v){
         getActivity().onBackPressed();
     }
 
-    public static UserPlacesFragment createInstance(String name, int tabPos, String userId) {
+    public static UserPlacesFragment createInstance(String name, String userId) {
         UserPlacesFragment fragment = new UserPlacesFragment();
         Log.i("TAG21", "Create FeedFragment " + name);
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
-        bundle.putInt("tabPos", tabPos);
         bundle.putString("id", userId);
         fragment.setArguments(bundle);
         return fragment;

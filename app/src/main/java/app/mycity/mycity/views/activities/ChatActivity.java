@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -86,6 +87,9 @@ public class ChatActivity extends AppCompatActivity {
     @BindView(R.id.chatRootView)
     ConstraintLayout chatRootView;
 
+    @BindView(R.id.change)
+    ImageView changeView;
+
     final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 
     ChatRecyclerAdapter adapter;
@@ -107,8 +111,10 @@ public class ChatActivity extends AppCompatActivity {
     @OnClick(R.id.change)
     public void change(View v){
         if(emojiPopup.isShowing()){
+            changeView.setImageDrawable(getResources().getDrawable(R.drawable.ic_keyboard_outline));
             emojiPopup.dismiss();
         } else {
+            changeView.setImageDrawable(getResources().getDrawable(R.drawable.ic_emoticon_outline));
             emojiPopup.toggle();
         }
     }

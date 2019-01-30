@@ -2,12 +2,12 @@ package app.mycity.mycity.views.activities;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Window;
@@ -40,7 +40,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements Registe
     private String code;
     private String password, confirm;
 
-    private FragmentManager fragmentManager;
+    private android.support.v4.app.FragmentManager fragmentManager;
     private EmailFragment emailFragment;
     private ConfirmEmailFragment confirmEmailFragment;
     private PasswordFragment passwordFragment;
@@ -59,9 +59,9 @@ public class ForgotPasswordActivity extends AppCompatActivity implements Registe
 
         emailFragment = new EmailFragment();
 
-        fragmentManager = getFragmentManager();
+        fragmentManager = getSupportFragmentManager();
 
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.add(R.id.fragmentContainer, emailFragment);
         transaction.addToBackStack(null);
         transaction.commit();
@@ -94,7 +94,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements Registe
     @Override
     public void nextEmailStep() {
         emailFragment = new EmailFragment();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
         transaction.replace(R.id.fragmentContainer, emailFragment);
         transaction.addToBackStack(null);
@@ -106,7 +106,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements Registe
         Log.d("TAG", "confirmEmailCodeStep");
 
         confirmEmailFragment = new ConfirmEmailFragment();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
         transaction.replace(R.id.fragmentContainer, confirmEmailFragment);
         transaction.addToBackStack(null);
@@ -244,7 +244,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements Registe
                         String success = innerResponseObject.getString("exists");
                         if(success.equals("true")){
                             passwordFragment = new PasswordFragment();
-                            FragmentTransaction transaction = fragmentManager.beginTransaction();
+                            android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
                             transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
                             transaction.replace(R.id.fragmentContainer, passwordFragment);
                             transaction.addToBackStack(null);

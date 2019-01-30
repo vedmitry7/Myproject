@@ -69,12 +69,11 @@ public class NotificationsFragment extends Fragment implements TabStacker.TabSta
         return view;
     }
 
-    public static NotificationsFragment createInstance(String name, int tabPos) {
+    public static NotificationsFragment createInstance(String name) {
         NotificationsFragment fragment = new NotificationsFragment();
         Log.i("TAG21", "Create DIALOGS " + name);
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
-        bundle.putInt("tabPos", tabPos);
         fragment.setArguments(bundle);
         return fragment;
     }

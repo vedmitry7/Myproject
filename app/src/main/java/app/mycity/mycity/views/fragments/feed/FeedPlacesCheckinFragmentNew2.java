@@ -344,6 +344,22 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
 
 
         Profile p = profiles.get(postList.get(event.getPosition()).getOwnerId());
+
+            for (String s:profiles.keySet()
+                    ) {
+                Log.d("TAG21", "pr Key - " +  s);
+            }
+            for (Profile profile:profiles.values()
+                    ) {
+                Log.d("TAG21", "pr id - " +  profile.getId());
+            }
+        if(p==null){
+
+            Log.d("TAG21", "post list size" +  postList.size());
+            Log.d("TAG21", "profiles  size" +  profiles.size());
+            Log.d("TAG21", "Profile -  " +  postList.get(event.getPosition()).getOwnerId() + " null");
+        }
+
         Log.d("TAG21", "link 130 - " + p.getPhoto130());
 
         Picasso.get().load(p.getPhoto130()).into(photo);

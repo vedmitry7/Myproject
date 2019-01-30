@@ -137,14 +137,14 @@ public class ProfileCheckinContent extends android.support.v4.app.Fragment imple
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
 
-        View.OnClickListener openUserListener = new View.OnClickListener() {
+        View.OnClickListener openPlaceListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 EventBus.getDefault().post(new EventBusMessages.OpenPlace(currentPlaceId));
             }
         };
-        name.setOnClickListener(openUserListener);
-        photo.setOnClickListener(openUserListener);
+        name.setOnClickListener(openPlaceListener);
+        photo.setOnClickListener(openPlaceListener);
 
         commentButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -231,14 +231,15 @@ public class ProfileCheckinContent extends android.support.v4.app.Fragment imple
          */
         viewPager.setCurrentItem(event.getPosition());
 
-        Log.d("TAG23", "groups size - " + groups.size());
+        Log.d("TAG24", "groups size - " + groups.size());
+        Log.d("TAG24", "post size - " + postList.size());
 
         if(groups.containsKey(postList.get(currentPostIdPosition).getPlaceId())){
-            Log.i("TAG21", "cont key " + postList.get(currentPostIdPosition).getPlaceId());
+            Log.i("TAG24", "cont key " + postList.get(currentPostIdPosition).getPlaceId());
             name.setText(groups.get(postList.get(currentPostIdPosition).getPlaceId()).getName());
             Picasso.get().load(groups.get(postList.get(currentPostIdPosition).getPlaceId()).getPhoto130()).into(photo);
         } else {
-            Log.i("TAG21", "not cont key " + postList.get(currentPostIdPosition).getPlaceId());
+            Log.i("TAG24", "not cont key " + postList.get(currentPostIdPosition).getPlaceId());
         }
         likesCount.setText(String.valueOf(postList.get(currentPostIdPosition).getLikes().getCount()));
         setLiked(postList.get(currentPostIdPosition).getLikes().getCount()==1);
@@ -357,7 +358,7 @@ public class ProfileCheckinContent extends android.support.v4.app.Fragment imple
         totalCount = postList.size();
         groups = (HashMap<String, Group>) storage.getDate(getArguments().getString("storageKey") + "groups");
         Log.i("TAG21", "postList size - " + postList.size());
-        Log.i("TAG21", "groups size - " + groups.size());
+        Log.i("TAG24", "Attach. Groups size - " + groups.size());
         profile = (Profile) storage.getDate(getArguments().getString("storageKey") + "profile");
 
     }
@@ -387,6 +388,8 @@ public class ProfileCheckinContent extends android.support.v4.app.Fragment imple
         }
         if(dismissReason == TabStacker.DismissReason.BACK){
             // delete shit
+
+            storage.remove("");
         }
 
     }

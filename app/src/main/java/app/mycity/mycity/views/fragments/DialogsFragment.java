@@ -75,12 +75,11 @@ public class DialogsFragment extends Fragment implements TabStacker.TabStackInte
         return view;
     }
 
-    public static DialogsFragment createInstance(String name, int tabPos) {
+    public static DialogsFragment createInstance(String name) {
         DialogsFragment fragment = new DialogsFragment();
         Log.i("TAG21", "Create DIALOGS " + name);
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
-        bundle.putInt("tabPos", tabPos);
         fragment.setArguments(bundle);
         return fragment;
     }

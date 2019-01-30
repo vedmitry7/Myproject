@@ -318,7 +318,7 @@
         app:layout_anchorGravity="bottom|end"
         app:layout_constraintBottom_toBottomOf="@+id/profileFragRoundImage"
         app:layout_constraintEnd_toEndOf="@+id/profileFragRoundImage"
-        app:srcCompat="@drawable/ic_settings_vector" />
+        app:srcCompat="@drawable/ic_settings_vector_white" />
 
 <!--    <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabWriteMessage"

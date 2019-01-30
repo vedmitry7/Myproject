@@ -93,12 +93,11 @@ public class CommentsFragment extends android.support.v4.app.Fragment implements
     }
 
 
-    public static CommentsFragment createInstance(String fragmentId, int tabPos, String postId, String ownerId, String type) {
+    public static CommentsFragment createInstance(String fragmentId, String postId, String ownerId, String type) {
         CommentsFragment fragment = new  CommentsFragment();
         Log.i("TAG21", "Create Comment Fragment " + fragmentId);
         Bundle bundle = new Bundle();
         bundle.putString("name", fragmentId);
-        bundle.putInt("tabPos", tabPos);
         bundle.putString("postId", postId);
         bundle.putString("ownerId", ownerId);
         bundle.putString("type", type);

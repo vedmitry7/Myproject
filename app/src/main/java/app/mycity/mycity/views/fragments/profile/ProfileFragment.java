@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.github.nkzawa.socketio.client.Manager;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -157,15 +158,18 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
         //setRetainInstance(true);
     }
 
-    public static ProfileFragment createInstance(String name, int stackPos, int tabPos) {
+    public static ProfileFragment createInstance(String name) {
         ProfileFragment fragment = new ProfileFragment();
-        Log.i("TAG21", "Create Profile " + name + tabPos);
+        Log.i("TAG21", "Create Profile " + name);
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
-        bundle.putInt("tabPos", tabPos);
-        bundle.putInt("stackPos", stackPos);
         fragment.setArguments(bundle);
         return fragment;
+    }
+
+    @OnClick(R.id.backButton)
+    public void back(View v){
+        getActivity().onBackPressed();
     }
 
     @Nullable
@@ -201,9 +205,6 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
         Util.setNawBarIconColor(getContext(), view, 1);
         Util.setUnreadCount(view);
 
-        if(getArguments().getInt("stackPos")==0){
-            toolBar.setVisibility(View.GONE);
-        }
 
         //      imageView.setShadow(App.dpToPx(getActivity(),10));
         spaceDecoration = new ImagesSpacesItemDecoration(3, App.dpToPx(getActivity(), 4), false);
@@ -241,20 +242,25 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
         Log.i("TAG21", "Profile onAttach ");
         activity = (MainAct) context;
         storage = (Storage) context;
+
+        if(storage.getDate(getArguments().get("name") + "_posts")!=null)
+        Log.i("TAG24", "attach PROFILE STORAGE Post size  - " + ((List<Post>)storage.getDate(getArguments().get("name") + "_posts")).size());
+
+
+
         postList = (List<Post>)storage.getDate(getArguments().get("name") + "_posts");
         groups = (Map) storage.getDate(getArguments().get("name")+ "_groups");
 
         if(postList!=null) {
-            Log.i("TAG21", "Post size " + postList.size());
+            Log.i("TAG24", "attach post/  Post size " + postList.size());
             mayRestore = true;
         }
 
         if(groups==null){
             groups = new HashMap();
-        }
-        else{
+        } else{
             Log.i("TAG21", "Post null ");
-            mayRestore = false;
+            mayRestore = true;
         }
 
         String[] mass = (String[]) storage.getDate((String) getArguments().get("name")+"_info");
@@ -275,14 +281,16 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
         storage.setDate(getArguments().getString("name") + "groups", groups);
         storage.setDate(getArguments().getString("name") + "profile", profile);
 
+        if(groups==null){
+            Log.d("TAG24", "Save. groups null");
+        } else {
+            Log.d("TAG24", "Save. groups size - " + groups.size());
+            Log.d("TAG24", "Save. groups size - " + postList.size());
+        }
+
         EventBus.getDefault().post(new EventBusMessages.OpenCheckinProfileContent(postList.get(event.getPosition()).getId(), getArguments().getString("name")));
     }
 
-
-    @OnClick(R.id.profileFragBackButtonContainer)
-    public void back(View v){
-        getActivity().onBackPressed();
-    }
 
 
 /*    public Observable<ResponseContainer<Profile>> getObservable(){
@@ -397,22 +405,13 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
         Log.i("TAG21", "Get Checkins");
 
         if(!mayRestore){
-            Log.i("TAG21", "Cant restore checkins");
+            Log.i("TAG24", "Cant restore checkins");
             ApiFactory.getApi().getWallExtended(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), 0, 50, "1").enqueue(new Callback<ResponseContainer<ResponseWall>>() {
                 @Override
                 public void onResponse(Call<ResponseContainer<ResponseWall>> call, Response<ResponseContainer<ResponseWall>> response) {
                     Log.d("TAG21", "resp = " + response.body().getResponse().getCount());
 
                     postList.addAll(response.body().getResponse().getItems());
-
-                    //        checkinCount.setText(String.valueOf(response.body().getResponse().getCount()));
-
-
-           /*     for (Post p:response.body().getResponse().getItems()
-                     ) {
-                    photoList.add(p.getAttachments().get(0));
-                    likeList.add(p.getLikes());
-                }*/
 
                     if(response.body().getResponse().getGroups()!=null){
                         for (Group g:response.body().getResponse().getGroups()
@@ -438,26 +437,6 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
             checkinLoad = true;
             showContent();
         }
-
-
-        /*      ApiFactory.getApi().getPhotosById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),SharedManager.getProperty(Constants.KEY_MY_ID), "4").enqueue(new Callback<ResponseContainer<PhotoContainer>>() {
-            @Override
-            public void onResponse(Call<ResponseContainer<PhotoContainer>> call, Response<ResponseContainer<PhotoContainer>> response) {
-                PhotoContainer photos = response.body().getResponse();
-                Log.d("TAG21", "ph count = " + photos.getCount());
-
-                if(photos != null){
-                    photoList.addAll(photos.getPhotos());
-                    Log.d("TAG21", "photos size = " + photoList.size());
-                    adapter.update(photoList);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseContainer<PhotoContainer>> call, Throwable t) {
-
-            }
-        });*/
     }
 
 
@@ -555,6 +534,9 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        Log.d("TAG23","activity Result ");
+
         switch(requestCode) {
             case 0:
                 if(resultCode == RESULT_OK){
@@ -590,12 +572,15 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
                 cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
         cursor.moveToFirst();
         String s=cursor.getString(column_index);
-        cursor.close();
+        //cursor.close();
         return s;
     }
 
     void getUploadServer(){
         Log.d("TAG21","get server " + SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN));
+        Log.d("TAG23","FILE -  " + file.getAbsolutePath());
+        Log.d("TAG23","FILE -  " + file.getPath());
+//        Log.d("TAG23","FILE -  " + fileUri.getPath());
 
         ApiFactory.getApi().getUploadServerAvatar(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN)).enqueue(new Callback<ResponseContainer<ResponseUploadServer>>() {
             @Override
@@ -776,7 +761,7 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
 
     @Override
     public void onStop() {
-        Log.i("TAG21", "Stop activity");
+        Log.i("TAG23", "Stop profile fragment");
         EventBus.getDefault().unregister(this);
         super.onStop();
     }
@@ -790,8 +775,6 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
     @Override
     public void onTabFragmentPresented(TabStacker.PresentReason presentReason) {
         Log.i("TAG21", "Fragment Presented");
-
-
     }
 
     @Override
@@ -801,6 +784,7 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
 
         if(dismissReason != TabStacker.DismissReason.BACK){
             storage.setDate( getArguments().get("name")+"_posts", postList);
+            storage.setDate( getArguments().get("name")+"_groups", groups);
             String[] mass = new String[4];
             mass[0] = name.getText().toString();
             mass[1] = subscribersCount.getText().toString();

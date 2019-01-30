@@ -42,13 +42,12 @@ public class SubscriptionFragment extends Fragment implements TabStacker.TabStac
 
 
 
-    public static SubscriptionFragment createInstance(String fragmentId, int tabPos, String userId) {
+    public static SubscriptionFragment createInstance(String fragmentId, String userId) {
         SubscriptionFragment fragment = new SubscriptionFragment();
         Log.i("TAG21", "Create Subscribers " + fragmentId);
         Bundle bundle = new Bundle();
         bundle.putString("name", fragmentId);
         bundle.putString("userId", userId);
-        bundle.putInt("tabPos", tabPos);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -61,8 +60,8 @@ public class SubscriptionFragment extends Fragment implements TabStacker.TabStac
         return view;
     }
 
-    @OnClick(R.id.profileFragBackButtonContainer)
-    public void back(View v){
+    @OnClick(R.id.backButton)
+    public void sadsa(View v){
         getActivity().onBackPressed();
     }
 

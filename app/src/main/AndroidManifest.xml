@@ -30,7 +30,12 @@
         <activity
             android:windowSoftInputMode="adjustPan"
             android:name=".views.activities.RegistrationActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".views.activities.LoginActivity" />
+
+        </activity>
         <activity
             android:name=".views.activities.ForgotPasswordActivity"
             android:screenOrientation="portrait" />

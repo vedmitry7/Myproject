@@ -119,11 +119,10 @@ public class FeedPhotoReportFragmentContentNew extends android.support.v4.app.Fr
     boolean clearScreen;
 
 
-    public static FeedPhotoReportFragmentContentNew createInstance(String name, int tabPos, String placeId, String albumId, String albumName, Long albumDate, int position) {
+    public static FeedPhotoReportFragmentContentNew createInstance(String name, String placeId, String albumId, String albumName, Long albumDate, int position) {
         FeedPhotoReportFragmentContentNew fragment = new FeedPhotoReportFragmentContentNew();
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
-        bundle.putInt("tabPos", tabPos);
         bundle.putString("placeId", placeId);
         bundle.putString("albumId", albumId);
         bundle.putString("albumName", albumName);

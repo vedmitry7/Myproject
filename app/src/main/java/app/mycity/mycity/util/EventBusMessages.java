@@ -482,7 +482,6 @@ public class EventBusMessages {
     }
 
     public static class OpenChat {
-
     }
 
     public static class OpenEvents {

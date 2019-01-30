@@ -98,6 +98,7 @@ public class ActionContentFragment extends android.support.v4.app.Fragment imple
         return view;
     }
 
+
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
 

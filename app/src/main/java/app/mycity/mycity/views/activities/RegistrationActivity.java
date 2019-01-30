@@ -3,17 +3,16 @@ package app.mycity.mycity.views.activities;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,7 +46,7 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
 
     private String cityId;
 
-    private FragmentManager fragmentManager;
+    private android.support.v4.app.FragmentManager fragmentManager;
     private EmailFragment emailFragment;
     private ConfirmEmailFragment confirmEmailFragment;
     private PasswordFragment passwordFragment;
@@ -66,11 +65,11 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
 
         DataFragment fragment = new DataFragment();
 
-        fragmentManager = getFragmentManager();
+        fragmentManager = getSupportFragmentManager();
 
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.add(R.id.fragmentContainer, fragment);
-        transaction.addToBackStack(null);
+      //  transaction.addToBackStack("ds");
         transaction.commit();
 
         Typeface type = Typeface.createFromAsset(getAssets(),"abril_fatface_regular.otf");
@@ -376,7 +375,7 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
     @Override
     public void onBackPressed() {
         Log.i("TAG", "back key");
-        Fragment currentFrag = fragmentManager.findFragmentById(R.id.fragmentContainer);
+        android.support.v4.app.Fragment currentFrag = fragmentManager.findFragmentById(R.id.fragmentContainer);
 
         if(currentFrag instanceof DataFragment){
             Log.i("TAG", "Data fara");

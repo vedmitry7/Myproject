@@ -550,25 +550,8 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
         }
     }
 
-    void clearFragmentStack(){
-        FragmentManager fm = getFragmentManager(); // or 'getSupportFragmentManager();'
-        int count = fm.getBackStackEntryCount();
-        for(int i = 0; i < count; ++i) {
-            fm.popBackStack();
-        }
-    }
-
-    private void clearStack(){
-        int count = fragmentManager.getBackStackEntryCount();
-        while(count > 0){
-            fragmentManager.popBackStack();
-            count--;
-        }
-    }
-
     @Override
     public void startSettings(int i) {
-
         switch (i){
             case 0 :
                 MainSettingsFragment settingsFragment = new MainSettingsFragment();
@@ -584,8 +567,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void startSubscribers(EventBusMessages.OpenSubscribers event) {
         SubscribersFragment myFriendsFragment = SubscribersFragment.createInstance(
-                currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
-                getCurrentTabPosition(),
+                getFragmentName(),
                 event.getUserId());
         mTabStacker.replaceFragment(myFriendsFragment, null);
     }
@@ -611,8 +593,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void startSubscription(EventBusMessages.OpenSubscriptions event) {
         SubscriptionFragment subscriptionFragment = SubscriptionFragment.createInstance(
-                currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
-                getCurrentTabPosition(),
+                getFragmentName(),
                 event.getUserId());
         mTabStacker.replaceFragment(subscriptionFragment, null);
     }
@@ -620,8 +601,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void startUserPlaces(EventBusMessages.OpenUserPlace event) {
         UserPlacesFragment subscriptionFragment = UserPlacesFragment.createInstance(
-                currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
-                getCurrentTabPosition(),
+                getFragmentName(),
                 event.getUserId());
         mTabStacker.replaceFragment(subscriptionFragment, null);
     }
@@ -633,21 +613,10 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
     }
 
     public void startFriendsById(String id) {
-/*        SomeoneFriendsFragment someoneFriendsFragment = new SomeoneFriendsFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("ID", id);
-        someoneFriendsFragment.setArguments(bundle);
-        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
-   //     transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
-        transaction.replace(R.id.main_act_fragment_container, someoneFriendsFragment);
-        transaction.addToBackStack("idFriends");
-        transaction.commit();*/
-
         SomeoneFriendsFragment someoneFriendsFragment = new SomeoneFriendsFragment();
         Bundle bundle = new Bundle();
         bundle.putString("ID", id);
         someoneFriendsFragment.setArguments(bundle);
-
         mTabStacker.replaceFragment(someoneFriendsFragment, null);
     }
 
@@ -658,14 +627,11 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
         android.support.v4.app.Fragment profileFragment;
         if(event.getMessage().equals(SharedManager.getProperty(Constants.KEY_MY_ID))){
             profileFragment = ProfileFragment.createInstance(
-                    getFragmentName(),
-                    mTabStacker.getCurrentTabSize(),
-                    getCurrentTabPosition());
+                    getFragmentName());
             Log.d("TAG21", "Start my profile");
         } else {
             profileFragment = SomeoneProfileFragment.createInstance(
-                    currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
-                    getCurrentTabPosition(),
+                    getFragmentName(),
                     event.getMessage());
             Log.d("TAG21", "Start someone");
         }
@@ -673,15 +639,10 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
 
     }
 
-    int getCurrentTabPosition(){
-        return Tab.valueOf(currentTab.name()).mButtonResId;
-    }
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(EventBusMessages.OpenComments event){
         CommentsFragment commentsFragment = CommentsFragment.createInstance(
                 getFragmentName(),
-                getCurrentTabPosition(),
                 event.getPostId(),
                 event.getOwnerId(),
                 event.getType());
@@ -712,8 +673,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void openPhotoReportContent(EventBusMessages.OpenPhotoReportContent event){
         FeedPhotoReportFragmentContentNew placeFragment = FeedPhotoReportFragmentContentNew.createInstance(
-                currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
-                getCurrentTabPosition(),
+                getFragmentName(),
                 event.getPlaceId(),
                 event.getAlbumId(),
                 event.getAlbumName(),
@@ -725,8 +685,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void asdfasdfdas(EventBusMessages.OpenPhotoReport event){
         PhotoReportFragment photoReportFragment = PhotoReportFragment.createInstance(
-                currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
-                getCurrentTabPosition(),
+                getFragmentName(),
                 event.getAlbum().getId(),
                 event.getAlbum().getTitle(),
                 event.getAlbum().getDateCreated());
@@ -736,20 +695,13 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void openFeed(EventBusMessages.OpenFeed event){
         mTabStacker.replaceFragment(
-                FeedFragment.createInstance(getFragmentName(), getCurrentTabPosition()), null);
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void openFeed(EventBusMessages.OpenCheckins event){
-        mTabStacker.replaceFragment(
-                FeedFragment.createInstance(getFragmentName(), getCurrentTabPosition()), null);
+                FeedFragment.createInstance(getFragmentName()), null);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void OpenChronics(EventBusMessages.OpenChronics event){
-
         mTabStacker.replaceFragment(
-                ChronicsFragment.createInstance(getFragmentName(), getCurrentTabPosition()), null);
+                ChronicsFragment.createInstance(getFragmentName()), null);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -773,7 +725,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
         Log.d("TAG21", "... open profile");
         if(!(mTabStacker.getCurrentTopFragment() instanceof ProfileFragment)){
             mTabStacker.replaceFragment(
-                    ProfileFragment.createInstance(getFragmentName(), mTabStacker.getCurrentTabSize(), 0), null);
+                    ProfileFragment.createInstance(getFragmentName()), null);
             currentFragment = CurrentFragment.PROFILE_FRAGMENT;
         }
     }
@@ -823,7 +775,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
         Log.d("TAG21", "... open chat");
         if(!(mTabStacker.getCurrentTopFragment() instanceof DialogsFragment)){
             mTabStacker.replaceFragment(
-                    DialogsFragment.createInstance(getFragmentName(), getCurrentTabPosition()), null);
+                    DialogsFragment.createInstance(getFragmentName()), null);
             currentFragment = CurrentFragment.MESSAGES_FRAGMENT;
         }
     }
@@ -836,7 +788,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
         if(!(mTabStacker.getCurrentTopFragment() instanceof NotificationsFragment)){
             Log.d("TAG21", "not inst create");
             mTabStacker.replaceFragment(NotificationsFragment.createInstance(
-                    currentTab.name() + "_" + mTabStacker.getCurrentTabSize(), getCurrentTabPosition()), null);
+                    getFragmentName()), null);
         }
     }
     /**
@@ -844,9 +796,11 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void openMenuFragment(EventBusMessages.OpenMenu event){
-        if(!(mTabStacker.getCurrentTopFragment() instanceof MenuFragment))
+        if(!(mTabStacker.getCurrentTopFragment() instanceof MenuFragment)){
+            mTabStacker.clearTabStack();
             mTabStacker.replaceFragment(
                     new MenuFragment(), null);
+        }
         currentFragment = CurrentFragment.MENU_FRAGMENT;
         mTabStacker.popToTop(true);
     }
@@ -881,6 +835,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
     @Override
     public void onStop() {
         super.onStop();
+        Log.d("TAG23","stop Main Activity");
         EventBus.getDefault().unregister(this);
     }
 
@@ -909,6 +864,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
         }
         return null;
     }
+
     @Override
     public Object getDate(String key) {
         Log.i("TAG23", "GET DATE " + key );
@@ -922,6 +878,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
     @Override
     public void setDate(String key, Object date) {
         Log.i("TAG23", "SAVE " + key);
+        remove(key);
         this.date.put(key, date);
     }
 
@@ -934,7 +891,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
 
     @Override
     public void onBackPressed() {
-        Log.i("TAG21", "                                        name " + mTabStacker.getCurrentTabName() );
+        Log.i("TAG21", "name " + mTabStacker.getCurrentTabName() );
         if (!mTabStacker.onBackPressed()) {
             super.onBackPressed();
         }

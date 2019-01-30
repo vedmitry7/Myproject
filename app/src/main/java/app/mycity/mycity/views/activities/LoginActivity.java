@@ -251,7 +251,7 @@ public class LoginActivity extends AppCompatActivity {
                     SharedManager.addProperty(Constants.KEY_PASSWORD, finalPasswordText);
 
 
-                   // SharedManager.addBooleanProperty("login", true);
+                    SharedManager.addBooleanProperty("login", true);
                     launchApp();
 
                 } else {

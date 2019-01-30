@@ -80,12 +80,6 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
     @BindView(R.id.someoneFragAdd)
     FloatingActionButton fab;
 
-   /* @BindView(R.id.profileFragSubscriberTv)
-    TextView friendsCount;*/
-
-/*    @BindView(R.id.checkinCount)
-    TextView checkinCount;*/
-
     @BindView(R.id.profileFragCurrentPointContainer)
     RelativeLayout currentPoint;
 
@@ -147,13 +141,12 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
 
 
-    public static SomeoneProfileFragment createInstance(String name, int tabPos, String userId) {
+    public static SomeoneProfileFragment createInstance(String name, String userId) {
         SomeoneProfileFragment fragment = new SomeoneProfileFragment();
         Log.i("TAG21", "Create SomeoneProfileFragment " + name);
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
         bundle.putString("userId", userId);
-        bundle.putInt("tabPos", tabPos);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -212,12 +205,10 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
         Log.d("TAG25", "Update TOTAL UNREAD COUNT   -  Chronics");
     }
 
-
- /*   @OnClick(R.id.profileFragGridRecyclerLayout)
-    public void gridView(View v) {
-
-    }*/
-
+    @OnClick(R.id.backButton)
+    public void back(View v){
+        getActivity().onBackPressed();
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -265,12 +256,6 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
         EventBus.getDefault().post(new EventBusMessages.OpenCheckinProfileContent(postList.get(event.getPosition()).getId(), getArguments().getString("name")));
     }
 
-
-
-    @OnClick(R.id.profileFragBackButtonContainer)
-    public void back(View v) {
-        getActivity().onBackPressed();
-    }
 
     @OnClick(R.id.someoneFragAdd)
     public void addToFriends(View v) {
@@ -333,7 +318,7 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
                     if(profile.getIsSubscription()==1){
                         isSubscription = true;
-                        fab.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_delete_subscription));
+                        fab.setImageDrawable(ContextCompat.getDrawable(getActivity().getApplicationContext(), R.drawable.ic_delete_subscription));
                     } else {
                         fab.setImageResource(R.drawable.ic_add_subscription);
                     }
@@ -359,41 +344,45 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
     }
 
     private void getSubscriberCount(){
-        ApiFactory.getApi().getSubscribersCount(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN)).enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
-            @Override
-            public void onResponse(retrofit2.Call<ResponseContainer<UsersContainer>> call, retrofit2.Response<ResponseContainer<UsersContainer>> response) {
-                UsersContainer users = response.body().getResponse();
 
-                if(users != null){
-                    subscribersCount.setText(String.valueOf(users.getFriends().size()));
+        ApiFactory.getApi().getSubscribers(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("userId"), 0, "").enqueue(new Callback<ResponseContainer<UsersContainer>>() {
+            @Override
+            public void onResponse(Call<ResponseContainer<UsersContainer>> call, Response<ResponseContainer<UsersContainer>> response) {
+
+                if(response.body()!= null && response.body().getResponse()!= null){
+                    Log.i("TAG24", "1 count - " + response.body().getResponse().getCount());
+                    subscribersCount.setText("" + response.body().getResponse().getCount());
                 }
                 friendLoad = true;
                 showContent();
             }
 
             @Override
-            public void onFailure(retrofit2.Call<ResponseContainer<UsersContainer>> call, Throwable t) {
+            public void onFailure(Call<ResponseContainer<UsersContainer>> call, Throwable t) {
 
             }
         });
 
-        ApiFactory.getApi().getSubscriptionsCount(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN)).enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
+        ApiFactory.getApi().getSubscriptions(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("userId"), 0, "").enqueue(new Callback<ResponseContainer<UsersContainer>>() {
             @Override
-            public void onResponse(retrofit2.Call<ResponseContainer<UsersContainer>> call, retrofit2.Response<ResponseContainer<UsersContainer>> response) {
-                UsersContainer users = response.body().getResponse();
+            public void onResponse(Call<ResponseContainer<UsersContainer>> call, Response<ResponseContainer<UsersContainer>> response) {
 
-                if(users != null){
-                    subscriptionsCount.setText(String.valueOf(users.getFriends().size()));
+                if(response.body()!= null && response.body().getResponse()!= null){
+                    Log.i("TAG24", "2 count - " + response.body().getResponse().getCount());
+                    subscriptionsCount.setText("" + response.body().getResponse().getCount());
                 }
                 friendLoad = true;
                 showContent();
             }
 
             @Override
-            public void onFailure(retrofit2.Call<ResponseContainer<UsersContainer>> call, Throwable t) {
+            public void onFailure(Call<ResponseContainer<UsersContainer>> call, Throwable t) {
 
             }
         });
+
+
+
     }
 
     private void getCheckins() {
@@ -407,14 +396,6 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
                     Log.d("TAG21", "resp = " + response.body().getResponse().getCount());
 
                     postList.addAll(response.body().getResponse().getItems());
-
-             //       checkinCount.setText(String.valueOf(response.body().getResponse().getCount()));
-
-           /*     for (Post p:response.body().getResponse().getItems()
-                     ) {
-                    photoList.add(p.getAttachments().get(0));
-                    likeList.add(p.getLikes());
-                }*/
 
                     if(response.body().getResponse().getGroups()!=null)
                     for (Group g:response.body().getResponse().getGroups()
@@ -439,26 +420,6 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
             checkinLoad = true;
             showContent();
         }
-
-
-        /*      ApiFactory.getApi().getPhotosById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),SharedManager.getProperty(Constants.KEY_MY_ID), "4").enqueue(new Callback<ResponseContainer<PhotoContainer>>() {
-            @Override
-            public void onResponse(Call<ResponseContainer<PhotoContainer>> call, Response<ResponseContainer<PhotoContainer>> response) {
-                PhotoContainer photos = response.body().getResponse();
-                Log.d("TAG21", "ph count = " + photos.getCount());
-
-                if(photos != null){
-                    photoList.addAll(photos.getPhotos());
-                    Log.d("TAG21", "photos size = " + photoList.size());
-                    adapter.update(photoList);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseContainer<PhotoContainer>> call, Throwable t) {
-
-            }
-        });*/
     }
 
 
@@ -593,6 +554,7 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
         if(dismissReason != TabStacker.DismissReason.BACK){
             storage.setDate((String) getArguments().get("name")+"_posts", postList);
+            storage.setDate((String) getArguments().get("name")+"_groups", groups);
             String[] mass = new String[4];
             mass[0] = name.getText().toString();
             mass[1] = subscribersCount.getText().toString();

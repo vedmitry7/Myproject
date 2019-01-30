@@ -59,6 +59,8 @@ public class SocketService extends Service {
 
     TimerTask timerTask;
 
+    Timer timer;
+
     private void updateToken(){
         ApiFactory.getApi().updateToken(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), SharedManager.getProperty(Constants.KEY_REFRESH_TOKEN)).enqueue(new Callback<ResponseContainer<RefreshTokenResponse>>() {
             @Override
@@ -96,89 +98,24 @@ public class SocketService extends Service {
         Log.i("Test", "Service: onCreate");
 
         if(!SharedManager.getBooleanProperty("login")){
-            Log.i("Test", "Service: STOP SELF");
+            Log.i("Test", "onCreate. Login false Service: STOP SELF");
             stopSelf();
+            return;
+        } else {
+            Log.i("Test", "onCreate. Login true");
         }
 
-
         EventBus.getDefault().register(this);
-        //  initRealm();
         mRealm = Realm.getDefaultInstance();
-
-       // initSocket();
-
         Intent ishintent = new Intent(this, SocketService.class);
         ishintent.putExtra("data", "alarm");
         PendingIntent pintent = PendingIntent.getService(this, 6, ishintent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarm = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
         //  alarm.cancel(pintent);
         alarm.setRepeating(AlarmManager.RTC, System.currentTimeMillis(),560000, pintent);
+
+        checkToken();
     }
-
-
-    private void getServerTime() {
-        ApiFactory.getApi().getSocketServer(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN)).enqueue(new Callback<ResponseContainer<ResponseSocketServer>>() {
-            @Override
-            public void onResponse(Call<ResponseContainer<ResponseSocketServer>> call, Response<ResponseContainer<ResponseSocketServer>> response) {
-                if(response.body()!=null && response.body().getResponse()!=null){
-                    SharedManager.addProperty("ts", response.body().getResponse().getTs());
-                    SharedManager.addProperty("socketServer", response.body().getResponse().getServer());
-                    Log.d("Test", "update TS - " + response.body().getResponse().getTs());
-                    Log.d("TAG21", "Socket Server - " + response.body().getResponse().getServer());
-
-                    String ts = response.body().getResponse().getTs();
-                    String ex = SharedManager.getProperty(Constants.KEY_EXPIRED_AT);
-
-                    long tsl = Long.parseLong(ts);
-                    tsl = tsl/10000;
-                    long exl = Long.parseLong(ex);
-                    Log.d("Test", "TS - " + tsl);
-                    Log.d("Test", "EX - " + exl);
-                    Log.d("Test", "dif - " + (exl - tsl));
-                    //1541677974476
-                    //1541764363000
-
-                    if(((exl - tsl)/60/60) < 3){
-                        Log.d("Test", "update token");
-                        updateToken();
-                    } else {
-                        Log.d("Test", "token is good");
-                    }
-                } else {
-                    Toast.makeText(SocketService.this, "Get Server Time Response Error", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseContainer<ResponseSocketServer>> call, Throwable t) {
-
-            }
-        });
-    }
-
-    private void getSocketServerAndInitSocket() {
-        ApiFactory.getApi().getSocketServer(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN)).enqueue(new Callback<ResponseContainer<ResponseSocketServer>>() {
-            @Override
-            public void onResponse(Call<ResponseContainer<ResponseSocketServer>> call, Response<ResponseContainer<ResponseSocketServer>> response) {
-                if(response.body()!=null && response.body().getResponse()!=null){
-                    SharedManager.addProperty("ts", response.body().getResponse().getTs());
-                    SharedManager.addProperty("socketServer", response.body().getResponse().getServer());
-                    Log.d("Test", "update TS - " + response.body().getResponse().getTs());
-                    Log.d("TAG21", "Socket Server - " + response.body().getResponse().getServer());
-
-                    initSocket();
-                } else {
-                    Toast.makeText(SocketService.this, "Get Server Time Response Error", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseContainer<ResponseSocketServer>> call, Throwable t) {
-
-            }
-        });
-    }
-
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void startSubscribers(EventBusMessages.UpdateSocketConnection event) {
@@ -189,7 +126,6 @@ public class SocketService extends Service {
         mSocket.close();
         initSocket();
     }
-
 
     private void initSocket() {
         Log.i("Test", "initSocket");
@@ -206,6 +142,7 @@ public class SocketService extends Service {
         }
 
         mSocket.connect();
+        Log.i("Test", "Socket was connect");
 
         mSocket.off("history");
 
@@ -244,18 +181,19 @@ public class SocketService extends Service {
 
         final boolean[] wasLost = new boolean[1];
 
+        Log.i("Test", "Socket create task");
         timerTask = new TimerTask() {
             @Override
             public void run() {
-                Log.i("TAG25", this + " socket connected - " + mSocket.connected());
+                Log.d("Test", this + " socket connected - " + mSocket.connected());
 
                 if(!mSocket.connected()){
-                    Log.i("Test", "socket lost connection");
+                    Log.d("Test", "socket lost connection");
                     wasLost[0] = true;
                 } else {
                     if(wasLost[0]){
-                        Log.i("Test", "socket get connection after lost");
-                        wasLost[0] = false;
+                        Log.d("Test", "socket get connection after lost");
+                       wasLost[0] = false;
                         mSocket.off("history");
                         mSocket.disconnect();
                         mSocket.close();
@@ -267,7 +205,10 @@ public class SocketService extends Service {
         };
 
         // check if socket lost connection and get it again. then init again, can be problem with
-        new Timer().schedule(timerTask, 60000, 60000);
+        timer = new Timer();
+        timer.schedule(timerTask, 10000, 5000);
+        Log.i("Test", "task was scheduled");
+
     }
 
     void chatResponse2(String responseString){
@@ -530,12 +471,30 @@ public class SocketService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 // error NullPointerException       Log.i("Test", "Service: onStartCommand. Intent - " + intent.getStringExtra("data") );
+
+        if(!SharedManager.getBooleanProperty("login")){
+            Log.i("Test", "onStartCommand. Login false Service: STOP SELF");
+            stopSelf();
+        } else {
+            Log.i("Test", "onStartCommand. Login true");
+
+            if(mSocket==null){
+                Log.i("Test", "Socket is null");
+                checkToken();
+            } else {
+                if(mSocket.connected()){
+                    Log.i("Test", "Socket connected");
+                } else {
+                    Log.i("Test", "Socket not connected");
+                }
+            }
+        }
+
         if(intent!=null){
             Log.i("Test", "onStartCommand - " + intent.getAction());
         } else {
             Log.i("Test", "onStartCommand - intent - null");
         }
-        checkToken();
 
         return START_STICKY;
     }
@@ -543,18 +502,25 @@ public class SocketService extends Service {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onDestroy() {
+        Log.i("Test", "Service: onDestroy");
 
         EventBus.getDefault().unregister(this);
-        if(timerTask!=null)
-        timerTask.cancel();
+
+        if(timerTask!=null){
+            Log.i("Test", "Cancel timer task");
+            timerTask.cancel();
+            timer.cancel();
+        } else {
+            Log.i("Test", "Timer task = null");
+        }
         if(mSocket!=null){
             mSocket.off("history");
             mSocket.disconnect();
             mSocket.close();
         }
+
         super.onDestroy();
         //  Log.i("Test", "Service: restart");
-        Log.i("Test", "Service: onDestroy");
     }
 
     @Override
@@ -571,15 +537,7 @@ public class SocketService extends Service {
                 if(response.body().getResponse()!=null){
                     if(response.body().getResponse().getSuccess()==1){
                         Log.i("Test", "CheckToken SUC");
-
                         initSocket();
-                      /*  new Timer().schedule(new TimerTask() {
-                            @Override
-                            public void run() {
-                                //should check internet connection
-                                getServerTime();
-                            }
-                        }, 0, 1000*60*60*23);*/
                     }
                 } else {
                     Log.i("Test", "CheckToken NOT SUCCESS");

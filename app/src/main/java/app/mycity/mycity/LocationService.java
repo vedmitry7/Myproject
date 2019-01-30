@@ -61,7 +61,17 @@ public class LocationService extends Service  implements GoogleApiClient.Connect
 
     @Override
     public void onCreate() {
-        Log.i("TAG23", "LocationService: onCreate");
+        Log.i("Test", "LocationService: onCreate");
+
+        if(!SharedManager.getBooleanProperty("login")){
+            Log.i("Test", "onCreate. Login false Service: STOP SELF");
+            stopSelf();
+            return;
+        } else {
+            Log.i("Test", "onCreate. Login true");
+        }
+
+        Log.i("Test", "onCreate. continue");
 
         EventBus.getDefault().register(this);
 
@@ -211,9 +221,12 @@ public class LocationService extends Service  implements GoogleApiClient.Connect
 
     @Override
     public void onDestroy() {
+        Log.d("Test", "On Destroy Location Service");
         // Your need of location update is done. So you have to stop the apiClient.
-        super.onDestroy();
-        this.apiClient.disconnect();
         EventBus.getDefault().unregister(this);
+        if(apiClient!=null){
+            apiClient.disconnect();
+        }
+        super.onDestroy();
     }
 }
