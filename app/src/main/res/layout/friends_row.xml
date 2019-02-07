@@ -41,7 +41,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:padding="12dp"
-        android:src="@drawable/ic_dots"
+        app:srcCompat="@drawable/ic_dots"
         app:layout_constraintEnd_toEndOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

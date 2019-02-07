@@ -3,6 +3,7 @@ package app.mycity.mycity.views.fragments.profile;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -40,6 +41,12 @@ public class UserPlacesFragment extends Fragment implements TabStacker.TabStackI
 
     @BindView(R.id.placesFragmentRecyclerView)
     RecyclerView recyclerView;
+
+    @BindView(R.id.placesProgressBar)
+    ConstraintLayout placesProgressBar;
+
+    @BindView(R.id.placeInfoPlaceHolder)
+    ConstraintLayout placeInfoPlaceHolder;
 
     PlacesRecyclerAdapter adapter;
 
@@ -119,6 +126,11 @@ public class UserPlacesFragment extends Fragment implements TabStacker.TabStackI
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<ResponsePlaces>> call, retrofit2.Response<ResponseContainer<ResponsePlaces>> response) {
                 if(response.body()!=null){
+
+                    placesProgressBar.setVisibility(View.GONE);
+                    if(response.body().getResponse().getCount()==0){
+                        placeInfoPlaceHolder.setVisibility(View.VISIBLE);
+                    }
 
                     placeList.addAll(response.body().getResponse().getItems());
                     Log.d("TAG21", "Places size" + response.body().getResponse().getItems().size());

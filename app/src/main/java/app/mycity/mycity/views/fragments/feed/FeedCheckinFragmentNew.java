@@ -96,6 +96,7 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment impl
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
+                int first = layoutManager.findFirstVisibleItemPosition();
                 int totalItemCount = layoutManager.getItemCount();
                 int lastVisibleItems = layoutManager.findLastVisibleItemPosition();
 
@@ -113,6 +114,8 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment impl
                 } else {
                     Log.d("TAG21", "did not load yet ");
                 }
+
+
             }
         };
         recyclerView.addItemDecoration(new ImagesSpacesItemDecoration(2, App.dpToPx(getActivity(), 2), false));
@@ -127,12 +130,12 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment impl
     public void onAttach(Context context) {
         super.onAttach(context);
         storage = (Storage) context;
-        Log.d("TAG21", "storage - " + String.valueOf(storage == null) + totalCount);
+        Log.d("TAG24", "storage - " + String.valueOf(storage == null) + totalCount);
 
 
-        postList = (List<Post>) storage.getDate(getArguments().get("name")+ "_postList");
-        profiles = (Map) storage.getDate(getArguments().get("name")+ "_profiles");
-        groups = (Map) storage.getDate(getArguments().get("name")+ "_groups");
+        postList = (List<Post>) storage.getDate(getArguments().get("name")+ "_postList_" + getArguments().getString("filter"));
+        profiles = (Map) storage.getDate(getArguments().get("name")+ "_profiles_" + getArguments().getString("filter"));
+        groups = (Map) storage.getDate(getArguments().get("name")+ "_groups_" + getArguments().getString("filter"));
 
         if(postList==null){
             postList = new ArrayList<>();
@@ -140,9 +143,9 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment impl
             groups = new HashMap();
             totalCount = 0;
         } else {
-            totalCount = (int) storage.getDate(getArguments().get("name")+ "_postListTotalCount");
-            Log.d("TAG21", "Scroll position - " + storage.getDate(getArguments().get("name")+ "_scrollPosition"));
-            scrollPos = (Integer) storage.getDate(getArguments().get("name")+ "_scrollPosition");
+            totalCount = (int) storage.getDate(getArguments().get("name")+ "_postListTotalCount_" + getArguments().getString("filter"));
+            Log.d("TAG24", "Scroll position - " + storage.getDate(getArguments().get("name")+ "_scrollPosition_" + getArguments().getString("filter")));
+            scrollPos = (Integer) storage.getDate(getArguments().get("name")+ "_scrollPosition_" + getArguments().getString("filter"));
             mayRestore = true;
         }
 
@@ -268,13 +271,11 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment impl
 
     @Override
     public void onStop() {
-/*
-        storage.setDate(getArguments().get("name") + "_postList", postList);
-        storage.setDate(getArguments().get("name") + "_postListTotalCount", totalCount);
-        storage.setDate(getArguments().get("name") + "_profiles", profiles);
-        storage.setDate(getArguments().get("name") + "_groups", groups);
-        storage.setDate(getArguments().get("name") + "_scrollPosition", ((LinearLayoutManager)recyclerView.getLayoutManager()).findFirstVisibleItemPosition());
-*/
+        storage.setDate(getArguments().get("name") + "_postList_" + getArguments().getString("filter"), postList);
+        storage.setDate(getArguments().get("name") + "_postListTotalCount_" + getArguments().getString("filter"), totalCount);
+        storage.setDate(getArguments().get("name") + "_profiles_" + getArguments().getString("filter"), profiles);
+        storage.setDate(getArguments().get("name") + "_groups_" + getArguments().getString("filter"), groups);
+        storage.setDate(getArguments().get("name") + "_scrollPosition_" + getArguments().getString("filter"), ((LinearLayoutManager)recyclerView.getLayoutManager()).findFirstVisibleItemPosition());
 
         EventBus.getDefault().unregister(this);
         super.onStop();

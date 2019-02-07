@@ -20,19 +20,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import app.mycity.mycity.App;
-import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
-import app.mycity.mycity.api.model.Dialog;
-import app.mycity.mycity.api.model.DialogsContainer;
 import app.mycity.mycity.api.model.Notification;
 import app.mycity.mycity.api.model.NotificationResponce;
 import app.mycity.mycity.api.model.ResponseContainer;
-import app.mycity.mycity.api.model.SuccessResponceNumber;
 import app.mycity.mycity.util.EventBusMessages;
-import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.activities.MainAct;
+import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.adapters.NotificationRecyclerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -55,10 +51,12 @@ public class NotificationsFragment extends Fragment implements TabStacker.TabSta
 
     List<Notification> notificationList;
 
-    MainAct activity;
     private boolean isLoading;
     private int totalCount;
     private View fragmentView;
+    private Storage storage;
+    private boolean mayRestore;
+    private int scrollPosition;
 
 
     @Nullable
@@ -89,8 +87,6 @@ public class NotificationsFragment extends Fragment implements TabStacker.TabSta
         Util.setNawBarIconColor(getContext(), view, 3);
         Util.setUnreadCount(view);
 
-        notificationList = new ArrayList<>();
-
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
             @Override
@@ -106,7 +102,7 @@ public class NotificationsFragment extends Fragment implements TabStacker.TabSta
                         // load if we don't load all
                         if(totalCount > notificationList.size()){
                             Log.d("TAG21", "load notifications");
-                            loadDialogs(notificationList.size());
+                            loadNotifications(notificationList.size());
 
                         }
                     }
@@ -118,7 +114,7 @@ public class NotificationsFragment extends Fragment implements TabStacker.TabSta
         recyclerView.addOnScrollListener(scrollListener);
         recyclerView.setAdapter(adapter);
 
-        loadDialogs(notificationList.size());
+        loadNotifications(notificationList.size());
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
@@ -140,28 +136,35 @@ public class NotificationsFragment extends Fragment implements TabStacker.TabSta
         EventBus.getDefault().unregister(this);
     }
 
-    private void loadDialogs(int offset) {
-        ApiFactory.getApi().getNotifications(App.accessToken(), offset).enqueue(new Callback<ResponseContainer<NotificationResponce>>() {
-            @Override
-            public void onResponse(Call<ResponseContainer<NotificationResponce>> call, Response<ResponseContainer<NotificationResponce>> response) {
-                if(response != null && response.body().getResponse() != null){
+    private void loadNotifications(int offset) {
+        if(mayRestore){
+            Log.i("TAG21", "attach size " + notificationList.size() );
+            adapter.update(notificationList);
+            recyclerView.scrollToPosition(scrollPosition);
+            mayRestore = false;
+            placesProgressBar.setVisibility(View.GONE);
+        } else {
+            ApiFactory.getApi().getNotifications(App.accessToken(), offset).enqueue(new Callback<ResponseContainer<NotificationResponce>>() {
+                @Override
+                public void onResponse(Call<ResponseContainer<NotificationResponce>> call, Response<ResponseContainer<NotificationResponce>> response) {
+                    if(response != null && response.body().getResponse() != null){
 
-
-                    placesProgressBar.setVisibility(View.GONE);
-                    totalCount = response.body().getResponse().getCount();
-                    notificationList = response.body().getResponse().getItems();
-                    Log.d("TAG21", "Size list = " + notificationList.size());
-                    adapter.update(notificationList);
-
-                    isLoading = false;
+                        placesProgressBar.setVisibility(View.GONE);
+                        totalCount = response.body().getResponse().getCount();
+                        notificationList.addAll(response.body().getResponse().getItems());
+                        Log.d("TAG21", "Size list = " + notificationList.size());
+                        adapter.update(notificationList);
+                        isLoading = false;
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<ResponseContainer<NotificationResponce>> call, Throwable t) {
-                Log.d("TAG21", "FAIL " + t.getLocalizedMessage());
-            }
-        });
+                @Override
+                public void onFailure(Call<ResponseContainer<NotificationResponce>> call, Throwable t) {
+                    Log.d("TAG21", "FAIL " + t.getLocalizedMessage());
+                }
+            });
+
+        }
 
 
     }
@@ -183,8 +186,19 @@ public class NotificationsFragment extends Fragment implements TabStacker.TabSta
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        activity = (MainAct) context;
-        Log.i("TAG21", "attach DIALOGS " );
+
+        storage = (Storage) context;
+
+        notificationList = (List<Notification>) storage.getDate(getArguments().get("name") + "_notifications");
+
+        if(notificationList==null){
+            notificationList = new ArrayList<>();
+        } else {
+            scrollPosition = (int) storage.getDate(getArguments().get("name") + "_scrollPosition");
+            mayRestore = true;
+        }
+
+        Log.i("TAG21", "attach size " + notificationList.size() );
     }
 
 
@@ -201,7 +215,15 @@ public class NotificationsFragment extends Fragment implements TabStacker.TabSta
 
     @Override
     public void onTabFragmentDismissed(TabStacker.DismissReason dismissReason) {
+        if(dismissReason == TabStacker.DismissReason.REPLACED){
+            storage.setDate(getArguments().get("name") + "_notifications", notificationList);
+            storage.setDate(getArguments().get("name") + "_scrollPosition", ((LinearLayoutManager)recyclerView.getLayoutManager()).findFirstVisibleItemPosition());
 
+        }
+        if(dismissReason == TabStacker.DismissReason.BACK){
+            storage.remove(getArguments().get("name") + "_notifications");
+            storage.remove(getArguments().get("name") + "_scrollPosition");
+        }
     }
 
     @Override

@@ -145,7 +145,7 @@ public class CommentsFragment extends android.support.v4.app.Fragment implements
             Picasso.get().load(SharedManager.getProperty(Constants.KEY_PHOTO_130)).into(photo);
             Log.d("TAG21", "SharedManager.getProperty(Constants.KEY_PHOTO_130) NUUUUUUUUUUUUL ");
         } else {
-            Log.d("TAG21", SharedManager.getProperty(Constants.KEY_PHOTO_130));
+//            Log.d("TAG21", SharedManager.getProperty(Constants.KEY_PHOTO_130));
         }
 
         layoutManager.setReverseLayout(true);

@@ -114,11 +114,12 @@ public class EventContentFragment extends android.support.v4.app.Fragment implem
 
     Profile profile;
 
-    public static EventContentFragment createInstance(String name, String eventId, String ownerId, String placeName) {
+    public static EventContentFragment createInstance(String name, String eventId, String ownerId, String placeName, boolean backToPlace) {
         EventContentFragment fragment = new EventContentFragment();
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
         bundle.putString("eventId", eventId);
+        bundle.putBoolean("backToPlace", backToPlace);
         bundle.putString("ownerId", ownerId);
         bundle.putString("placeName", placeName);
         fragment.setArguments(bundle);
@@ -248,7 +249,18 @@ public class EventContentFragment extends android.support.v4.app.Fragment implem
 
     @OnClick(R.id.backButton)
     public void back(View v){
-        getActivity().onBackPressed();
+
+        if(getArguments().getBoolean("backToPlace")) {
+            Log.d("TAG26","backToPlace");
+            Log.d("TAG26","post event");
+            EventBusMessages.OpenPlace openPlace = new EventBusMessages.OpenPlace(getArguments().getString("ownerId"));
+            openPlace.setCloseCurrent(true);
+            EventBus.getDefault().post(openPlace);
+            //  getActivity().onBackPressed();
+        } else {
+            Log.d("TAG26","usual back");
+            getActivity().onBackPressed();
+        }
     }
 
     public void show(){

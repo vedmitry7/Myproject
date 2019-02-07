@@ -1,6 +1,7 @@
 package app.mycity.mycity.views.activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
@@ -22,6 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +33,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.nkzawa.socketio.client.Manager;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -56,6 +64,7 @@ import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponsePlaces;
 import app.mycity.mycity.api.model.ResponseSocketServer;
+import app.mycity.mycity.api.model.Success;
 import app.mycity.mycity.filter_desc_post.FilterImageActivity;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
@@ -98,11 +107,13 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
 
     private TabStacker mTabStacker;
     Tab currentTab;
-    HashMap<String, Object> date =new HashMap<>();
+    HashMap<String, Object> date = new HashMap<>();
     android.support.v4.app.FragmentManager fragmentManager;
+
     private enum Tab {
         TAB_MENU(0);
         private int mButtonResId;
+
         Tab(int buttonResId) {
             mButtonResId = buttonResId;
         }
@@ -138,10 +149,27 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
-
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.d("TAG26", "getInstanceId failed", task.getException());
+                            Log.d("TAG26", "getInstanceId failed", task.getException().getCause());
+                            return;
+                        }
+                        String token = task.getResult().getToken();
+                        registrationDevice(token);
+                        Log.d("TAG26", token);
+                    }
+                });
 //        window.setStatusBarColor(ContextCompat.getColor(this,R.color.colorAccent));
 
+        FirebaseMessaging.getInstance().subscribeToTopic("profile" + SharedManager.getProperty(Constants.KEY_MY_ID));
+        FirebaseMessaging.getInstance().subscribeToTopic("news");
+
         updateTimestemp();
+
 
         new Timer().schedule(new TimerTask() {
             @Override
@@ -173,8 +201,44 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
             startActivity(intent);
         }*/
 
+        Intent intent = getIntent();
+        if (intent != null && intent.getExtras() != null) {
+            Bundle extras = intent.getExtras();
+            String event = extras.getString("type");
+            Log.d("TAG26", "Type - " +  event);
 
-        if(getIntent()!=null){
+            switch (event){
+                case "follow":
+                    openNotifications(new EventBusMessages.OpenNotifications());
+                    break;
+                case "like_post":
+                    openNotifications(new EventBusMessages.OpenNotifications());
+                    break;
+                case "like_comment":
+                    openNotifications(new EventBusMessages.OpenNotifications());
+                    break;
+                case "comment_post":
+                    openNotifications(new EventBusMessages.OpenNotifications());
+                    break;
+                case "place_event":
+                    String placeId = extras.getString("group_id");
+                    String eventId = extras.getString("event_id");
+                    String name = extras.getString("name");
+                    Log.d("TAG26", "Type - " +  placeId);
+                    Log.d("TAG26", "Type - " +  eventId);
+
+                    openEventContent(new EventBusMessages.OpenEventContent(
+                            eventId,
+                            placeId,
+                            name,
+                            true));
+                    break;
+            }
+        } else {
+            Log.d("TAG26", "intent " );
+        }
+
+      /*  if(getIntent()!=null){
             String event = getIntent().getStringExtra("data");
             Log.i("TAG25", "INTENT " + event );
             if(event!=null)
@@ -186,6 +250,27 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
         }
         else {
             Log.i("TAG25", "INTENT null " );
+        }*/
+    }
+
+    private void registrationDevice(String token) {
+
+        if(!SharedManager.getBooleanProperty("deviceRegister")){
+            String androidID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+            ApiFactory.getApi().registerDevice(App.accessToken(), androidID, token).enqueue(new Callback<ResponseContainer<Success>>() {
+                @Override
+                public void onResponse(Call<ResponseContainer<Success>> call, Response<ResponseContainer<Success>> response) {
+                    if(response.body().getResponse().getSuccess()==1){
+                        SharedManager.addBooleanProperty("deviceRegister", true);
+                    }
+                    Log.i("TAG26", "resp 1" );
+                }
+
+                @Override
+                public void onFailure(Call<ResponseContainer<Success>> call, Throwable t) {
+                    Log.i("TAG26", "resp fail " + t.getLocalizedMessage() );
+                }
+            });
         }
     }
 
@@ -651,6 +736,12 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void openPlace(EventBusMessages.OpenPlace event){
+        Log.d("TAG26", "open place");
+        if(event.isCloseCurrent()){
+            Log.d("TAG26", "close current");
+            mTabStacker.onBackPressed();
+        }
+
         PlaceFragment placeFragment = PlaceFragment.createInstance(
                 getFragmentName(),
                 event.getId());
@@ -746,8 +837,9 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void openEventContent(EventBusMessages.OpenEventContent event){
+        Log.d("TAG26", "");
         mTabStacker.replaceFragment(
-                EventContentFragment.createInstance(getFragmentName(), event.getEventId(), event.getOwnerId(), event.getPlaceName()), null);
+                EventContentFragment.createInstance(getFragmentName(), event.getEventId(), event.getOwnerId(), event.getPlaceName(), event.isBackToPlace()), null);
 
         Log.d("TAG21", "... open profile content " + event.getPlaceName());
 
@@ -891,7 +983,16 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
 
     @Override
     public void onBackPressed() {
+        Log.i("TAG26", "onBackPressed");
         Log.i("TAG21", "name " + mTabStacker.getCurrentTabName() );
+
+        android.support.v4.app.Fragment fragment = mTabStacker.getCurrentTopFragment();
+        if(fragment!=null && fragment instanceof ActionContentFragment){
+            Log.i("TAG26", "ActionContentFragment back 2");
+        } else {
+            Log.i("TAG26", "хз 2");
+        }
+
         if (!mTabStacker.onBackPressed()) {
             super.onBackPressed();
         }

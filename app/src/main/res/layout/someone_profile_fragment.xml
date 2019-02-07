@@ -248,12 +248,12 @@
                             android:id="@+id/profileFragLabelPlaces"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_below="@+id/profileFragPlacesTv"
+                            android:layout_below="@+id/profileFragPlacesCount"
                             android:layout_centerHorizontal="true"
                             android:text="Места" />
 
                         <TextView
-                            android:id="@+id/profileFragPlacesTv"
+                            android:id="@+id/profileFragPlacesCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerHorizontal="true"

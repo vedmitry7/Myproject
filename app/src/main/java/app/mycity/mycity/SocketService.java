@@ -383,8 +383,8 @@ public class SocketService extends Service {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.ic_main)
-                        .setContentTitle(text)
-                        .setContentText(userName);
+                        .setContentTitle("S " + text)
+                        .setContentText("S " + userName);
         //  mBuilder.setSound(alarmSound);
         mBuilder.setDefaults(Notification.DEFAULT_SOUND);
         long[] vibrate = { 0, 200, 100, 100, 100, 50};
@@ -429,8 +429,8 @@ public class SocketService extends Service {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.ic_main)
-                        .setContentTitle(title)
-                        .setContentText(text);
+                        .setContentTitle("S" + title)
+                        .setContentText("S" + text);
         //  mBuilder.setSound(alarmSound);
         mBuilder.setDefaults(Notification.DEFAULT_SOUND);
         long[] vibrate = { 0, 200, 100, 100, 100, 50};
@@ -440,7 +440,7 @@ public class SocketService extends Service {
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
 
-        resultIntent.putExtra("user_id", userId);
+        resultIntent.putExtra("peer_id", userId);
 
         mBuilder.setAutoCancel(true);
 

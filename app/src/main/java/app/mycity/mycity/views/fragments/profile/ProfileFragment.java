@@ -12,7 +12,6 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.FileProvider;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,7 +24,6 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.github.nkzawa.socketio.client.Manager;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -246,8 +244,6 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
         if(storage.getDate(getArguments().get("name") + "_posts")!=null)
         Log.i("TAG24", "attach PROFILE STORAGE Post size  - " + ((List<Post>)storage.getDate(getArguments().get("name") + "_posts")).size());
 
-
-
         postList = (List<Post>)storage.getDate(getArguments().get("name") + "_posts");
         groups = (Map) storage.getDate(getArguments().get("name")+ "_groups");
 
@@ -399,6 +395,8 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
 
             }
         });
+
+
     }
 
     private void getCheckins(){
@@ -432,7 +430,7 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
                 }
             });
         } else {
-            Log.i("TAG21", "Restore checkins ) ");
+            Log.i("TAG21", "Restore checkins");
             adapter.notifyDataSetChanged();
             checkinLoad = true;
             showContent();
@@ -498,11 +496,11 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
                                     Log.d("TAG21", file.getAbsolutePath());
                                     fileUri = Uri.fromFile(file);
 
-                                    Uri imageUri = FileProvider.getUriForFile(
+                                  /*  Uri imageUri = FileProvider.getUriForFile(
                                             getContext(),
                                             "app.mycity.mycity.provider", //(use your app signature + ".provider" )
-                                            file);
-                                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                                            file);*/
+                                    intent.putExtra(MediaStore.EXTRA_OUTPUT, file);
                                     startActivityForResult(intent, 0);
 
                                     dialog.dismiss();

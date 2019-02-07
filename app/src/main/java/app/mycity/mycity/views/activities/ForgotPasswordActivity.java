@@ -19,6 +19,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
+import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.OkHttpClientFactory;
 import app.mycity.mycity.views.fragments.registrationFragments.ConfirmEmailFragment;
@@ -121,7 +122,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements Registe
                 .add("email", email)
                 .build();
 
-        Request request = new Request.Builder().url("http://192.168.0.104/api/auth.emailExists")
+        Request request = new Request.Builder().url(Constants.URL_BASE + "auth.emailExists")
                 .post(body)
                 .build();
 
@@ -185,7 +186,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements Registe
         RequestBody body = new FormBody.Builder()
                 .add("email", email)
                 .build();
-        Request request = new Request.Builder().url("http://192.168.0.104/api/auth.restore")
+        Request request = new Request.Builder().url(Constants.URL_BASE + "auth.restore")
                 .post(body)
                 .build();
         okhttp3.Response response = null;
@@ -215,7 +216,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements Registe
                 .add("email", email)
                 .build();
 
-        Request request = new Request.Builder().url("http://192.168.0.104/api/auth.checkCode")
+        Request request = new Request.Builder().url(Constants.URL_BASE + "auth.checkCode")
                 .post(body)
                 .build();
 
@@ -292,7 +293,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements Registe
                 .add("confirm_password", confirm)
                 .build();
 
-        Request request = new Request.Builder().url("http://192.168.0.104/api/auth.reset")
+        Request request = new Request.Builder().url(Constants.URL_BASE + "auth.reset")
                 .post(body)
                 .build();
 

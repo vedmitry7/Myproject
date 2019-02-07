@@ -147,7 +147,7 @@ public class PlacesCheckinFragment extends android.support.v4.app.Fragment {
             adapter.update(postList);
         } else {
             Log.d("TAG21", "Can not RESTORE PLACE CHECKIN " + placeId);
-            ApiFactory.getApi().getGroupWallById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), placeId, "checkin", "1","photo_360", offset).enqueue(new Callback<ResponseContainer<ResponseWall>>() {
+            ApiFactory.getApi().getGroupWallById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), placeId, "checkin", "1","photo_360", offset, 100).enqueue(new Callback<ResponseContainer<ResponseWall>>() {
                 @Override
                 public void onResponse(Call<ResponseContainer<ResponseWall>> call, Response<ResponseContainer<ResponseWall>> response) {
 

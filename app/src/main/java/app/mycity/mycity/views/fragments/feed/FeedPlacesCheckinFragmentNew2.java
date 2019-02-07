@@ -142,27 +142,6 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
 
-//        Util.setNawBarClickListener(view);
-  //      Util.setNawBarIconColor(getContext(), view, -1);
-
-/*
-        event =  EventBus.getDefault().getStickyEvent((EventBusMessages.OpenPlacePhoto2.class));
-        if(event!=null){
-            placeName.setText(event.getGroup().getName());
-            currentPostId = String.valueOf(event.getPost().getId());
-            currentUserId = event.getProfile().getId();
-            currentOwnerId = event.getPost().getOwnerId();
-            Picasso.get().load(event.getProfile().getPhoto130()).into(photo);
-            name.setText(event.getProfile().getFirstName() + " " + event.getProfile().getLastName());
-            likesCount.setText(String.valueOf(event.getPost().getLikes().getCount()));
-            time.setText(Util.getDatePretty(event.getPost().getDate()));
-            commentsCount.setText(String.valueOf(event.getPost().getComments().getCount()));
-
-            setLiked(event.getPost().getLikes().getUserLikes()==1);
-        }
-*/
-
-
         View.OnClickListener openUserListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -218,6 +197,7 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
 
     private void setNumeration(int current){
         numeration.setText((current+1)+"/"+totalCount);
+        recyclerView.smoothScrollToPosition(current);
     }
 
 
@@ -230,10 +210,13 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
 
         if(mayRestore){
             Log.d("TAG21", "RESTORE PLACE CHECKIN");
+            placeHolder.setVisibility(View.GONE);
+            initPagerAdapter(postList);
             adapter.update(postList);
+            openPlace(new EventBusMessages.ShowImage(currentPostIdPosition));
         } else {
             Log.d("TAG21", "Can not RESTORE PLACE CHECKIN ");
-            ApiFactory.getApi().getGroupWallById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), placeId, "checkin", "1", "photo_130", offset).enqueue(new Callback<ResponseContainer<ResponseWall>>() {
+            ApiFactory.getApi().getGroupWallById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), placeId, "checkin", "1", "photo_130", offset, 100).enqueue(new Callback<ResponseContainer<ResponseWall>>() {
                 @Override
                 public void onResponse(Call<ResponseContainer<ResponseWall>> call, Response<ResponseContainer<ResponseWall>> response) {
 
@@ -267,23 +250,7 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
                             }
                         }
 
-                        CheckinSliderAdapter checkinSliderAdapter = new CheckinSliderAdapter(getContext(), postList);
-                        viewPager.setAdapter(checkinSliderAdapter);
-
-                        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-                            @Override
-                            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                            }
-
-                            @Override
-                            public void onPageSelected(int position) {
-                                setNumeration(position);
-                            }
-
-                            @Override
-                            public void onPageScrollStateChanged(int state) {
-                            }
-                        });
+                        initPagerAdapter(postList);
 
                         if(offset==0){
                             for (int i = 0; i < postList.size(); i++) {
@@ -312,8 +279,31 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
         }
     }
 
+    private void initPagerAdapter(List<Post> postList) {
+        Log.d("TAG24", "initPagerAdapter " + postList.size());
+
+        CheckinSliderAdapter checkinSliderAdapter = new CheckinSliderAdapter(getContext(), postList);
+        viewPager.setAdapter(checkinSliderAdapter);
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                setNumeration(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void clickImage(EventBusMessages.ClickOnSliderImage event) {
+
 
         if(clearScreen){
         //    recyclerView.setVisibility(View.VISIBLE);
@@ -334,6 +324,9 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
 
         @Subscribe(threadMode = ThreadMode.MAIN)
     public void openPlace(EventBusMessages.ShowImage event){
+
+        Log.d("TAG24", "Open image " +  event.getPosition());
+
         currentPostIdPosition = event.getPosition();
 
         /**
@@ -378,13 +371,9 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
 
     void setLiked(boolean b){
         if(b){
-            likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_like_heart_vector_red));
-         //   likeIcon.setColorFilter(getResources().getColor(R.color.colorAccentRed));
-          //  likesCount.setTextColor(getResources().getColor(R.color.colorAccentRed));
+            likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart_vector_white));
         } else {
-            likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_like_heart_vector_grey));
-         //   likeIcon.setColorFilter(getResources().getColor(R.color.grey600));
-          //  likesCount.setTextColor(getResources().getColor(R.color.black_67percent));
+            likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart_outline_vector_white));
         }
     }
 
@@ -486,6 +475,7 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
             profiles = new HashMap();
         } else {
             Log.d("TAG21", "restore ok - " + postList.size());
+            currentPostIdPosition = (int) storage.getDate(getArguments().get("name") + "_currentPostIdPosition");
             mayRestore = true;
         }
 
@@ -514,6 +504,7 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
         if(dismissReason == TabStacker.DismissReason.REPLACED){
             storage.setDate(getArguments().get("name") + "_postList", postList);
             storage.setDate(getArguments().get("name") + "_profiles", profiles);
+            storage.setDate(getArguments().get("name") + "_currentPostIdPosition", currentPostIdPosition);
         }
         if(dismissReason == TabStacker.DismissReason.BACK){
         // delete shit

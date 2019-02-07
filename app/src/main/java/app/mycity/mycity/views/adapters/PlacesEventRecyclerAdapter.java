@@ -170,9 +170,11 @@ public class PlacesEventRecyclerAdapter extends RecyclerView.Adapter<PlacesEvent
                     @Override
                     public void onClick(View v) {
                      //   imageClickListener.onClick(getAdapterPosition());
-                        EventBus.getDefault().post(new EventBusMessages.OpenEventContent(postList.get(getAdapterPosition()).getId(),
+                        EventBus.getDefault().post(new EventBusMessages.OpenEventContent(
+                                postList.get(getAdapterPosition()).getId(),
                                 postList.get(getAdapterPosition()).getOwnerId(),
-                                groups.get(postList.get(getAdapterPosition()).getOwnerId()).getName()));
+                                groups.get(postList.get(getAdapterPosition()).getOwnerId()).getName(),
+                                false));
                     }
                 });
             }

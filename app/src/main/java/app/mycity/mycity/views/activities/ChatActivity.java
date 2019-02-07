@@ -105,7 +105,6 @@ public class ChatActivity extends AppCompatActivity {
 
     List<Message> results = new ArrayList<>();
     String userId;
-    public static String imageUrl = "";
     private boolean isLoading;
 
     @OnClick(R.id.change)
@@ -127,20 +126,11 @@ public class ChatActivity extends AppCompatActivity {
 
 
         emojiPopup = EmojiPopup.Builder.fromRootView(chatRootView).build(editText);
-       // emojiPopup.toggle(); // Toggles visibility of the Popup.
-     /*   emojiPopup.dismiss(); // Dismisses the Popup.
-        emojiPopup.isShowing();*/
 
         Log.i("TAG25", "CHAT onCREATE" );
 
         mRealm = Realm.getDefaultInstance();
-
-        userId = getIntent().getStringExtra("user_id");
-        imageUrl = getIntent().getStringExtra("image");
-
-        http://192.168.0.104/src/u4/41342266018b1fe8aa054b4e5f2ec462/o_7e46ed0986.jpg
-
-        Log.i("TAG25", "CHAT Photo130() - " + imageUrl);
+        userId = getIntent().getStringExtra("peer_id");
 
         SharedManager.addProperty("unread_" + userId, "0");
 
@@ -148,18 +138,14 @@ public class ChatActivity extends AppCompatActivity {
         nMgr.cancel(Integer.parseInt(userId));
 
         adapter = new ChatRecyclerAdapter(results);
-
         layoutManager.setReverseLayout(true);
         layoutManager.setStackFromEnd(true);
-
-
         editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 Log.d("TAG25", "Focus - " + hasFocus);
             }
         });
-
         RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -300,6 +286,8 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ResponseContainer<MessageResponse>> call, Throwable t) {
+                Log.d("TAG25", "load message fail " + t.getLocalizedMessage());
+                Log.d("TAG25", "load message fail " + t.getCause());
 
             }
         });

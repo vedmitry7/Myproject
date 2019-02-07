@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 import app.mycity.mycity.R;
 import app.mycity.mycity.util.EventBusMessages;
@@ -149,6 +153,27 @@ public class FeedFragment extends Fragment implements TabStacker.TabStackInterfa
     @Override
     public void onTabFragmentDismissed(TabStacker.DismissReason dismissReason) {
 
+        if(dismissReason == TabStacker.DismissReason.BACK){
+
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    storage.remove(getArguments().get("name") + "_postList_" + "all");
+                    storage.remove(getArguments().get("name") + "_postListTotalCount_" + "all");
+                    storage.remove(getArguments().get("name") + "_profiles_" + "all");
+                    storage.remove(getArguments().get("name") + "_groups_" + "all");
+                    storage.remove(getArguments().get("name") + "_scrollPosition_" + "all");
+
+                    storage.remove(getArguments().get("name") + "_postList_" + "subscriptions");
+                    storage.remove(getArguments().get("name") + "_postListTotalCount_" + "subscriptions");
+                    storage.remove(getArguments().get("name") + "_profiles_" + "subscriptions");
+                    storage.remove(getArguments().get("name") + "_groups_" + "subscriptions");
+                    storage.remove(getArguments().get("name") + "_scrollPosition_" + "subscriptions");
+
+                }
+            }, 200);
+
+        }
     }
 
     @Override

@@ -40,6 +40,7 @@ import app.mycity.mycity.api.model.Group;
 import app.mycity.mycity.api.model.Post;
 import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.api.model.ResponseLike;
+import app.mycity.mycity.api.model.ResponsePlaces;
 import app.mycity.mycity.api.model.ResponseWall;
 import app.mycity.mycity.api.model.Success;
 import app.mycity.mycity.util.EventBusMessages;
@@ -94,6 +95,9 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
     @BindView(R.id.profileFragSubscriptionTv)
     TextView subscriptionsCount;
+
+    @BindView(R.id.profileFragPlacesCount)
+    TextView placesCount;
 
     @BindView(R.id.profileNestedScrollView)
     NestedScrollView scrollView;
@@ -318,9 +322,9 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
                     if(profile.getIsSubscription()==1){
                         isSubscription = true;
-                        fab.setImageDrawable(ContextCompat.getDrawable(getActivity().getApplicationContext(), R.drawable.ic_delete_subscription));
+                        fab.setBackgroundResource(R.drawable.ic_delete_subscription);
                     } else {
-                        fab.setImageResource(R.drawable.ic_add_subscription);
+                        fab.setBackgroundResource(R.drawable.ic_add_subscription);
                     }
 
                     name.setText(profile.getFirstName() + " " + profile.getLastName());
@@ -381,6 +385,20 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
             }
         });
 
+        ApiFactory.getApi().getPlacesByUserId(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), 0, 552, userId).enqueue(new retrofit2.Callback<ResponseContainer<ResponsePlaces>>() {
+            @Override
+            public void onResponse(retrofit2.Call<ResponseContainer<ResponsePlaces>> call, retrofit2.Response<ResponseContainer<ResponsePlaces>> response) {
+                if(response.body()!=null){
+                    placesCount.setText("" + response.body().getResponse().getCount());
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<ResponseContainer<ResponsePlaces>> call, Throwable t) {
+
+            }
+        });
+
 
 
     }
@@ -427,7 +445,7 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
     public void chat(View v) {
         Log.d("TAG", "Chat ");
         Intent intent = new Intent(getContext(), ChatActivity.class);
-        intent.putExtra("user_id",  userId);
+        intent.putExtra("peer_id",  userId);
         intent.putExtra("image", profile.getPhoto130());
         intent.putExtra("name", profile.getFirstName() + " " + profile.getLastName());
         getContext().startActivity(intent);

@@ -15,11 +15,9 @@ import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import com.google.firebase.FirebaseApp;
 import com.vanniktech.emoji.EmojiManager;
-import com.vanniktech.emoji.google.GoogleEmojiProvider;
 import com.vanniktech.emoji.ios.IosEmojiProvider;
-import com.vanniktech.emoji.one.EmojiOneProvider;
-import com.vanniktech.emoji.twitter.TwitterEmojiProvider;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -41,12 +39,19 @@ public class App extends Application implements Application.ActivityLifecycleCal
     @Override
     public void onCreate() {
         super.onCreate();
-        MultiDex.install(this);
+      //  MultiDex.install(this);
+        FirebaseApp.initializeApp(this);
         SharedManager.init(this);
         initRealm();
         EmojiManager.install(new IosEmojiProvider());
 
         registerActivityLifecycleCallbacks(this);
+    }
+
+    @Override
+    protected void attachBaseContext(Context context) {
+        super.attachBaseContext(context);
+        MultiDex.install(this);
     }
 
     public static void closeKeyboard(Context context){

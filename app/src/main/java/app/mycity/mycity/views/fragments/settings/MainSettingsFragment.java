@@ -3,22 +3,33 @@ package app.mycity.mycity.views.fragments.settings;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+
+import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.LocationService;
 import app.mycity.mycity.R;
 import app.mycity.mycity.SocketService;
+import app.mycity.mycity.api.ApiFactory;
+import app.mycity.mycity.api.model.ResponseContainer;
+import app.mycity.mycity.api.model.Success;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.activities.LoginActivity;
 import app.mycity.mycity.views.activities.MainActivity3;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import fr.arnaudguyon.tabstacker.TabStacker;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainSettingsFragment extends Fragment implements TabStacker.TabStackInterface {
 
@@ -33,13 +44,41 @@ public class MainSettingsFragment extends Fragment implements TabStacker.TabStac
 
     @OnClick(R.id.logoutButton)
     public void logout(View v){
+        unregisterDevice();
+
         SharedManager.addBooleanProperty("login", false);
         getActivity().stopService(new Intent(getContext(), SocketService.class));
         getActivity().stopService(new Intent(getContext(), LocationService.class));
-        SharedManager.addProperty(Constants.KEY_ACCESS_TOKEN, "null");
-        getActivity().finish();
-        Intent intent = new Intent(getActivity(), LoginActivity.class);
-        startActivity(intent);
+        FirebaseMessaging.getInstance().unsubscribeFromTopic("profile" + SharedManager.getProperty(Constants.KEY_MY_ID));
+
+
+    }
+
+    void unregisterDevice(){
+        String androidID = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        Log.i("TAG21", "android Id " + androidID);
+        Log.i("TAG21", "t " + App.accessToken());
+
+
+        ApiFactory.getApi().unregisterDevice(App.accessToken(), androidID).enqueue(new Callback<ResponseContainer<Success>>() {
+            @Override
+            public void onResponse(Call<ResponseContainer<Success>> call, Response<ResponseContainer<Success>> response) {
+                if(response.body().getResponse().getSuccess()==1){
+                    SharedManager.addBooleanProperty("deviceRegister", false);
+
+                    SharedManager.addProperty(Constants.KEY_ACCESS_TOKEN, "null");
+                    SharedManager.addBooleanProperty("deviceRegister", false);
+                    getActivity().finish();
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseContainer<Success>> call, Throwable t) {
+
+            }
+        });
     }
 
     @Override

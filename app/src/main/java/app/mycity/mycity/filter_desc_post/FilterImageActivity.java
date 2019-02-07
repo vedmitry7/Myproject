@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.TabLayout;
-import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -43,7 +42,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static okhttp3.RequestBody.create;
 
 public class FilterImageActivity extends AppCompatActivity implements FiltersListFragment.FiltersListFragmentListener, FilterEditImageFragment.EditImageFragmentListener {
 
@@ -304,11 +302,11 @@ public class FilterImageActivity extends AppCompatActivity implements FiltersLis
         Log.d("TAG21", file.getAbsolutePath());
         fileUri = Uri.fromFile(file);
 
-        Uri imageUri = FileProvider.getUriForFile(
+       /* Uri imageUri = FileProvider.getUriForFile(
                 this,
                 "app.mycity.mycity.provider", //(use your app signature + ".provider" )
-                file);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                file);*/
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
         startActivityForResult(intent, REQUEST_CODE);
 
     }

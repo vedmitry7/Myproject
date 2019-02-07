@@ -89,7 +89,8 @@
         android:id="@+id/messageContentBottomPadding"
         android:layout_width="match_parent"
         android:layout_height="12dp"
-        tools:layout_editor_absoluteY="48dp" />
+        tools:layout_editor_absoluteY="48dp"
+        tools:ignore="MissingConstraints" />
 
     <View
         android:visibility="gone"
@@ -117,6 +118,7 @@
         android:text="12.06.17"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/messageDeliverLine"
-        tools:layout_editor_absoluteX="0dp" />
+        tools:layout_editor_absoluteX="0dp"
+        tools:ignore="MissingConstraints" />
 
 </android.support.constraint.ConstraintLayout>

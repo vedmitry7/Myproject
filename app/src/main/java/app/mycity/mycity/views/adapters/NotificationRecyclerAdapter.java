@@ -79,7 +79,7 @@ public class NotificationRecyclerAdapter extends RecyclerView.Adapter<Notificati
         final Notification notification = notifications.get(position);
 
         holder.time.setText(Util.getDatePretty(notification.getDate()));
-        holder.name.setText(notification.getFeedback().getFirstName() + " " + notification.getFeedback().getLastName());
+        holder.name.setText(position + " " +notification.getFeedback().getFirstName() + " " + notification.getFeedback().getLastName());
         Picasso.get().load(notification.getFeedback().getPhoto130()).into(holder.photo);
 
         if(notification.getType().equals("follow")){

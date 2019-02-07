@@ -95,7 +95,6 @@ public class FeedPhotoReportFragmentContentNew extends android.support.v4.app.Fr
     ConstraintLayout buttonsContainer;
 
     List<Photo> photoList;
-
     Group group;
 
     FeedPhotoReportContentAdapter adapter;
@@ -219,8 +218,11 @@ public class FeedPhotoReportFragmentContentNew extends android.support.v4.app.Fr
     private void loadMedia(final int offset) {
 
         if(mayRestore){
-            Log.d("TAG21", "RESTORE PLACE CHECKIN");
+            Log.d("TAG24", "restore");
+            placeHolder.setVisibility(View.GONE);
+            initPagerAdapter(photoList);
             adapter.update(photoList);
+            setInfo(new EventBusMessages.ShowImage(currentPostIdPosition));
         } else {
             Log.d("TAG21", "Can not RESTORE PLACE CHECKIN ");
             ApiFactory.getApi().getAlbum(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),
@@ -237,25 +239,7 @@ public class FeedPhotoReportFragmentContentNew extends android.support.v4.app.Fr
 
                         totalCount = response.body().getResponse().getCount();
 
-                        AlbumSliderAdapter albumSliderAdapter = new AlbumSliderAdapter(getContext(), photoList);
-                        viewPager.setAdapter(albumSliderAdapter);
-
-                        //Picasso.get().load(photoList.get(getArguments().getInt("position")).getPhoto780()).into(image);
-
-                        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-                            @Override
-                            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                            }
-
-                            @Override
-                            public void onPageSelected(int position) {
-                                setNumeration(position);
-                            }
-
-                            @Override
-                            public void onPageScrollStateChanged(int state) {
-                            }
-                        });
+                       initPagerAdapter(photoList);
 
                         if(response.body().getResponse().getGroups()!=null){
                             Log.d("TAG24", "Groups GET");
@@ -279,6 +263,30 @@ public class FeedPhotoReportFragmentContentNew extends android.support.v4.app.Fr
         }
 
     }
+
+    private void initPagerAdapter(List<Photo> photoList) {
+        Log.d("TAG24", "init pager");
+        AlbumSliderAdapter albumSliderAdapter = new AlbumSliderAdapter(getContext(), photoList);
+        viewPager.setAdapter(albumSliderAdapter);
+
+        //Picasso.get().load(photoList.get(getArguments().getInt("position")).getPhoto780()).into(image);
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                setNumeration(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
+    }
+
 
     @OnClick(R.id.likeIcon)
     public void like(View v) {
@@ -344,12 +352,8 @@ public class FeedPhotoReportFragmentContentNew extends android.support.v4.app.Fr
     void setLiked(boolean b){
         if(b){
             likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart_vector_white));
-          //  likeIcon.setColorFilter(getResources().getColor(R.color.colorAccentRed));
-           // likesCount.setTextColor(getResources().getColor(R.color.colorAccentRed));
         } else {
             likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart_outline_vector_white));
-           // likeIcon.setColorFilter(getResources().getColor(R.color.grey600));
-          //  likesCount.setTextColor(getResources().getColor(R.color.black_67percent));
         }
     }
 
@@ -359,19 +363,22 @@ public class FeedPhotoReportFragmentContentNew extends android.support.v4.app.Fr
 
         storage = (Storage) context;
 
-       // photoList = (List<Photo>) storage.getDate(getArguments().get("name")+ "_postList");
+        photoList = (List<Photo>) storage.getDate(getArguments().get("name")+ "_photoList");
+        group = (Group) storage.getDate(getArguments().get("name")+ "_group");
 
         if(photoList ==null){
             Log.d("TAG21", "restore null");
             photoList = new ArrayList<>();
         } else {
             Log.d("TAG21", "restore ok - " + photoList.size());
+            currentPostIdPosition = (int) storage.getDate(getArguments().get("name") + "_currentPostIdPosition");
             mayRestore = true;
         }
     }
 
     private void setNumeration(int current){
         numeration.setText((current+1)+"/"+totalCount);
+        recyclerView.smoothScrollToPosition(current);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -414,10 +421,15 @@ public class FeedPhotoReportFragmentContentNew extends android.support.v4.app.Fr
     @Override
     public void onTabFragmentDismissed(TabStacker.DismissReason dismissReason) {
         if(dismissReason == TabStacker.DismissReason.REPLACED){
+            storage.setDate(getArguments().get("name") + "_photoList", photoList);
+            storage.setDate(getArguments().get("name") + "_group", group);
+            storage.setDate(getArguments().get("name") + "_currentPostIdPosition", currentPostIdPosition);
+
         }
         if(dismissReason == TabStacker.DismissReason.BACK){
-        // delete shit
-
+            storage.remove(getArguments().get("name") + "_photoList");
+            storage.remove(getArguments().get("name") + "_group");
+            storage.remove(getArguments().get("name") + "_currentPostIdPosition");
         }
 
     }

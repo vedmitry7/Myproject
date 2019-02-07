@@ -256,13 +256,9 @@ public class ProfileCheckinContent extends android.support.v4.app.Fragment imple
 
     void setLiked(boolean b){
         if(b){
-            likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_like_heart_vector_red));
-            //   likeIcon.setColorFilter(getResources().getColor(R.color.colorAccentRed));
-            //  likesCount.setTextColor(getResources().getColor(R.color.colorAccentRed));
+            likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart_vector_white));
         } else {
-            likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_like_heart_vector_grey));
-            //   likeIcon.setColorFilter(getResources().getColor(R.color.grey600));
-            //  likesCount.setTextColor(getResources().getColor(R.color.black_67percent));
+            likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart_outline_vector_white));
         }
     }
 

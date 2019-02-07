@@ -341,7 +341,8 @@ public interface ApiInterface {
                                                            @Field("filter") String filters,
                                                            @Field("extended") String extended,
                                                            @Field("fields") String fields,   //for users
-                                                           @Field("offset") int offset);
+                                                           @Field("offset") int offset,
+                                                           @Field("count") int count);
 
     @FormUrlEncoded
     @POST("wall.get")
@@ -617,4 +618,16 @@ public interface ApiInterface {
     @POST("database.getCities")
     Call<ResponseContainer<ResponseCities>> getCities(@Field("country_id") String countryId);
 
+
+
+    @FormUrlEncoded
+    @POST("account.registerDevice")
+    Call<ResponseContainer<Success>> registerDevice(@Field("access_token") String token,
+                                                    @Field("device_id") String deviceId,
+                                                    @Field("token") String FCMToken);
+
+    @FormUrlEncoded
+    @POST("account.unregisterDevice")
+    Call<ResponseContainer<Success>> unregisterDevice(@Field("access_token") String token,
+                                                    @Field("device_id") String deviceId);
 }

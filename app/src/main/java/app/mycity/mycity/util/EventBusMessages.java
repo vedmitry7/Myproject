@@ -324,7 +324,16 @@ public class EventBusMessages {
     }
 
     public static class OpenPlace {
+        boolean closeCurrent;
         private String id;
+
+        public boolean isCloseCurrent() {
+            return closeCurrent;
+        }
+
+        public void setCloseCurrent(boolean closeCurrent) {
+            this.closeCurrent = closeCurrent;
+        }
 
         public String getId() {
             return id;
@@ -546,11 +555,13 @@ public class EventBusMessages {
         private String eventId;
         private String ownerId;
         private String placeName;
+        private boolean backToPlace;
 
-        public OpenEventContent(String eventId, String ownerId, String placeName) {
+        public OpenEventContent(String eventId, String ownerId, String placeName, boolean backToPlace) {
             this.eventId = eventId;
             this.ownerId = ownerId;
             this.placeName = placeName;
+            this.backToPlace = backToPlace;
         }
 
         public String getEventId() {
@@ -563,6 +574,14 @@ public class EventBusMessages {
 
         public String getPlaceName() {
             return placeName;
+        }
+
+        public boolean isBackToPlace() {
+            return backToPlace;
+        }
+
+        public void setBackToPlace(boolean backToPlace) {
+            this.backToPlace = backToPlace;
         }
     }
 

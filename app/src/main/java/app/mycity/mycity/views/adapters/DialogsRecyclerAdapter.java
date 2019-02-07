@@ -132,7 +132,7 @@ public class DialogsRecyclerAdapter extends RecyclerView.Adapter<DialogsRecycler
                     dialogList.get(getAdapterPosition()).setCountUnread(0);
 
                     Intent intent = new Intent(context, ChatActivity.class);
-                    intent.putExtra("user_id", dialogList.get(getAdapterPosition()).getId());
+                    intent.putExtra("peer_id", dialogList.get(getAdapterPosition()).getId());
                     intent.putExtra("image", dialogList.get(getAdapterPosition()).getPhoto130());
                     intent.putExtra("name", dialogList.get(getAdapterPosition()).getTitle());
                     context.startActivity(intent);

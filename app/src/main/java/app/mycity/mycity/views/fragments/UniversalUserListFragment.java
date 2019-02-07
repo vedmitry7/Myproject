@@ -78,6 +78,15 @@ public class UniversalUserListFragment extends Fragment {
         recyclerView.setAdapter(adapter);
         Log.d("TAG21", "ViewCreated " + this.getClass().getSimpleName());
 
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+
+            }
+        });
+
         getFriendsList();
     }
 
