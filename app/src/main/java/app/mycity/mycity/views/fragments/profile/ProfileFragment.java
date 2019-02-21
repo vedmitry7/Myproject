@@ -56,6 +56,7 @@ import app.mycity.mycity.api.model.ResponseSavePhoto;
 import app.mycity.mycity.api.model.ResponseUploadServer;
 import app.mycity.mycity.api.model.ResponseUploading;
 import app.mycity.mycity.api.model.ResponseWall;
+import app.mycity.mycity.api.model.Success;
 import app.mycity.mycity.api.model.UsersContainer;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
@@ -98,6 +99,9 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
     TextView name;
     @BindView(R.id.profileFragSubscriberTv)
     TextView subscribersCount;
+
+    @BindView(R.id.profileAbout)
+    TextView profileAbout;
 
     @BindView(R.id.profileFragSubscriptionTv)
     TextView subscriptionsCount;
@@ -152,8 +156,6 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // keep the fragment and all its data across screen rotation
-        //setRetainInstance(true);
     }
 
     public static ProfileFragment createInstance(String name) {
@@ -318,15 +320,13 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
         };
     }
 
-
     private void getInfoViaRetrofit(){
         //  getObservable().subscribeWith(getObserver());
     }
 
-
     private void getInfo(){
         Log.i("TAG21", "Get Info");
-        ApiFactory.getApi().getUser(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "photo_550,photo_130").enqueue(new retrofit2.Callback<ResponseContainer<Profile>>() {
+        ApiFactory.getApi().getUser(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "about,photo_550,photo_130").enqueue(new retrofit2.Callback<ResponseContainer<Profile>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<Profile>> call, retrofit2.Response<ResponseContainer<Profile>> response) {
                 profile = response.body().getResponse();
@@ -340,6 +340,11 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
                     infoLoad = true;
                     showContent();
                     Picasso.get().load(profile.getPhoto550()).into(imageView);
+                    if(profile.getAbout().length()==0){
+                        profileAbout.setVisibility(View.GONE);
+                    } else {
+                        profileAbout.setText(profile.getAbout());
+                    }
                     Log.i("TAG21", "130 " + response.body().getResponse().getPhoto130());
                     SharedManager.addProperty(Constants.KEY_PHOTO_130, response.body().getResponse().getPhoto130());
                     if(progressDialog!=null){
@@ -510,7 +515,17 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
                             deleteAvatar.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
+                                    ApiFactory.getApi().deletePhoto(App.accessToken()).enqueue(new Callback<ResponseContainer<Success>>() {
+                                        @Override
+                                        public void onResponse(Call<ResponseContainer<Success>> call, Response<ResponseContainer<Success>> response) {
+                                            getInfo();
+                                        }
 
+                                        @Override
+                                        public void onFailure(Call<ResponseContainer<Success>> call, Throwable t) {
+
+                                        }
+                                    });
 
 
                                     dialog.dismiss();
@@ -720,35 +735,6 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
                 }
             });
         }
-
-/*
-        RequestBody body = new FormBody.Builder()
-                .add("access_token", SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN))
-                .add("type", "post")
-                .add("item_id", postList.get(event.getAdapterPosition()).getPos().toString())
-                .add("owner_id", postList.get(event.getAdapterPosition()).getOwnerId().toString())
-                .build();
-
-        Request request = new Request.Builder().url("http://192.168.0.104/api/likes.add")
-                .post(body)
-                .build();
-
-        okhttp3.Response response = null;
-        OkHttpClientFactory.getClient().newCall(request).enqueue(new okhttp3.Callback() {
-            @Override
-            public void onFailure(okhttp3.Call call, IOException e) {
-
-            }
-
-            @Override
-            public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
-                String responseString = response.body().string();
-                Log.i("TAG21", responseString);
-                String responseClear = responseString.substring(1,responseString.length()-1);
-                Log.i("TAG21", responseClear);
-            }
-        });*/
-
     }
 
     @Override

@@ -56,11 +56,20 @@
             android:name=".views.activities.MainActivity3"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" >
-
-
             <intent-filter>
                 <action android:name="MAIN_ACTIVITY" />
                 <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Accepts URIs that begin with "http://www.example.com/gizmos” -->
+                <data android:scheme="http"
+                    android:host="front.itmacros.beget.tech"
+                    android:pathPrefix="/" />
+                <!-- note that the leading "/" is required for pathPrefix-->
             </intent-filter>
 
         </activity>

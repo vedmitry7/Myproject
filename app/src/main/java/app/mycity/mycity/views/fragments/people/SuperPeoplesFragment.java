@@ -1,4 +1,4 @@
-package app.mycity.mycity.views.fragments.top;
+package app.mycity.mycity.views.fragments.people;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -63,11 +63,17 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
     @BindView(R.id.progressBarPlaceHolder)
     ConstraintLayout progressBarPlaceHolder;
 
+    @BindView(R.id.listEmptyContainer)
+    ConstraintLayout listEmptyContainer;
+
     @BindView(R.id.horizontalRecyclerView)
     RecyclerView categoriesRecyclerView;
 
     @BindView(R.id.editTextSearch)
     TextView search;
+
+    @BindView(R.id.toolBarTitle)
+    TextView toolBarTitle;
 
     @BindView(R.id.clearSearch)
     ImageView clearSearch;
@@ -80,6 +86,8 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
     List<PlaceCategory> placeCategories;
 
     String filter = "";
+    private boolean isLoading;
+    private int totalCount;
 
     @Nullable
     @Override
@@ -111,20 +119,49 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        toolBarTitle.setText("Люди");
 
         Util.setNawBarClickListener(view);
         Util.setNawBarIconColor(getContext(), view, -1);
 
+        final LinearLayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
+
         userList = new ArrayList<>();
-        recyclerView.setLayoutManager(new GridLayoutManager(this.getActivity(), 2));
+        recyclerView.setLayoutManager(layoutManager);
         adapter = new PeoplesRecyclerAdapter(userList);
         recyclerView.setAdapter(adapter);
         Log.d("TAG", "ViewCreated " + this.getClass().getSimpleName());
 
+        RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int first = layoutManager.findFirstVisibleItemPosition();
+                int totalItemCount = layoutManager.getItemCount();
+                int lastVisibleItems = layoutManager.findLastVisibleItemPosition();
+
+                if (!isLoading) {
+                    if ( lastVisibleItems >= totalItemCount -10 ) {
+                        Log.d("TAG21", "ЗАГРУЗКА ДАННЫХ " + userList.size());
+                        Log.d("TAG21", "Total count " + totalCount);
+                        isLoading = true;
+                        // load if we don't load all
+                        if(totalCount > userList.size()){
+                            Log.d("TAG21", "load feed FROM SCROLL");
+                            getUsersList(filter, search.getText().toString(), userList.size());
+                        }
+                    }
+                } else {
+                    Log.d("TAG21", "did not load yet ");
+                }
+            }
+        };
+
+        recyclerView.addOnScrollListener(scrollListener);
+
         progressBarPlaceHolder.setVisibility(View.GONE);
 
-
-        getUsersList("", "");
+        getUsersList("", "", userList.size());
 
 
         placeCategories = new ArrayList<>();
@@ -176,7 +213,7 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
                     userList = new ArrayList<>();
                     adapter.notifyDataSetChanged();
                     App.hideKeyboard(getActivity());
-                    getUsersList("", search.getText().toString());
+                    getUsersList(filter, search.getText().toString(), userList.size());
                     search.clearFocus();
                     return true;
                 }
@@ -189,20 +226,17 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
             public void onClick(View v) {
                 search.setText("");
                 clearSearch.setVisibility(View.GONE);
-                getUsersList("", "");
+                userList = new ArrayList<>();
+                getUsersList(filter, "", userList.size());
             }
         });
-
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void gfdsgsd(EventBusMessages.SortPeople event){
         Log.i("TAG21","sort - " + event.getPosition());
 
-
         userList = new ArrayList<>();
-
-
         switch (event.getPosition()){
             case 0:
                 filter = "";
@@ -215,7 +249,7 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
                 break;
         }
 
-        getUsersList(filter, search.getText().toString());
+        getUsersList(filter, search.getText().toString(), userList.size());
         search.clearFocus();
     }
 
@@ -227,7 +261,7 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
         Log.i("TAG3","All list attach");
     }
 
-    private void getUsersList(String filter, String search){
+    private void getUsersList(String filter, String search, int offset){
         Log.d("TAG", "getUsersList " + this.getClass().getSimpleName());
         Log.i("TAG21","getUsers - f:" + filter + " s:" + search);
         int sex = 0;
@@ -245,15 +279,25 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
         }
 
 
-        ApiFactory.getApi().getTopUsersInPlacesWithSorting(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "photo_360,place,count_likes", "top", filter, sex, ageFrom, ageTo, "1").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
+        ApiFactory.getApi().getTopUsersInPlacesWithSorting(App.accessToken(), App.chosenCity(), offset, "photo_360,place,count_likes", "top", filter, search, sex, ageFrom, ageTo, "1").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<UsersContainer>> call, retrofit2.Response<ResponseContainer<UsersContainer>> response) {
                 UsersContainer users = response.body().getResponse();
 
                 if(users != null){
-                    userList = users.getFriends();
-                    Log.d("TAG", "Users all loaded. List size = " + userList.size());
+                    userList.addAll(users.getFriends());
+                    isLoading = false;
+
+                    totalCount = response.body().getResponse().getCount();
+                    Log.d("TAG21", "Users all loaded. List size = " + userList.size());
+                    Log.d("TAG21", "Total - " + response.body().getResponse().getCount());
                     adapter.update(userList);
+
+                    if(response.body().getResponse().getCount()==0){
+                        listEmptyContainer.setVisibility(View.VISIBLE);
+                    } else {
+                        listEmptyContainer.setVisibility(View.GONE);
+                    }
                 } else {
 
                 }
@@ -363,9 +407,6 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
         final int[] positionFrom = {SharedManager.getIntProperty("ageFrom")};
          final int[] positionTo = {SharedManager.getIntProperty("ageTo")};
 
-     //   final int[] positionFrom = {0};
-     //   final int[] positionTo = {7};
-
         spinnerFrom.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -424,7 +465,7 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
 
         builder.setPositiveButton("Ок", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                getUsersList(filter,"");
+                getUsersList(filter,"", userList.size());
                 // User clicked OK button
             }
         });
@@ -439,34 +480,6 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
         final AlertDialog dialog = builder.create();
         dialog.show();
     }
-
-    private void getFriendsListById(){
-        Log.d("TAG", "getFriendsListById " + this.getClass().getSimpleName());
-
-        ApiFactory.getApi().getUsersById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),"sdfsd", "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
-            @Override
-            public void onResponse(retrofit2.Call<ResponseContainer<UsersContainer>> call, retrofit2.Response<ResponseContainer<UsersContainer>> response) {
-
-
-
-                UsersContainer users = response.body().getResponse();
-
-                if(users != null){
-                    userList = users.getFriends();
-                    Log.d("TAG", "Users all loaded. List size = " + userList.size());
-                    adapter.update(userList);
-                } else {
-
-                }
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<ResponseContainer<UsersContainer>> call, Throwable t) {
-
-            }
-        });
-    }
-
 
     public void onStart() {
         super.onStart();

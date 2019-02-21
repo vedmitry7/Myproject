@@ -209,7 +209,7 @@
             android:layout_marginStart="16dp"
             android:background="@android:color/white"
             android:gravity="center_vertical"
-            android:hint="Страна"
+            android:hint="Введите название города"
             android:text=""
             android:textSize="16sp" />
 

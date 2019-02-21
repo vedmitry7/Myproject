@@ -114,14 +114,13 @@ public class EventContentFragment extends android.support.v4.app.Fragment implem
 
     Profile profile;
 
-    public static EventContentFragment createInstance(String name, String eventId, String ownerId, String placeName, boolean backToPlace) {
+    public static EventContentFragment createInstance(String name, String eventId, String ownerId, boolean backToPlace) {
         EventContentFragment fragment = new EventContentFragment();
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
         bundle.putString("eventId", eventId);
         bundle.putBoolean("backToPlace", backToPlace);
         bundle.putString("ownerId", ownerId);
-        bundle.putString("placeName", placeName);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -136,6 +135,8 @@ public class EventContentFragment extends android.support.v4.app.Fragment implem
 
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
+
+        EventBus.getDefault().post(new EventBusMessages.BlackStatusBar());
 
         View.OnClickListener openUserListener = new View.OnClickListener() {
             @Override
@@ -163,18 +164,6 @@ public class EventContentFragment extends android.support.v4.app.Fragment implem
         recyclerView.setAdapter(adapter);
 
         loadContent(0);
-
-        placeName.setText(getArguments().getString("placeName"));
-
-      /*  for (int i = 0; i < postList.size(); i++) {
-            if(postList.get(i).getId()==getArguments().getString("postId")){
-                setLiked(postList.get(i).getLikes().getUserLikes()==1);
-                likesCount.setText(String.valueOf(postList.get(i).getLikes().getCount()));
-                currentPostIdPosition = i;
-            }
-        }*/
-
-        //super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
@@ -193,7 +182,7 @@ public class EventContentFragment extends android.support.v4.app.Fragment implem
         if(mayRestore){
             //adapter.update(postList, groups);
         } else {
-            ApiFactory.getApi().getEventsById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("eventId")).enqueue(new retrofit2.Callback<ResponseContainer<ResponseEvents>>() {
+            ApiFactory.getApi().getEventsById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("eventId"), "1").enqueue(new retrofit2.Callback<ResponseContainer<ResponseEvents>>() {
                 @Override
                 public void onResponse(retrofit2.Call<ResponseContainer<ResponseEvents>> call, retrofit2.Response<ResponseContainer<ResponseEvents>> response) {
 
@@ -206,6 +195,10 @@ public class EventContentFragment extends android.support.v4.app.Fragment implem
                            // placeHolderNoEvents.setVisibility(View.GONE);
                         }
                         placeHolder.setVisibility(View.GONE);
+
+                        if(response.body().getResponse().getGroups()!=null)
+                        placeName.setText(response.body().getResponse().getGroups().get(0).getName());
+
 
                         event = response.body().getResponse().getItems().get(0);
                         show();
@@ -251,14 +244,11 @@ public class EventContentFragment extends android.support.v4.app.Fragment implem
     public void back(View v){
 
         if(getArguments().getBoolean("backToPlace")) {
-            Log.d("TAG26","backToPlace");
-            Log.d("TAG26","post event");
             EventBusMessages.OpenPlace openPlace = new EventBusMessages.OpenPlace(getArguments().getString("ownerId"));
             openPlace.setCloseCurrent(true);
+            openPlace.setTabPos(3);
             EventBus.getDefault().post(openPlace);
-            //  getActivity().onBackPressed();
         } else {
-            Log.d("TAG26","usual back");
             getActivity().onBackPressed();
         }
     }

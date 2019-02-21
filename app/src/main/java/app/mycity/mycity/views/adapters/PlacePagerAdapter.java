@@ -6,11 +6,12 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
 
 import app.mycity.mycity.api.model.Place;
-import app.mycity.mycity.views.fragments.places.PhotoAlbumsFragment;
 import app.mycity.mycity.views.fragments.SimpleFragment;
 import app.mycity.mycity.views.fragments.places.PlaceActions;
 import app.mycity.mycity.views.fragments.places.PlaceEvents;
 import app.mycity.mycity.views.fragments.places.PlaceInfoFragment;
+import app.mycity.mycity.views.fragments.places.PlacePhotoAlbumFragment;
+import app.mycity.mycity.views.fragments.places.PlaceServices;
 import app.mycity.mycity.views.fragments.places.PlacesCheckinFragment;
 
 public class PlacePagerAdapter extends FragmentPagerAdapter {
@@ -35,18 +36,20 @@ public class PlacePagerAdapter extends FragmentPagerAdapter {
             case 1:
                 return PlaceInfoFragment.createInstance();
             case 2:
-                return PhotoAlbumsFragment.createInstance(tabName, place.getId());
+                return PlacePhotoAlbumFragment.createInstance(tabName, place.getId());
             case 3:
                 return PlaceEvents.createInstance(tabName, place.getId());
             case 4:
                 return PlaceActions.createInstance(tabName, place.getId());
+            case 5:
+                return PlaceServices.createInstance(tabName, place.getId());
         }
         return new SimpleFragment();
     }
 
     @Override
     public int getCount() {
-        return 5;
+        return 6;
     }
 
     @Override
@@ -62,6 +65,8 @@ public class PlacePagerAdapter extends FragmentPagerAdapter {
                 return "События";
             case 4:
                 return "Акции";
+            case 5:
+                return "Услуги";
         }
         return null;
     }

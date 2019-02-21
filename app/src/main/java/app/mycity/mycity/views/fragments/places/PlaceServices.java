@@ -1,4 +1,4 @@
-package app.mycity.mycity.views.fragments.feed;
+package app.mycity.mycity.views.fragments.places;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -18,26 +19,25 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.Group;
 import app.mycity.mycity.api.model.Post;
-import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponseLike;
 import app.mycity.mycity.api.model.ResponseVisit;
 import app.mycity.mycity.api.model.ResponseWall;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
-import app.mycity.mycity.views.adapters.PlacesEventRecyclerAdapter;
+import app.mycity.mycity.views.activities.Storage;
+import app.mycity.mycity.views.adapters.AllActionRecyclerAdapter;
+import app.mycity.mycity.views.adapters.ServicesRecyclerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import fr.arnaudguyon.tabstacker.TabStacker;
 
-public class FeedEvents extends android.support.v4.app.Fragment implements TabStacker.TabStackInterface {
+public class PlaceServices extends android.support.v4.app.Fragment{
 
 
     @BindView(R.id.placeEventsFragmentRecyclerView)
@@ -46,13 +46,23 @@ public class FeedEvents extends android.support.v4.app.Fragment implements TabSt
     @BindView(R.id.placeEventsPlaceHolder)
     RelativeLayout placeHolderNoEvents;
 
-    PlacesEventRecyclerAdapter adapter;
+    @BindView(R.id.placeHolderInfo)
+    TextView placeHolderInfo;
+
+    ServicesRecyclerAdapter adapter;
 
     List<Post> postList;
     HashMap<String, Group> groups = new HashMap<String, Group>();
 
     boolean isLoading;
     int totalCount;
+
+    Storage storage;
+
+    boolean mayRestore;
+
+    LinearLayoutManager layoutManager;
+    private int position;
 
     @Nullable
     @Override
@@ -62,15 +72,22 @@ public class FeedEvents extends android.support.v4.app.Fragment implements TabSt
         return view;
     }
 
+    public static PlaceServices createInstance(String name, String placeId) {
+        PlaceServices fragment = new PlaceServices();
+        Bundle bundle = new Bundle();
+        bundle.putString("name", name);
+        bundle.putString("placeId", placeId);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        postList = new ArrayList<>();
-        groups = new HashMap();
-        adapter = new PlacesEventRecyclerAdapter(postList, groups);
+        adapter = new ServicesRecyclerAdapter(postList, groups);
 
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager = new LinearLayoutManager(getActivity());
 
         RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
             @Override
@@ -101,74 +118,49 @@ public class FeedEvents extends android.support.v4.app.Fragment implements TabSt
 
     private void loadFeed(int offset) {
 
-        ApiFactory.getApi().getAllEvents(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "1", 0).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
-            @Override
-            public void onResponse(retrofit2.Call<ResponseContainer<ResponseWall>> call, retrofit2.Response<ResponseContainer<ResponseWall>> response) {
+        if(mayRestore){
+            adapter.update(postList, groups);
+        } else {
+            ApiFactory.getApi().getAllServicesByGroupId(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "1", offset, getArguments().getString("placeId")).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
+                @Override
+                public void onResponse(retrofit2.Call<ResponseContainer<ResponseWall>> call, retrofit2.Response<ResponseContainer<ResponseWall>> response) {
 
-                if(response!=null && response.body().getResponse()!=null){
-                    Log.d("TAG21", "RESPONSE Events OK");
+                    if(response!=null && response.body().getResponse()!=null){
+                        Log.d("TAG21", "RESPONSE Actions OK");
 
-                    if(response.body().getResponse().getCount()==0){
-                        placeHolderNoEvents.setVisibility(View.VISIBLE);
+                        if(response.body().getResponse().getCount()==0){
+                            placeHolderInfo.setText("Список услуг пуст");
+                            placeHolderNoEvents.setVisibility(View.VISIBLE);
+                        } else {
+                            placeHolderNoEvents.setVisibility(View.GONE);
+                        }
+
+                        totalCount = response.body().getResponse().getCount();
+                        if(totalCount>0){
+                            postList.addAll(response.body().getResponse().getItems());
+                            for (Group g: response.body().getResponse().getGroups()
+                                    ) {
+                                groups.put(g.getId(), g);
+                            }
+                        }
+
+                        Log.d("TAG21", "Actions size - " + postList.size() + " total - " + totalCount);
+                        isLoading = false;
+
                     } else {
-                        placeHolderNoEvents.setVisibility(View.GONE);
+                        Log.d("TAG21", "RESPONSE ERROR ");
                     }
 
-                    totalCount = response.body().getResponse().getCount();
+                    adapter.update(postList, groups);
 
-                    postList.addAll(response.body().getResponse().getItems());
-
-                    for (Group g: response.body().getResponse().getGroups()
-                            ) {
-                        groups.put(String.valueOf(g.getId()), g);
-                        Log.d("TAG21", "GGG - " + g.getName());
-                    }
-
-                    Log.d("TAG21", "Events size - " + postList.size() + " total - " + totalCount);
-                    isLoading = false;
-
-                } else {
-                    Log.d("TAG21", "RESPONSE ERROR ");
                 }
 
-               adapter.update(postList, groups);
-
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<ResponseContainer<ResponseWall>> call, Throwable t) {
-
-            }
-        });
-
-        /*RequestBody requestBody = new FormBody.Builder()
-                .add("access_token", SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN))
-                .add("extended", "1")
-                .build();
-
-        final Request request = new Request.Builder().url("http://192.168.0.104/api/feed.get")
-                .post(requestBody)
-                .build();
-
-        OkHttpClientFactory.getClient().newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.d("TAG21", "fail");
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                Log.d("TAG21", response.toString());
-            }
-        });*/
-
+                @Override
+                public void onFailure(retrofit2.Call<ResponseContainer<ResponseWall>> call, Throwable t) {
+                }
+            });
+        }
     }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(final EventBusMessages.LikePost event) {
@@ -280,6 +272,27 @@ public class FeedEvents extends android.support.v4.app.Fragment implements TabSt
 
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        storage = (Storage) context;
+
+        postList = (List<Post>) storage.getDate(getArguments().get("name")+ "_servicesPostList");
+        groups = (HashMap<String, Group>) storage.getDate(getArguments().get("name")+ "_servicesGroups");
+
+
+        if(postList==null){
+            Log.d("TAG21", "restore null");
+            postList = new ArrayList<>();
+            groups = new HashMap();
+        } else {
+            Log.d("TAG21", "restore ok - " + postList.size());
+            mayRestore = true;
+            position = (int) storage.getDate(getArguments().get("name") + "_servicesScrollPosition");
+        }
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
@@ -288,26 +301,12 @@ public class FeedEvents extends android.support.v4.app.Fragment implements TabSt
     @Override
     public void onStop() {
         EventBus.getDefault().unregister(this);
+        Log.d("TAG21", "Stop Actions FRAGMENT Save " + getArguments().getString("name"));
+        storage.setDate(getArguments().get("name") + "_servicesPostList", postList);
+        storage.setDate(getArguments().get("name") + "_servicesGroups", groups);
+        storage.setDate(getArguments().get("name") + "_servicesScrollPosition", layoutManager.findFirstVisibleItemPosition());
+
         super.onStop();
     }
 
-    @Override
-    public void onTabFragmentPresented(TabStacker.PresentReason presentReason) {
-
-    }
-
-    @Override
-    public void onTabFragmentDismissed(TabStacker.DismissReason dismissReason) {
-
-    }
-
-    @Override
-    public View onSaveTabFragmentInstance(Bundle bundle) {
-        return null;
-    }
-
-    @Override
-    public void onRestoreTabFragmentInstance(Bundle bundle) {
-
-    }
 }

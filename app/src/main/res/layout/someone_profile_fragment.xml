@@ -71,7 +71,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <android.support.design.widget.FloatingActionButton
+       <!--     <android.support.design.widget.FloatingActionButton
                 android:id="@+id/someoneFragChat"
 
                 android:layout_width="wrap_content"
@@ -106,7 +106,7 @@
                 app:layout_constraintTop_toTopOf="@+id/profileFragRoundImage"
                 app:layout_constraintVertical_bias="0.029999971"
                 android:padding="10dp"
-                app:srcCompat="@drawable/ic_add_subscription" />
+                app:srcCompat="@drawable/ic_add_subscription" />-->
 
 
             <TextView
@@ -150,7 +150,7 @@
 
             <TextView
                 android:textColor="@color/black_67percent"
-                android:id="@+id/profileFragDescription"
+                android:id="@+id/profileAbout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
@@ -180,12 +180,13 @@
 
 
             <LinearLayout
-                android:paddingTop="@dimen/padding16"
                 android:id="@+id/friendsPlacesSubscriberContainer"
-                app:layout_constraintTop_toBottomOf="@+id/profileFragDescription"
-                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="0dp"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical"
+                android:paddingTop="@dimen/padding16"
+                app:layout_constraintTop_toBottomOf="@+id/someoneFragChat">
 
 
                 <View
@@ -202,13 +203,12 @@
                     tools:layout_editor_absoluteX="16dp">
 
                     <RelativeLayout
-                        android:padding="10dp"
                         android:id="@+id/profileFragSubscribersButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_weight="1"
-                        >
+                        android:padding="10dp">
 
                         <TextView
                             android:id="@+id/profileFragLabelFriends"
@@ -225,8 +225,8 @@
                             android:layout_height="wrap_content"
                             android:layout_centerHorizontal="true"
                             android:clickable="false"
-                            android:textColor="@android:color/black"
-                            android:text="" />
+                            android:text=""
+                            android:textColor="@android:color/black" />
 
                     </RelativeLayout>
 
@@ -276,10 +276,10 @@
                         android:layout_weight="1">
 
                         <TextView
-                            android:layout_below="@+id/profileFragSubscriptionTv"
                             android:id="@+id/profileFragLabelSubscribers"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_below="@+id/profileFragSubscriptionTv"
                             android:layout_centerHorizontal="true"
                             android:text="Подписки" />
 
@@ -288,8 +288,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerHorizontal="true"
-                            android:textColor="@android:color/black"
-                            android:text="" />
+                            android:text=""
+                            android:textColor="@android:color/black" />
 
                     </RelativeLayout>
 
@@ -299,7 +299,7 @@
                     android:id="@+id/top_shadow2"
                     android:layout_width="match_parent"
                     android:layout_height="3dp"
-                    android:background="@drawable/toolbar_down_shadow_light"/>
+                    android:background="@drawable/toolbar_down_shadow_light" />
 
             </LinearLayout>
 
@@ -331,6 +331,36 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"/>
+
+            <Button
+                android:id="@+id/someoneFragChat"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/button_border_bg"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="Написать"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/profileAbout"
+                tools:ignore="MissingConstraints" />
+
+            <Button
+                android:id="@+id/someoneFragAdd"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:background="@drawable/button_border_bg"
+                android:text="Подписаться"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/profileAbout"
+                tools:ignore="MissingConstraints" />
 
         </android.support.constraint.ConstraintLayout>
 

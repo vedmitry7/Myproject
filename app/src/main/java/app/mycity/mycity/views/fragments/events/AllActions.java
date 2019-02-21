@@ -3,6 +3,8 @@ package app.mycity.mycity.views.fragments.events;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
@@ -38,8 +41,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import fr.arnaudguyon.tabstacker.TabStacker;
 
-public class AllActions extends android.support.v4.app.Fragment implements TabStacker.TabStackInterface {
-
+public class AllActions extends android.support.v4.app.Fragment implements TabStacker.TabStackInterface, SwipeRefreshLayout.OnRefreshListener {
 
     @BindView(R.id.placeEventsFragmentRecyclerView)
     RecyclerView recyclerView;
@@ -47,17 +49,23 @@ public class AllActions extends android.support.v4.app.Fragment implements TabSt
     @BindView(R.id.placeEventsPlaceHolder)
     RelativeLayout placeHolderNoEvents;
 
+    @BindView(R.id.progressBarPlaceHolder)
+    ConstraintLayout placeHolder;
+
+    @BindView(R.id.swipeContainer)
+    SwipeRefreshLayout swipeRefreshLayout;
+
     AllActionRecyclerAdapter adapter;
 
     List<Post> postList;
     HashMap<String, Group> groups = new HashMap<String, Group>();
 
+    Storage storage;
     boolean isLoading;
     int totalCount;
-
-    Storage storage;
-
     boolean mayRestore;
+    private LinearLayoutManager layoutManager;
+    private int position;
 
     @Nullable
     @Override
@@ -80,9 +88,12 @@ public class AllActions extends android.support.v4.app.Fragment implements TabSt
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
+
         adapter = new AllActionRecyclerAdapter(postList, groups);
 
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager = new LinearLayoutManager(getActivity());
 
         RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
             @Override
@@ -116,20 +127,26 @@ public class AllActions extends android.support.v4.app.Fragment implements TabSt
 
         if(mayRestore){
             adapter.update(postList, groups);
+            layoutManager.scrollToPosition(position);
+            mayRestore = false;
+            placeHolder.setVisibility(View.GONE);
         } else {
-            ApiFactory.getApi().getAllActions(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),"1", offset).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
+            ApiFactory.getApi().getAllActions(App.accessToken(), App.chosenCity(),"1", offset).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
                 @Override
                 public void onResponse(retrofit2.Call<ResponseContainer<ResponseWall>> call, retrofit2.Response<ResponseContainer<ResponseWall>> response) {
                     Log.d("TAG21", "RESPONSE EVENTS");
                     if(response!=null && response.body().getResponse()!=null){
                         Log.d("TAG21", "RESPONSE ACTION OK");
 
+                        swipeRefreshLayout.setRefreshing(false);
+                        placeHolder.setVisibility(View.GONE);
+
+
                         if(response.body().getResponse().getCount()==0){
                             placeHolderNoEvents.setVisibility(View.VISIBLE);
                         } else {
                             placeHolderNoEvents.setVisibility(View.GONE);
                         }
-
                         totalCount = response.body().getResponse().getCount();
                         Log.d("TAG21", "RESPONSE ACTION OK " + totalCount);
 
@@ -141,15 +158,12 @@ public class AllActions extends android.support.v4.app.Fragment implements TabSt
                             }
                         }
 
-                        Log.d("TAG21", "Events size - " + postList.size() + " total - " + totalCount);
+                        Log.d("TAG21", "Actions size - " + postList.size() + " total - " + totalCount);
                         isLoading = false;
-
                     } else {
                         Log.d("TAG21", "RESPONSE ERROR ");
                     }
-
                     adapter.notifyDataSetChanged();
-
                 }
 
                 @Override
@@ -275,8 +289,8 @@ public class AllActions extends android.support.v4.app.Fragment implements TabSt
 
         storage = (Storage) context;
 
-//        postList = (List<Post>) storage.getDate(getArguments().get("name")+ "_eventsPostList");
-  //      groups = (Map) storage.getDate(getArguments().get("name")+ "_eventsGroups");
+        postList = (List<Post>) storage.getDate(getArguments().get("name")+ "_actionsPostList");
+        groups = (HashMap<String, Group>) storage.getDate(getArguments().get("name")+ "_actionsGroups");
 
 
         if(postList==null){
@@ -285,6 +299,7 @@ public class AllActions extends android.support.v4.app.Fragment implements TabSt
             groups = new HashMap();
         } else {
             Log.d("TAG21", "restore ok - " + postList.size());
+            position = (int) storage.getDate(getArguments().getString("name") + "_actionsScrollPosition");
             mayRestore = true;
         }
 
@@ -299,11 +314,10 @@ public class AllActions extends android.support.v4.app.Fragment implements TabSt
     @Override
     public void onStop() {
         EventBus.getDefault().unregister(this);
-//        Log.d("TAG21", "Stop EVENTS FRAGMENT Save " + getArguments().getString("name"));
-        String name = getArguments().getString("name");
-        if(storage!=null && postList!=null){
+        if(storage!=null){
             storage.setDate(getArguments().getString("name") + "_actionsPostList", postList);
             storage.setDate(getArguments().getString("name") + "_actionsGroups", groups);
+            storage.setDate(getArguments().getString("name") + "_actionsScrollPosition", layoutManager.findFirstVisibleItemPosition());
         }
 
         super.onStop();
@@ -327,5 +341,12 @@ public class AllActions extends android.support.v4.app.Fragment implements TabSt
     @Override
     public void onRestoreTabFragmentInstance(Bundle bundle) {
 
+    }
+
+    @Override
+    public void onRefresh() {
+        postList = new ArrayList<>();
+        loadFeed(0);
+        placeHolder.setVisibility(View.VISIBLE);
     }
 }

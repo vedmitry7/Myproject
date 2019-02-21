@@ -55,6 +55,8 @@ public class FeedPhotoReportAdapter extends RecyclerView.Adapter<FeedPhotoReport
                 //.centerCrop()
                 .into(holder.photo);
 
+
+
         if(groups.containsKey(albumsList.get(position).getGroupId())){
             Group group = (Group) groups.get(albumsList.get(position).getGroupId());
             Picasso.get()
@@ -62,7 +64,10 @@ public class FeedPhotoReportAdapter extends RecyclerView.Adapter<FeedPhotoReport
                     .resize(App.dpToPx(context, 36), App.dpToPx(context, 36))
                     .centerCrop()
                     .into(holder.groupPhoto);
+
             holder.placeName.setText(group.getName());
+
+            holder.albumName.setText(albumsList.get(position).getTitle());
         }
     }
 

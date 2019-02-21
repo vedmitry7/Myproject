@@ -1,6 +1,8 @@
 package app.mycity.mycity.views.activities;
 
 import android.app.NotificationManager;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,8 +11,10 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -229,8 +233,43 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
-    public String getEmojiByUnicode(int unicode){
-        return new String(Character.toChars(unicode));
+    @OnClick(R.id.chatSettings)
+    public void chatSettings(View v){
+        final PopupMenu popupMenu = new PopupMenu(v.getContext(), v);
+        popupMenu.getMenuInflater().inflate(R.menu.popupmenu_chat, popupMenu.getMenu());
+
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    // Handle the non group menu items here
+
+                    case R.id.clearChat:
+
+                        ApiFactory.getApi().deleteDialogs(App.accessToken(), userId).enqueue(new Callback<ResponseContainer<SuccessResponceNumber>>() {
+                            @Override
+                            public void onResponse(Call<ResponseContainer<SuccessResponceNumber>> call, Response<ResponseContainer<SuccessResponceNumber>> response) {
+                                if(response.body()!=null && response.body().getResponse()!=null){
+
+                                    results.clear();
+                                    adapter.update(results);
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<ResponseContainer<SuccessResponceNumber>> call, Throwable t) {
+                            }
+                        });
+                        break;
+                    case R.id.blockUser:
+
+                        break;
+                }
+                return true;
+            }
+        });
+
+        popupMenu.show();
     }
 
     private void loadMessages(int offset) {

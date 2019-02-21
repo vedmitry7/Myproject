@@ -1,17 +1,14 @@
 package app.mycity.mycity.views.fragments.events;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.chrisbanes.photoview.PhotoView;
@@ -19,24 +16,18 @@ import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.Post;
 import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.api.model.ResponseContainer;
-import app.mycity.mycity.api.model.ResponseEventVisitors;
 import app.mycity.mycity.api.model.ResponseEvents;
-import app.mycity.mycity.api.model.ResponseLike;
-import app.mycity.mycity.api.model.ResponseVisit;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.activities.Storage;
-import app.mycity.mycity.views.adapters.EventVisitorsRecyclerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -79,13 +70,14 @@ public class ActionContentFragment extends android.support.v4.app.Fragment imple
 
     Profile profile;
 
-    public static ActionContentFragment createInstance(String name, String eventId, String ownerId, String placeName) {
+    public static ActionContentFragment createInstance(String name, String eventId, String ownerId, boolean backToPlace) {
         ActionContentFragment fragment = new ActionContentFragment();
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
         bundle.putString("eventId", eventId);
+        bundle.putBoolean("backToPlace", backToPlace);
         bundle.putString("ownerId", ownerId);
-        bundle.putString("placeName", placeName);
+
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -98,9 +90,11 @@ public class ActionContentFragment extends android.support.v4.app.Fragment imple
         return view;
     }
 
-
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
+        Log.d("TAG21", "ACTION CONTENT");
+
+        EventBus.getDefault().post(new EventBusMessages.BlackStatusBar());
 
         View.OnClickListener openUserListener = new View.OnClickListener() {
             @Override
@@ -111,7 +105,7 @@ public class ActionContentFragment extends android.support.v4.app.Fragment imple
 
         loadContent(0);
 
-        placeName.setText(getArguments().getString("placeName"));
+     //   placeName.setText(getArguments().getString("placeName"));
 
       /*  for (int i = 0; i < postList.size(); i++) {
             if(postList.get(i).getId()==getArguments().getString("postId")){
@@ -140,7 +134,7 @@ public class ActionContentFragment extends android.support.v4.app.Fragment imple
         if(mayRestore){
             //adapter.update(postList, groups);
         } else {
-            ApiFactory.getApi().getEventsById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("eventId")).enqueue(new Callback<ResponseContainer<ResponseEvents>>() {
+            ApiFactory.getApi().getActionById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("eventId"), "1").enqueue(new Callback<ResponseContainer<ResponseEvents>>() {
                 @Override
                 public void onResponse(Call<ResponseContainer<ResponseEvents>> call, Response<ResponseContainer<ResponseEvents>> response) {
 
@@ -155,6 +149,9 @@ public class ActionContentFragment extends android.support.v4.app.Fragment imple
                         placeHolder.setVisibility(View.GONE);
 
                         event = response.body().getResponse().getItems().get(0);
+
+                        if(response.body().getResponse().getGroups()!=null)
+                            placeName.setText(response.body().getResponse().getGroups().get(0).getName());
 
                         Picasso.get().load(response.body().getResponse().getItems().get(0).getAttachments().get(0).getPhoto780()).into(eventPhoto);
 
@@ -173,7 +170,14 @@ public class ActionContentFragment extends android.support.v4.app.Fragment imple
 
     @OnClick(R.id.backButton)
     public void back(View v){
-        getActivity().onBackPressed();
+        if(getArguments().getBoolean("backToPlace")) {
+            EventBusMessages.OpenPlace openPlace = new EventBusMessages.OpenPlace(getArguments().getString("ownerId"));
+            openPlace.setCloseCurrent(true);
+            openPlace.setTabPos(4);
+            EventBus.getDefault().post(openPlace);
+        } else {
+            getActivity().onBackPressed();
+        }
     }
 
     @Override

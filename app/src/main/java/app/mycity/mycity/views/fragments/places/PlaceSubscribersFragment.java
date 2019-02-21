@@ -63,7 +63,7 @@ public class PlaceSubscribersFragment extends Fragment implements TabStacker.Tab
         return view;
     }
 
-    @OnClick (R.id.profileFragBackButtonContainer)
+    @OnClick (R.id.backButton)
     public void back(View v){
         getActivity().onBackPressed();
     }

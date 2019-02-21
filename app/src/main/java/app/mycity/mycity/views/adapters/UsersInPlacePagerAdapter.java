@@ -7,10 +7,6 @@ import android.util.Log;
 
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.views.fragments.UniversalUserListFragment;
-import app.mycity.mycity.views.fragments.places.PlaceSubscribersListFragment;
-import app.mycity.mycity.views.fragments.places.UsersInPlaceListFragment;
-import app.mycity.mycity.views.fragments.places.UsersInPlaceSubscribtionsListFragment;
-import app.mycity.mycity.views.fragments.subscribers.SubscribersOnlineListFragment;
 
 
 public class UsersInPlacePagerAdapter extends FragmentStatePagerAdapter {

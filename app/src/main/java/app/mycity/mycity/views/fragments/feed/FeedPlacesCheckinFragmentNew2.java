@@ -10,10 +10,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -142,6 +145,8 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
 
+        EventBus.getDefault().post(new EventBusMessages.BlackStatusBar());
+        placeHolder.setVisibility(View.VISIBLE);
         View.OnClickListener openUserListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -159,7 +164,7 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
         });
 
 
-         mLayoutManager
+        mLayoutManager
                 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
 
         recyclerView.setLayoutManager(mLayoutManager);
@@ -228,7 +233,7 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
                         totalCount = response.body().getResponse().getCount();
 
                         if(response.body().getResponse().getGroups()!=null)
-                        placeName.setText(response.body().getResponse().getGroups().get(0).getName());
+                            placeName.setText(response.body().getResponse().getGroups().get(0).getName());
 
                         postList.addAll(response.body().getResponse().getItems());
 
@@ -256,7 +261,7 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
                             for (int i = 0; i < postList.size(); i++) {
                                 if(postList.get(i).getId().equals(getArguments().getString("postId")))
                                     openPlace(new EventBusMessages.ShowImage(i));
-                                   // viewPager.setCurrentItem(i);
+                                // viewPager.setCurrentItem(i);
                             }
                         }
 
@@ -306,7 +311,7 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
 
 
         if(clearScreen){
-        //    recyclerView.setVisibility(View.VISIBLE);
+            //    recyclerView.setVisibility(View.VISIBLE);
             buttonsContainer.animate().setDuration(200).translationYBy(-recyclerView.getLayoutParams().height);
             recyclerView.animate().setDuration(200).translationYBy(-recyclerView.getHeight());
             clearScreen = false;
@@ -322,7 +327,7 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
 
 
 
-        @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void openPlace(EventBusMessages.ShowImage event){
 
         Log.d("TAG24", "Open image " +  event.getPosition());
@@ -338,14 +343,14 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
 
         Profile p = profiles.get(postList.get(event.getPosition()).getOwnerId());
 
-            for (String s:profiles.keySet()
-                    ) {
-                Log.d("TAG21", "pr Key - " +  s);
-            }
-            for (Profile profile:profiles.values()
-                    ) {
-                Log.d("TAG21", "pr id - " +  profile.getId());
-            }
+        for (String s:profiles.keySet()
+                ) {
+            Log.d("TAG21", "pr Key - " +  s);
+        }
+        for (Profile profile:profiles.values()
+                ) {
+            Log.d("TAG21", "pr id - " +  profile.getId());
+        }
         if(p==null){
 
             Log.d("TAG21", "post list size" +  postList.size());
@@ -370,12 +375,48 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
     }
 
     void setLiked(boolean b){
+        if(getContext() == null){
+            return;
+        }
+
         if(b){
             likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart_vector_white));
         } else {
             likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart_outline_vector_white));
         }
     }
+
+    @OnClick(R.id.menuButton)
+    public void qwe(View v) {
+        PopupMenu popupMenu = new PopupMenu(getContext(), v);
+
+        popupMenu.inflate(R.menu.content_menu);
+
+        popupMenu
+                .setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.complain:
+
+                                return true;
+                            case R.id.copy:
+
+                                return true;
+                            case R.id.share:
+
+                                return true;
+
+                            default:
+                                return false;
+                        }
+                    }
+                });
+
+        popupMenu.show();
+
+    }
+
 
     @OnClick(R.id.likeIcon)
     public void like(View v) {
@@ -431,7 +472,7 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
                         post.getLikes().setUserLikes(1);
                         setLiked(true);
                         likesCount.setText(String.valueOf(post.getLikes().getCount()));
-                       setRightValue(post);
+                        setRightValue(post);
 
                     }
                 }
@@ -507,7 +548,7 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
             storage.setDate(getArguments().get("name") + "_currentPostIdPosition", currentPostIdPosition);
         }
         if(dismissReason == TabStacker.DismissReason.BACK){
-        // delete shit
+            // delete shit
         }
 
     }

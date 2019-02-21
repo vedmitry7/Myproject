@@ -46,6 +46,18 @@ public class Post {
     @Expose
     private String placeId;
 
+    @SerializedName("price")
+    @Expose
+    private String price;
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
     public String getPlaceId() {
         return placeId;
     }

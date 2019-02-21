@@ -103,7 +103,7 @@ public class AllActionRecyclerAdapter extends RecyclerView.Adapter<AllActionRecy
                     EventBus.getDefault().post(new EventBusMessages.OpenActionContent(
                             postList.get(position).getId(),
                             postList.get(position).getOwnerId(),
-                            group.getName()));
+                            false));
                 }
             });
 

@@ -51,6 +51,10 @@ public class UniversalUserListFragment extends Fragment {
 
     String type;
 
+    LinearLayoutManager layoutManager;
+    private boolean isLoading;
+    private int totalCount;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -73,21 +77,40 @@ public class UniversalUserListFragment extends Fragment {
 
         type = getArguments().getString("type");
         //userList = new ArrayList<>();
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
+        layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        recyclerView.setLayoutManager(layoutManager);
         adapter = new FriendsRecyclerAdapter(userList);
         recyclerView.setAdapter(adapter);
         Log.d("TAG21", "ViewCreated " + this.getClass().getSimpleName());
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
+                int first = layoutManager.findFirstVisibleItemPosition();
+                int totalItemCount = layoutManager.getItemCount();
+                int lastVisibleItems = layoutManager.findLastVisibleItemPosition();
+
+                if (!isLoading) {
+                    if ( lastVisibleItems >= totalItemCount -10 ) {
+                        Log.d("TAG21", "ЗАГРУЗКА ДАННЫХ " + userList.size());
+                        Log.d("TAG21", "Total count " + totalCount);
+                        isLoading = true;
+                        // load if we don't load all
+                        if(totalCount > userList.size()){
+                            Log.d("TAG21", "load feed FROM SCROLL");
+                            getUsers(userList.size());
+                        }
+                    }
+                } else {
+                    Log.d("TAG21", "did not load yet ");
+                }
 
 
             }
-        });
+        };
 
-        getFriendsList();
+        getUsers(userList.size());
     }
 
 
@@ -121,8 +144,8 @@ public class UniversalUserListFragment extends Fragment {
         }
     }
 
-    private void getFriendsList(){
-        Log.d("TAG21", "getFriendsList " + this.getClass().getSimpleName() + " user - " + getArguments().getString("id"));
+    private void getUsers(int offset){
+        Log.d("TAG21", "getUsers " + this.getClass().getSimpleName() + " user - " + getArguments().getString("id"));
 
         if(mayRestore){
             Log.d("TAG21", "restore " + this.getClass().getSimpleName() + " " + userList.size());
@@ -141,6 +164,8 @@ public class UniversalUserListFragment extends Fragment {
                     UsersContainer users = response.body().getResponse();
                     if(users != null){
                         userList = users.getFriends();
+                        totalCount = response.body().getResponse().getCount();
+                        isLoading = false;
                         progressBarPlaceHolder.setVisibility(View.GONE);
                         if(userList.size()==0){
                             listEmptyContainer.setVisibility(View.VISIBLE);
@@ -157,30 +182,30 @@ public class UniversalUserListFragment extends Fragment {
 
             switch (type){
                 case Constants.KEY_PLACE_SUBSCRIBERS:
-                    ApiFactory.getApi().getPlaceSubscribers(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("id"),"photo_130", "0").enqueue(callback);
+                    ApiFactory.getApi().getPlaceSubscribers(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), offset, getArguments().getString("id"),"photo_130", "0").enqueue(callback);
                 return;
                 case Constants.KEY_PLACE_ONLINE_SUBSCRIBERS:
-                    ApiFactory.getApi().getPlaceSubscribers(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("id"),"photo_130", "1").enqueue(callback);
+                    ApiFactory.getApi().getPlaceSubscribers(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), offset, getArguments().getString("id"),"photo_130", "1").enqueue(callback);
                     return;
                 case Constants.KEY_USER_IN_PLACE:
-                    ApiFactory.getApi().getUsersInPlace(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("id"),"photo_130", "0").enqueue(callback);
+                    ApiFactory.getApi().getUsersInPlace(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), offset, getArguments().getString("id"),"photo_130", "0").enqueue(callback);
                     return;
                 case Constants.KEY_USER_IN_PLACE_SUBSCRIPTION:
-                    ApiFactory.getApi().getUsersInPlace(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("id"),"photo_130", "1").enqueue(callback);
+                    ApiFactory.getApi().getUsersInPlace(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), offset, getArguments().getString("id"),"photo_130", "1").enqueue(callback);
                     return;
 
                 case Constants.KEY_SUBSCRIBERS:
-                    ApiFactory.getApi().getSubscribers(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("id"), 0, "photo_130").enqueue(callback);
+                    ApiFactory.getApi().getSubscribers(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), offset, getArguments().getString("id"), 0, "photo_130").enqueue(callback);
                     return;
                 case Constants.KEY_SUBSCRIBERS_ONLINE:
-                    ApiFactory.getApi().getSubscribers(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("id"), 1, "photo_130").enqueue(callback);
+                    ApiFactory.getApi().getSubscribers(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), offset, getArguments().getString("id"), 1, "photo_130").enqueue(callback);
                     return;
 
                 case Constants.KEY_SUBSCRIPTIONS:
-                    ApiFactory.getApi().getSubscriptions(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("id"),0, "photo_130").enqueue(callback);
+                    ApiFactory.getApi().getSubscriptions(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), offset, getArguments().getString("id"),0, "photo_130").enqueue(callback);
                     return;
                 case Constants.KEY_SUBSCRIPTIONS_ONLINE:
-                    ApiFactory.getApi().getSubscriptions(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("id"), 1 , "photo_130").enqueue(callback);
+                    ApiFactory.getApi().getSubscriptions(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), offset, getArguments().getString("id"), 1 , "photo_130").enqueue(callback);
                     return;
 
             }

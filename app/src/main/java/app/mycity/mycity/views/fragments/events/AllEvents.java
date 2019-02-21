@@ -3,6 +3,8 @@ package app.mycity.mycity.views.fragments.events;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -21,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
@@ -40,14 +43,20 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import fr.arnaudguyon.tabstacker.TabStacker;
 
-public class AllEvents extends android.support.v4.app.Fragment implements TabStacker.TabStackInterface {
+public class AllEvents extends android.support.v4.app.Fragment implements TabStacker.TabStackInterface, SwipeRefreshLayout.OnRefreshListener {
 
 
     @BindView(R.id.placeEventsFragmentRecyclerView)
     RecyclerView recyclerView;
 
+    @BindView(R.id.progressBarPlaceHolder)
+    ConstraintLayout placeHolder;
+
     @BindView(R.id.placeEventsPlaceHolder)
     RelativeLayout placeHolderNoEvents;
+
+    @BindView(R.id.swipeContainer)
+    SwipeRefreshLayout swipeRefreshLayout;
 
     AllEventRecyclerAdapter adapter;
 
@@ -84,6 +93,9 @@ public class AllEvents extends android.support.v4.app.Fragment implements TabSta
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
 
         adapter = new AllEventRecyclerAdapter(postList, groups);
 
@@ -123,13 +135,19 @@ public class AllEvents extends android.support.v4.app.Fragment implements TabSta
             Log.d("TAG21", "Events restore. pos - " + position);
             adapter.update(postList, groups);
             layoutManager.scrollToPosition(position);
+            placeHolder.setVisibility(View.GONE);
+            mayRestore = false;
         } else {
-            ApiFactory.getApi().getAllEvents(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),"1", offset).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
+            ApiFactory.getApi().getAllEvents(App.accessToken(), App.chosenCity(),"1", offset).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
                 @Override
                 public void onResponse(retrofit2.Call<ResponseContainer<ResponseWall>> call, retrofit2.Response<ResponseContainer<ResponseWall>> response) {
                     Log.d("TAG21", "RESPONSE EVENTS");
                     if(response!=null && response.body().getResponse()!=null){
                         Log.d("TAG21", "RESPONSE Events OK");
+
+                        swipeRefreshLayout.setRefreshing(false);
+                        placeHolder.setVisibility(View.GONE);
+
 
                         if(response.body().getResponse().getCount()==0){
                             placeHolderNoEvents.setVisibility(View.VISIBLE);
@@ -330,5 +348,12 @@ public class AllEvents extends android.support.v4.app.Fragment implements TabSta
     @Override
     public void onRestoreTabFragmentInstance(Bundle bundle) {
 
+    }
+
+    @Override
+    public void onRefresh() {
+        postList = new ArrayList<>();
+        loadFeed(0);
+        placeHolder.setVisibility(View.VISIBLE);
     }
 }

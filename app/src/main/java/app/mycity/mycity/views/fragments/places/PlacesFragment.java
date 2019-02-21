@@ -340,7 +340,7 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
     }
 
     private void loadPlaces(final int offset, int category, String search, String order) {
-        ApiFactory.getApi().getPlaces(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), offset, 552, category, order, search).enqueue(new retrofit2.Callback<ResponseContainer<ResponsePlaces>>() {
+        ApiFactory.getApi().getPlaces(App.accessToken(), offset, App.chosenCity(), category, order, search).enqueue(new retrofit2.Callback<ResponseContainer<ResponsePlaces>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<ResponsePlaces>> call, retrofit2.Response<ResponseContainer<ResponsePlaces>> response) {
                 if(response.body()!=null){

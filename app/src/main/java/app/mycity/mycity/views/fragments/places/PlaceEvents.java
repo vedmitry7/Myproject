@@ -10,8 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-
-import com.github.nkzawa.socketio.client.Manager;
+import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -20,14 +19,12 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.Group;
 import app.mycity.mycity.api.model.Post;
-import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponseLike;
 import app.mycity.mycity.api.model.ResponseVisit;
@@ -38,7 +35,6 @@ import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.adapters.PlacesEventRecyclerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import fr.arnaudguyon.tabstacker.TabStacker;
 
 public class PlaceEvents extends android.support.v4.app.Fragment{
 
@@ -48,6 +44,9 @@ public class PlaceEvents extends android.support.v4.app.Fragment{
 
     @BindView(R.id.placeEventsPlaceHolder)
     RelativeLayout placeHolderNoEvents;
+
+    @BindView(R.id.placeHolderInfo)
+    TextView placeHolderInfo;
 
     PlacesEventRecyclerAdapter adapter;
 
@@ -130,6 +129,7 @@ public class PlaceEvents extends android.support.v4.app.Fragment{
                         Log.d("TAG21", "RESPONSE Events OK");
 
                         if(response.body().getResponse().getCount()==0){
+                            placeHolderInfo.setText("Событий пока не намечается");
                             placeHolderNoEvents.setVisibility(View.VISIBLE);
                         } else {
                             placeHolderNoEvents.setVisibility(View.GONE);

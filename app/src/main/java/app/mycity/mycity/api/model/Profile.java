@@ -11,6 +11,12 @@ public class Profile {
     @SerializedName("first_name")
     @Expose
     private String firstName;
+    @SerializedName("bdate")
+    @Expose
+    private String birthday;
+    @SerializedName("about")
+    @Expose
+    private String about;
     @SerializedName("last_name")
     @Expose
     private String lastName;
@@ -44,8 +50,24 @@ public class Profile {
     @Expose
     private Integer isSubscription;
 
+    public String getAbout() {
+        return about;
+    }
+
+    public void setAbout(String about) {
+        this.about = about;
+    }
+
     public Integer getIsSubscription() {
         return isSubscription;
+    }
+
+    public String getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
     }
 
     public void setIsSubscription(Integer isSubscription) {

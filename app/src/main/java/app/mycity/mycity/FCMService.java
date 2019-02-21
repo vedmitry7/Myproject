@@ -75,6 +75,12 @@ public class FCMService extends FirebaseMessagingService {
                     case "follow":
                         sendMessageNotification(remoteMessage, type);
                         break;
+                    case "place_event":
+                        sendMessageNotification(remoteMessage, type);
+                        break;
+                    case "place_action":
+                        sendMessageNotification(remoteMessage, type);
+                        break;
                 }
             }
         }
@@ -110,6 +116,22 @@ public class FCMService extends FirebaseMessagingService {
             case "like_post":
                 resultIntent = new Intent(this, MainActivity3.class);
                 resultIntent.putExtra("type", type);
+                resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                resultIntent.setFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                break;
+            case "place_event":
+                resultIntent = new Intent(this, MainActivity3.class);
+                resultIntent.putExtra("type", type);
+                resultIntent.putExtra("group_id", (String) data.get("group_id"));
+                resultIntent.putExtra("event_id", (String) data.get("event_id"));
+                resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                resultIntent.setFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                break;
+            case "place_action":
+                resultIntent = new Intent(this, MainActivity3.class);
+                resultIntent.putExtra("type", type);
+                resultIntent.putExtra("group_id", (String) data.get("group_id"));
+                resultIntent.putExtra("event_id", (String) data.get("action_id"));
                 resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 resultIntent.setFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
                 break;

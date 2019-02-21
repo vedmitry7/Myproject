@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -85,6 +87,12 @@ public class DataFragment extends Fragment {
     private String countryId = "";
     private String birthdayData;
 
+    private List<Country> countries;
+    List<City> cities;
+
+    private boolean countryFilled;
+    private boolean cityFilled;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -127,6 +135,11 @@ public class DataFragment extends Fragment {
                     secondName.requestFocus();
                     return true;
                 }
+                if (event.getAction() == KeyEvent.ACTION_DOWN
+                        && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+                    Log.d("TAG21", "et back");
+                    getActivity().onBackPressed();
+                }
                 return true;
             }
         });
@@ -141,6 +154,11 @@ public class DataFragment extends Fragment {
                     setDate();
                     return true;
                 }
+                if (event.getAction() == KeyEvent.ACTION_DOWN
+                        && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+                    Log.d("TAG21", "et back");
+                    getActivity().onBackPressed();
+                }
                 return true;
             }
         });
@@ -152,12 +170,52 @@ public class DataFragment extends Fragment {
 
                 if (event.getAction() == KeyEvent.ACTION_DOWN
                         && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                    String country = countryEditText.getText().toString().trim();
+
+                    for (int i = countries.size()-1; i >= 0; i--) {
+                        if(country.equals(countries.get(i).getTitle())){
+                            countryFilled = true;
+                            loadCities(countries.get(i).getId());
+                            countryId = countries.get(i).getId();
+                            Log.i("TAG21", "valid " + countries.get(i).getId());
+                            Log.i("TAG21", "valid " + countries.get(i).getTitle());
+                        }
+                    }
+
+
                     cityEditText.requestFocus();
                     return true;
+                }
+                if (event.getAction() == KeyEvent.ACTION_DOWN
+                        && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+                    Log.d("TAG21", "et back");
+                    getActivity().onBackPressed();
                 }
                 return true;
             }
         });
+
+        countryEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus){
+                    Log.i("TAG21", "Lose focus" );
+
+                    String country = countryEditText.getText().toString().trim();
+
+                    for (int i = countries.size()-1; i >= 0; i--) {
+                        if(country.equals(countries.get(i).getTitle())){
+                            countryFilled = true;
+                            loadCities(countries.get(i).getId());
+                            countryId = countries.get(i).getId();
+                            Log.i("TAG21", "lf valid " + countries.get(i).getId());
+                            Log.i("TAG21", "lf valid " + countries.get(i).getTitle());
+                        }
+                    }
+                }
+            }
+        });
+
 
         cityEditText.setOnKeyListener(new View.OnKeyListener() {
             @Override
@@ -169,7 +227,36 @@ public class DataFragment extends Fragment {
                     App.closeKeyboard(context);
                     return true;
                 }
+                if (event.getAction() == KeyEvent.ACTION_DOWN
+                        && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+                    Log.d("TAG21", "et back");
+                    getActivity().onBackPressed();
+                }
                 return true;
+            }
+        });
+
+        cityEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(!countryFilled){
+                    //Toast.makeText(getContext(), "Сперва заполните поле страны", Toast.LENGTH_SHORT).show();
+                    countryEditText.requestFocus();
+                    if(!cityEditText.getText().toString().equals("")){
+                        cityEditText.setText("");
+                        showAlert("Сперва заполните поле страны");
+                    }
+                }
             }
         });
         firstName.requestFocus();
@@ -183,9 +270,9 @@ public class DataFragment extends Fragment {
             @Override
             public void onResponse(Call<ResponseContainer<ResponseCountries>> call, Response<ResponseContainer<ResponseCountries>> response) {
                 final ArrayList<String> data = new ArrayList<>();
-                final List<Country> list = response.body().getResponse().getItems();
+                countries = response.body().getResponse().getItems();
                 for (int i = 0; i < response.body().getResponse().getItems().size(); i++) {
-                    data.add(list.get(i).getTitle());
+                    data.add(countries.get(i).getTitle());
                 }
                 countryEditText.setAdapter(new ArrayAdapter<>(getContext(),
                         android.R.layout.simple_dropdown_item_1line, data));
@@ -196,11 +283,12 @@ public class DataFragment extends Fragment {
 
                         for (int i = 0; i < data.size(); i++) {
                             if(countryEditText.getText().toString().equals(data.get(i))){
-                                loadCities(list.get(i).getId());
-                                countryId = list.get(i).getId();
+                                loadCities(countries.get(i).getId());
+                                countryId = countries.get(i).getId();
                                 cityEditText.requestFocus();
-                                Log.i("TAG", "valid " + list.get(i).getId());
-                                Log.i("TAG", "valid " + list.get(i).getTitle());
+                                countryFilled = true;
+                                Log.i("TAG", "valid " + countries.get(i).getId());
+                                Log.i("TAG", "valid " + countries.get(i).getTitle());
                                 return;
                             }
                         }
@@ -225,10 +313,10 @@ public class DataFragment extends Fragment {
                 final ArrayList<String> data = new ArrayList<>();
 
 
-                final List<City> list = response.body().getResponse().getItems();
+                cities = response.body().getResponse().getItems();
                 for (int i = 0; i < response.body().getResponse().getItems().size(); i++) {
                     if(i!=0){
-                        data.add(list.get(i-1).getTitle());
+                        data.add(cities.get(i-1).getTitle());
                     }
                 }
                 cityEditText.setAdapter(new ArrayAdapter<String>(getContext(),
@@ -236,7 +324,7 @@ public class DataFragment extends Fragment {
                 cityEditText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        cityId = list.get(position).getId();
+                        cityId = cities.get(position).getId();
                     }
                 });
 
@@ -272,10 +360,29 @@ public class DataFragment extends Fragment {
             return;
         }
 
-        if (cityId.length()==0) {
+        if (cityId.length()==0 && cityEditText.getText().toString().length()==0) {
             showAlert("Заполните поля страна и город");
+            Log.i("TAG21", "id and field null " );
             return;
         }
+
+        if (cityId.length()==0 && cityEditText.getText().toString().length()!=0) {
+            Log.i("TAG21", "id is null / field not null" );
+            String city = cityEditText.getText().toString().trim();
+            for (int i = cities.size()-1; i >= 0; i--) {
+                if(city.equalsIgnoreCase(cities.get(i).getTitle())){
+                    cityFilled = true;
+                    loadCities(cities.get(i).getId());
+                    cityId = cities.get(i).getId();
+                    Log.i("TAG21", "ch valid " + cities.get(i).getId());
+                    Log.i("TAG21", "ch valid " + cities.get(i).getTitle());
+                }
+            }
+            if(!cityFilled){
+                return;
+            }
+        }
+
 
 
 

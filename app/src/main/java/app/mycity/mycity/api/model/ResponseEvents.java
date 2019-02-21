@@ -13,6 +13,9 @@ public class ResponseEvents {
     @SerializedName("items")
     @Expose
     private List<Post> items = null;
+    @SerializedName("groups")
+    @Expose
+    private List<Group> groups = null;
 
     public Integer getCount() {
         return count;
@@ -30,4 +33,11 @@ public class ResponseEvents {
         this.items = items;
     }
 
+    public List<Group> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
+    }
 }

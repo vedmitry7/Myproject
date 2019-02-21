@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -45,6 +46,9 @@ public class PlaceActions extends android.support.v4.app.Fragment{
 
     @BindView(R.id.placeEventsPlaceHolder)
     RelativeLayout placeHolderNoEvents;
+
+    @BindView(R.id.placeHolderInfo)
+    TextView placeHolderInfo;
 
     AllActionRecyclerAdapter adapter;
 
@@ -123,10 +127,12 @@ public class PlaceActions extends android.support.v4.app.Fragment{
                 public void onResponse(retrofit2.Call<ResponseContainer<ResponseWall>> call, retrofit2.Response<ResponseContainer<ResponseWall>> response) {
 
                     if(response!=null && response.body().getResponse()!=null){
-                        Log.d("TAG21", "RESPONSE Events OK");
+                        Log.d("TAG21", "RESPONSE Actions OK");
 
                         if(response.body().getResponse().getCount()==0){
+                            placeHolderInfo.setText("Список акций пуст");
                             placeHolderNoEvents.setVisibility(View.VISIBLE);
+
                         } else {
                             placeHolderNoEvents.setVisibility(View.GONE);
                         }
@@ -140,14 +146,14 @@ public class PlaceActions extends android.support.v4.app.Fragment{
                             }
                         }
 
-                        Log.d("TAG21", "Events size - " + postList.size() + " total - " + totalCount);
+                        Log.d("TAG21", "Actions size - " + postList.size() + " total - " + totalCount);
                         isLoading = false;
 
                     } else {
                         Log.d("TAG21", "RESPONSE ERROR ");
                     }
 
-                    adapter.notifyDataSetChanged();
+                    adapter.update(postList, groups);
 
                 }
 

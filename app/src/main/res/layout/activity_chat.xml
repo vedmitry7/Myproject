@@ -50,30 +50,33 @@
             android:id="@+id/chatName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
             android:layout_marginLeft="16dp"
+            android:layout_marginRight="8dp"
             android:layout_marginStart="16dp"
             android:text="Загрузка..."
             android:textColor="@android:color/black"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/chatSettings"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/chatProfileImage"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <RelativeLayout
-            android:id="@+id/chatSettingsContainer"
+
+        <ImageView
+            android:id="@+id/chatSettings"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:padding="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                app:srcCompat="@drawable/ic_dots" />
-        </RelativeLayout>
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_dots" />
 
 
     </android.support.constraint.ConstraintLayout>

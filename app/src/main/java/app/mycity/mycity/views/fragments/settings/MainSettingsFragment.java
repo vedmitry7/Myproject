@@ -10,8 +10,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.firebase.messaging.FirebaseMessaging;
+
+import org.greenrobot.eventbus.EventBus;
 
 import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
@@ -21,9 +24,11 @@ import app.mycity.mycity.SocketService;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.Success;
+import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.activities.LoginActivity;
 import app.mycity.mycity.views.activities.MainActivity3;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import fr.arnaudguyon.tabstacker.TabStacker;
@@ -33,13 +38,22 @@ import retrofit2.Response;
 
 public class MainSettingsFragment extends Fragment implements TabStacker.TabStackInterface {
 
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main_settings, container, false);
         ButterKnife.bind(this, view);
         return view;
+    }
+
+    @OnClick(R.id.notificationsButton)
+    public void notif(View v){
+        EventBus.getDefault().post(new EventBusMessages.OpenNotificationSettings());
+    }
+
+    @OnClick(R.id.profileButton)
+    public void notif2(View v){
+        EventBus.getDefault().post(new EventBusMessages.OpenProfileSettings());
     }
 
     @OnClick(R.id.logoutButton)
@@ -50,8 +64,11 @@ public class MainSettingsFragment extends Fragment implements TabStacker.TabStac
         getActivity().stopService(new Intent(getContext(), SocketService.class));
         getActivity().stopService(new Intent(getContext(), LocationService.class));
         FirebaseMessaging.getInstance().unsubscribeFromTopic("profile" + SharedManager.getProperty(Constants.KEY_MY_ID));
+    }
 
-
+    @OnClick(R.id.backButton)
+    public void backButton(View v){
+        getActivity().onBackPressed();
     }
 
     void unregisterDevice(){

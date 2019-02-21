@@ -96,32 +96,18 @@
             app:layout_constraintStart_toEndOf="@+id/simpleRatingBar"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/placeSubscribersCount"
+        <Button
+            android:id="@+id/joinLeaveButton"
             android:layout_width="wrap_content"
-            android:layout_height="48dp"
+            android:layout_height="36dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            android:gravity="center"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:text="544"
-            android:textColor="@android:color/black"
+            android:padding="8dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="Подписаться"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
-            tools:ignore="MissingConstraints" />
-
-        <ImageView
-            android:id="@+id/loinLeaveButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:padding="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/placeSubscribersCount"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_add_subscription" />
 
@@ -150,5 +136,23 @@
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toTopOf="@+id/ringRow"
         app:layout_constraintStart_toStartOf="parent" />
+
+
+    <TextView
+        android:id="@+id/placeSubscribersCount"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:background="@drawable/place_corner_bg"
+        android:gravity="center"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:text="Подписчики: 524"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toTopOf="@+id/ringRow"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="MissingConstraints" />
 
 </android.support.constraint.ConstraintLayout>

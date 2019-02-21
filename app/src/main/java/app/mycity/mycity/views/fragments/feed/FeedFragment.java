@@ -67,33 +67,15 @@ public class FeedFragment extends Fragment implements TabStacker.TabStackInterfa
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        EventBus.getDefault().post(new EventBusMessages.DefaultStatusBar());
 
         Util.setNawBarClickListener(view);
         Util.setNawBarIconColor(getContext(), view, -1);
-
         title.setText("Чекины");
-
-        // Log.i("TAG21","Friends stack count - " + getActivity().getFragmentManager().getBackStackEntryCount());
-     //   Log.i("TAG21","Friends Fragment - " + getActivity().getFragmentManager().getBackStackEntryCount());
-        Log.i("TAG","Friends fragment on CreateView");
-
-        if(tabLayout!=null){
-            Log.i("TAG","TAB LAYOUT ! NULL");
-        }
-
-        if(viewPager!=null){
-            Log.i("TAG","PAGER != NULL");
-        }
-
-        if(getChildFragmentManager()!=null){
-            Log.i("TAG","getChildFragmentManager !" +
-                    " NULL");
-        }
 
         FeedPagerAdapter pagerAdapter = new FeedPagerAdapter(getChildFragmentManager(), getArguments().getString("name"));
         viewPager.setAdapter(pagerAdapter);
         viewPager.setOffscreenPageLimit(2);
-        //viewPager.addOnPageChangeListener(pagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
         Log.d("TAG", "Start " + this.getClass().getSimpleName());

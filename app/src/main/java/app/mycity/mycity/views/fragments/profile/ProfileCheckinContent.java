@@ -137,6 +137,9 @@ public class ProfileCheckinContent extends android.support.v4.app.Fragment imple
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
 
+        EventBus.getDefault().post(new EventBusMessages.BlackStatusBar());
+
+
         View.OnClickListener openPlaceListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {

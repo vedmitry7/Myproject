@@ -112,7 +112,6 @@ public class AllEventRecyclerAdapter extends RecyclerView.Adapter<AllEventRecycl
                     EventBus.getDefault().post(new EventBusMessages.OpenEventContent(
                             postList.get(position).getId(),
                             postList.get(position).getOwnerId(),
-                            group.getName(),
                             false));
                 }
             });

@@ -12,13 +12,11 @@ import app.mycity.mycity.views.fragments.feed.FeedPhotoAlbumFragment;
 
 public class FeedPagerAdapter extends FragmentPagerAdapter {
 
-
     String tabName;
 
     public FeedPagerAdapter(FragmentManager fm, String tabName) {
         super(fm);
         this.tabName = tabName;
-        Log.d("TAG21", "Top pager Init");
     }
 
     @Override
@@ -28,11 +26,6 @@ public class FeedPagerAdapter extends FragmentPagerAdapter {
                 return FeedCheckinFragmentNew.createInstance(tabName, "all");
             case 1:
                 return FeedCheckinFragmentNew.createInstance(tabName, "subscriptions");
-         /*       case 1:
-                return FeedPhotoAlbumFragment.createInstance(tabName);
-            case 2:
-                return AllEvents.createInstance(tabName, 4);*/
-
         }
         return null;
     }

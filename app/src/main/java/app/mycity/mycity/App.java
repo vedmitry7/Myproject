@@ -8,7 +8,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
+import android.support.annotation.RequiresApi;
 import android.support.multidex.MultiDex;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -36,6 +39,7 @@ public class App extends Application implements Application.ActivityLifecycleCal
     public boolean isChatActivityStarted = false;
     String currentChatUser;
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     public void onCreate() {
         super.onCreate();
@@ -46,6 +50,10 @@ public class App extends Application implements Application.ActivityLifecycleCal
         EmojiManager.install(new IosEmojiProvider());
 
         registerActivityLifecycleCallbacks(this);
+
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
+        builder.detectFileUriExposure();
     }
 
     @Override
@@ -212,5 +220,9 @@ public class App extends Application implements Application.ActivityLifecycleCal
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    public static int chosenCity() {
+        return SharedManager.getIntProperty("chosen_city_id");
     }
 }

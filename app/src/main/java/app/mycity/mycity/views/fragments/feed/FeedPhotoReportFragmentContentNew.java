@@ -172,6 +172,7 @@ public class FeedPhotoReportFragmentContentNew extends android.support.v4.app.Fr
 //        Util.setNawBarClickListener(view);
   //      Util.setNawBarIconColor(getContext(), view, -1);
 
+        EventBus.getDefault().post(new EventBusMessages.BlackStatusBar());
 
         time.setText(Util.getDatePretty(getArguments().getLong("albumDate")));
         placeName.setText(getArguments().getString("albumName"));

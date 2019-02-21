@@ -60,9 +60,6 @@ public class PeoplesRecyclerAdapter extends RecyclerView.Adapter<PeoplesRecycler
             holder.placeName.setVisibility(View.GONE);
             holder.imageMarker.setVisibility(View.GONE);
         }
-
-        Log.d("TAG21", "Bind FRIEND " + position);
-        Log.i("TAG3","bind");
     }
 
     @Override

@@ -9,6 +9,7 @@ public class EventBusMessages {
 
     public static class OpenUser {
         private final String message;
+        boolean closeCurrent;
 
         public OpenUser(String message) {
             this.message = message;
@@ -16,6 +17,14 @@ public class EventBusMessages {
 
         public String getMessage() {
             return message;
+        }
+
+        public boolean isCloseCurrent() {
+            return closeCurrent;
+        }
+
+        public void setCloseCurrent(boolean closeCurrent) {
+            this.closeCurrent = closeCurrent;
         }
     }
 
@@ -326,6 +335,7 @@ public class EventBusMessages {
     public static class OpenPlace {
         boolean closeCurrent;
         private String id;
+        private int tabPos = 0;
 
         public boolean isCloseCurrent() {
             return closeCurrent;
@@ -341,6 +351,14 @@ public class EventBusMessages {
 
         public OpenPlace(String id) {
          this.id = id;
+        }
+
+        public int getTabPos() {
+            return tabPos;
+        }
+
+        public void setTabPos(int tabPos) {
+            this.tabPos = tabPos;
         }
     }
 
@@ -554,13 +572,11 @@ public class EventBusMessages {
 
         private String eventId;
         private String ownerId;
-        private String placeName;
         private boolean backToPlace;
 
-        public OpenEventContent(String eventId, String ownerId, String placeName, boolean backToPlace) {
+        public OpenEventContent(String eventId, String ownerId, boolean backToPlace) {
             this.eventId = eventId;
             this.ownerId = ownerId;
-            this.placeName = placeName;
             this.backToPlace = backToPlace;
         }
 
@@ -570,10 +586,6 @@ public class EventBusMessages {
 
         public String getOwnerId() {
             return ownerId;
-        }
-
-        public String getPlaceName() {
-            return placeName;
         }
 
         public boolean isBackToPlace() {
@@ -589,12 +601,12 @@ public class EventBusMessages {
 
         private String eventId;
         private String ownerId;
-        private String placeName;
+        private boolean backToPlace;
 
-        public OpenActionContent(String eventId, String ownerId, String placeName) {
+        public OpenActionContent(String eventId, String ownerId, boolean backToPlace) {
             this.eventId = eventId;
             this.ownerId = ownerId;
-            this.placeName = placeName;
+            this.backToPlace = backToPlace;
         }
 
         public String getEventId() {
@@ -605,8 +617,43 @@ public class EventBusMessages {
             return ownerId;
         }
 
-        public String getPlaceName() {
-            return placeName;
+
+        public boolean isBackToPlace() {
+            return backToPlace;
+        }
+
+        public void setBackToPlace(boolean backToPlace) {
+            this.backToPlace = backToPlace;
+        }
+    }
+
+
+    public static class OpenServiceContent {
+
+        private String eventId;
+        private String ownerId;
+        private boolean backToPlace;
+
+        public OpenServiceContent(String eventId, String ownerId, boolean backToPlace) {
+            this.eventId = eventId;
+            this.ownerId = ownerId;
+            this.backToPlace = backToPlace;
+        }
+
+        public String getEventId() {
+            return eventId;
+        }
+
+        public String getOwnerId() {
+            return ownerId;
+        }
+
+        public boolean isBackToPlace() {
+            return backToPlace;
+        }
+
+        public void setBackToPlace(boolean backToPlace) {
+            this.backToPlace = backToPlace;
         }
     }
 
@@ -658,5 +705,40 @@ public class EventBusMessages {
 
     public static class UnreadCountUpdate{
 
+    }
+
+    public static class OpenServices {
+    }
+
+    public static class BlackStatusBar {
+    }
+
+    public static class DefaultStatusBar {
+    }
+
+    public static class OpenNotificationSettings {
+    }
+
+    public static class OpenProfileSettings {
+    }
+
+    public static class ProfileCheckinContentOne {
+        private String postId;
+        private boolean backToPlace;
+
+        public ProfileCheckinContentOne(String eventId) {
+            this.postId = eventId;
+        }
+        public String getPostId() {
+            return postId;
+        }
+
+        public boolean isBackToPlace() {
+            return backToPlace;
+        }
+
+        public void setBackToPlace(boolean backToPlace) {
+            this.backToPlace = backToPlace;
+        }
     }
 }

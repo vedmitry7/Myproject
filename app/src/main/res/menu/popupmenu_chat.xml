@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="Очистить чат"
+        android:visible="true"
+        android:id="@+id/clearChat">
+    </item>
+
+    <item android:title="Добавить в черный список"
+        android:visible="true"
+        android:id="@+id/blockUser">
+    </item>
+
+</menu>

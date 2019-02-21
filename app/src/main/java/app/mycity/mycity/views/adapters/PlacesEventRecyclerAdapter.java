@@ -3,8 +3,10 @@ package app.mycity.mycity.views.adapters;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -68,6 +70,7 @@ public class PlacesEventRecyclerAdapter extends RecyclerView.Adapter<PlacesEvent
             return new ViewHolder(view);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @SuppressLint("ResourceAsColor")
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
@@ -116,13 +119,9 @@ public class PlacesEventRecyclerAdapter extends RecyclerView.Adapter<PlacesEvent
 
         if(holder.likeIcon!=null){
             if(postList.get(position).getLikes().getUserLikes()==1){
-                holder.likeIcon.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_heart_black_18dp));
-                holder.likeIcon.setColorFilter(context.getResources().getColor(R.color.colorAccentRed));
-                holder.likesCount.setTextColor(context.getResources().getColor(R.color.colorAccentRed));
+                holder.likeIcon.setImageDrawable(context.getDrawable(R.drawable.ic_heart_vector_white));
             } else {
-                holder.likeIcon.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_heart_outline_grey600_18dp));
-                holder.likeIcon.setColorFilter(context.getResources().getColor(R.color.grey600));
-                holder.likesCount.setTextColor(context.getResources().getColor(R.color.black_67percent));
+                holder.likeIcon.setImageDrawable(context.getDrawable(R.drawable.ic_heart_outline_vector_white));
             }
         }
     }
@@ -173,7 +172,6 @@ public class PlacesEventRecyclerAdapter extends RecyclerView.Adapter<PlacesEvent
                         EventBus.getDefault().post(new EventBusMessages.OpenEventContent(
                                 postList.get(getAdapterPosition()).getId(),
                                 postList.get(getAdapterPosition()).getOwnerId(),
-                                groups.get(postList.get(getAdapterPosition()).getOwnerId()).getName(),
                                 false));
                     }
                 });

@@ -3,21 +3,20 @@ package app.mycity.mycity.views.fragments.profile;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -79,7 +78,10 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
     TextView name;
 
     @BindView(R.id.someoneFragAdd)
-    FloatingActionButton fab;
+    Button subscribeButton;
+
+    @BindView(R.id.someoneFragChat)
+    Button someoneFragChat;
 
     @BindView(R.id.profileFragCurrentPointContainer)
     RelativeLayout currentPoint;
@@ -102,6 +104,9 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
     @BindView(R.id.profileNestedScrollView)
     NestedScrollView scrollView;
 
+    @BindView(R.id.profileAbout)
+    TextView profileAbout;
+
     CheckinRecyclerAdapter adapter;
 
     List<Post> postList;
@@ -111,9 +116,6 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
     private RecyclerView.ItemDecoration spaceDecoration;
 
     RecyclerView.LayoutManager mLayoutManager;
-
-    File file;
-    Uri fileUri;
 
     ProgressDialog progressDialog;
 
@@ -178,7 +180,9 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
         Util.setNawBarIconColor(getContext(), view, -1);
         Util.setUnreadCount(view);
 
-        //      imageView.setShadow(App.dpToPx(getActivity(),10));
+        someoneFragChat.setBackgroundResource(R.drawable.places_top_bar_bg);
+        someoneFragChat.setTextColor(Color.parseColor("#009688"));
+
         spaceDecoration = new ImagesSpacesItemDecoration(3, App.dpToPx(getActivity(), 4), false);
 
         mLayoutManager = new GridLayoutManager(this.getActivity(), 3);
@@ -273,7 +277,12 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
                     if(response.body()!=null){
                         if(response.body().getResponse().getSuccess()==1){
                             isSubscription = false;
-                            fab.setImageResource(R.drawable.ic_add_subscription);
+                            subscribeButton.setBackgroundResource(R.drawable.places_top_bar_bg_choosen);
+                            subscribeButton.setTextColor(Color.WHITE);
+
+                            subscribeButton.setText("Подписаться");
+
+                            //                subscribeButton.setImageResource(R.drawable.ic_add_subscription);
                         }
                     }
                 }
@@ -293,7 +302,10 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
                     if(response.body()!=null){
                         if(response.body().getResponse().getSuccess()==1){
                             isSubscription = true;
-                            fab.setImageResource(R.drawable.ic_delete_subscription);
+                            subscribeButton.setBackgroundResource(R.drawable.places_top_bar_bg);
+                            subscribeButton.setTextColor(Color.parseColor("#009688"));
+                            subscribeButton.setText("Отписаться");
+           //                 subscribeButton.setImageResource(R.drawable.ic_delete_subscription);
                         }
                     }
                 }
@@ -311,7 +323,7 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
     private void getInfo() {
         Log.i("TAG21", "Get Info");
-        ApiFactory.getApi().getUserById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId, "photo_550,photo_130,is_subscription,is_subscriber").enqueue(new retrofit2.Callback<ResponseContainer<Profile>>() {
+        ApiFactory.getApi().getUserById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId, "about,photo_550,photo_130,is_subscription,is_subscriber").enqueue(new retrofit2.Callback<ResponseContainer<Profile>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<Profile>> call, retrofit2.Response<ResponseContainer<Profile>> response) {
                 profile = response.body().getResponse();
@@ -322,9 +334,18 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
                     if(profile.getIsSubscription()==1){
                         isSubscription = true;
-                        fab.setBackgroundResource(R.drawable.ic_delete_subscription);
+                        subscribeButton.setText("Отписаться");
+
+                        subscribeButton.setBackgroundResource(R.drawable.places_top_bar_bg);
+                        subscribeButton.setTextColor(Color.parseColor("#009688"));
+                        //subscribeButton.setBackgroundResource(R.drawable.ic_delete_subscription);
                     } else {
-                        fab.setBackgroundResource(R.drawable.ic_add_subscription);
+
+                        subscribeButton.setText("Подписаться");
+                        subscribeButton.setBackgroundResource(R.drawable.places_top_bar_bg_choosen);
+                        subscribeButton.setTextColor(Color.WHITE);
+
+                        //subscribeButton.setBackgroundResource(R.drawable.ic_add_subscription);
                     }
 
                     name.setText(profile.getFirstName() + " " + profile.getLastName());
@@ -332,6 +353,12 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
                     infoLoad = true;
                     showContent();
                     Picasso.get().load(profile.getPhoto550()).into(imageView);
+                    if(profile.getAbout()==null || profile.getAbout().length()==0){
+                        profileAbout.setVisibility(View.GONE);
+                    } else {
+                        profileAbout.setText(profile.getAbout());
+                    }
+
                     if (progressDialog != null) {
                         progressDialog.hide();
                     }
@@ -349,7 +376,7 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
     private void getSubscriberCount(){
 
-        ApiFactory.getApi().getSubscribers(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("userId"), 0, "").enqueue(new Callback<ResponseContainer<UsersContainer>>() {
+        ApiFactory.getApi().getSubscribers(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), 0, getArguments().getString("userId"), 0, "").enqueue(new Callback<ResponseContainer<UsersContainer>>() {
             @Override
             public void onResponse(Call<ResponseContainer<UsersContainer>> call, Response<ResponseContainer<UsersContainer>> response) {
 
@@ -367,7 +394,7 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
             }
         });
 
-        ApiFactory.getApi().getSubscriptions(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("userId"), 0, "").enqueue(new Callback<ResponseContainer<UsersContainer>>() {
+        ApiFactory.getApi().getSubscriptions(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), 0, getArguments().getString("userId"), 0, "").enqueue(new Callback<ResponseContainer<UsersContainer>>() {
             @Override
             public void onResponse(Call<ResponseContainer<UsersContainer>> call, Response<ResponseContainer<UsersContainer>> response) {
 

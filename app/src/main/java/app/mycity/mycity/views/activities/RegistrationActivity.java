@@ -2,7 +2,6 @@ package app.mycity.mycity.views.activities;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -12,7 +11,6 @@ import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,6 +48,7 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
     private EmailFragment emailFragment;
     private ConfirmEmailFragment confirmEmailFragment;
     private PasswordFragment passwordFragment;
+    private DataFragment fragment;
     private String countryId;
 
 
@@ -62,18 +61,20 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
 
         setContentView(R.layout.activity_registration);
         ButterKnife.bind(this);
-
-        DataFragment fragment = new DataFragment();
-
         fragmentManager = getSupportFragmentManager();
-
-        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.add(R.id.fragmentContainer, fragment);
-      //  transaction.addToBackStack("ds");
-        transaction.commit();
 
         Typeface type = Typeface.createFromAsset(getAssets(),"abril_fatface_regular.otf");
         label.setTypeface(type);
+
+        showDataFragment();
+    }
+
+    public void showDataFragment() {
+        fragment = new DataFragment();
+        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.fragmentContainer, fragment);
+       // transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     @Override
@@ -107,7 +108,7 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
     public void nextEmailStep() {
         emailFragment = new EmailFragment();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
+        //transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right);
         transaction.replace(R.id.fragmentContainer, emailFragment);
         transaction.addToBackStack(null);
         transaction.commit();
@@ -374,8 +375,8 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
 
     @Override
     public void onBackPressed() {
-        Log.i("TAG", "back key");
-        android.support.v4.app.Fragment currentFrag = fragmentManager.findFragmentById(R.id.fragmentContainer);
+        Log.i("TAG21", "back key");
+   /*     android.support.v4.app.Fragment currentFrag = fragmentManager.findFragmentById(R.id.fragmentContainer);
 
         if(currentFrag instanceof DataFragment){
             Log.i("TAG", "Data fara");
@@ -392,7 +393,8 @@ public class RegistrationActivity extends AppCompatActivity implements RegisterA
 
         if(currentFrag instanceof ConfirmEmailFragment){
             showDialog("Отменить подтверждение email?");
-        }
+        }*/
+   super.onBackPressed();
     }
 
     private void showDialog(String s) {

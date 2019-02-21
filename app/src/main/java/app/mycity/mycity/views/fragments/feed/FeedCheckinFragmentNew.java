@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -34,14 +35,13 @@ import app.mycity.mycity.api.model.ResponseWall;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.activities.Storage;
-import app.mycity.mycity.views.adapters.FeedRecyclerAdapter;
 import app.mycity.mycity.views.adapters.NewFeedRecyclerAdapter;
 import app.mycity.mycity.views.decoration.ImagesSpacesItemDecoration;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import fr.arnaudguyon.tabstacker.TabStacker;
 
-public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment implements TabStacker.TabStackInterface {
+public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment implements TabStacker.TabStackInterface, SwipeRefreshLayout.OnRefreshListener {
 
 
     @BindView(R.id.feedFragmentRecyclerView)
@@ -49,6 +49,9 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment impl
 
     @BindView(R.id.progressBarPlaceHolder)
     ConstraintLayout placeHolder;
+
+    @BindView(R.id.swipeContainer)
+    SwipeRefreshLayout swipeRefreshLayout;
 
     NewFeedRecyclerAdapter adapter;
 
@@ -58,7 +61,7 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment impl
 
     boolean isLoading;
 
-    int totalCount = 53 ;
+    int totalCount;
 
     Storage storage;
 
@@ -87,6 +90,10 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment impl
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        EventBus.getDefault().post(new EventBusMessages.DefaultStatusBar());
+
+        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
 
         adapter = new NewFeedRecyclerAdapter(postList, profiles, groups);
 
@@ -160,13 +167,15 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment impl
             recyclerView.scrollToPosition(scrollPos);
             placeHolder.setVisibility(View.GONE);
         } else {
-            ApiFactory.getApi().getFeed(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "1", offset, "photo_130", getArguments().getString("filter")).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
+
+            ApiFactory.getApi().getFeed(App.accessToken(), App.chosenCity(),"1", offset, "photo_130", getArguments().getString("filter")).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
                 @Override
                 public void onResponse(retrofit2.Call<ResponseContainer<ResponseWall>> call, retrofit2.Response<ResponseContainer<ResponseWall>> response) {
 
                     if(response.body().getResponse()!=null && response.body().getResponse().getCount()!=0){
                         Log.d("TAG21", "RESPONSE FEED OK !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
+                        swipeRefreshLayout.setRefreshing(false);
                         placeHolder.setVisibility(View.GONE);
 
                         totalCount = response.body().getResponse().getCount();
@@ -299,5 +308,12 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment impl
     @Override
     public void onRestoreTabFragmentInstance(Bundle bundle) {
 
+    }
+
+    @Override
+    public void onRefresh() {
+        postList = new ArrayList<>();
+        loadFeed(0);
+        placeHolder.setVisibility(View.VISIBLE);
     }
 }

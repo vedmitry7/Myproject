@@ -151,6 +151,16 @@
 
 
         <ImageView
+            android:id="@+id/menuButton"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:padding="6dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_dots_white" />
+
+        <ImageView
             android:id="@+id/backButton"
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -202,8 +212,10 @@
             android:text=""
             android:textColor="@android:color/white"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintEnd_toStartOf="@+id/menuButton"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.523" />
+
     </android.support.constraint.ConstraintLayout>
 
     <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -212,7 +224,7 @@
         android:id="@+id/progressBarPlaceHolder"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@android:color/white"
+        android:background="@android:color/black"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

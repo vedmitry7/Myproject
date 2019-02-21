@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -76,8 +77,8 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
     @BindView(R.id.place_image)
     ImageView imageView;
 
-    @BindView(R.id.loinLeaveButton)
-    ImageView joinLeaveButton;
+    @BindView(R.id.joinLeaveButton)
+    Button joinLeaveButton;
 
     @BindView(R.id.placeProgressBar)
     ConstraintLayout progressBar;
@@ -107,11 +108,12 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
         return view;
     }
 
-    public static PlaceFragment createInstance(String name, String placeId) {
+    public static PlaceFragment createInstance(String name, String placeId, int currentTabPos) {
         PlaceFragment fragment = new PlaceFragment();
         Log.i("TAG21", "Create PlaceFragment " + name);
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
+        bundle.putInt("currentTabPos", currentTabPos);
         bundle.putString("placeId", placeId);
         fragment.setArguments(bundle);
         return fragment;
@@ -121,6 +123,7 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
         PlacePagerAdapter adapter = new PlacePagerAdapter(getChildFragmentManager(), place, getArguments().getString("name"));
         viewPager.setAdapter(adapter);
         viewPager.setOffscreenPageLimit(3);
+        viewPager.setCurrentItem(getArguments().getInt("currentTabPos"));
         tabLayout.setupWithViewPager(viewPager);
         ratingBar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -316,19 +319,26 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
     void showInfo(Place place){
         Picasso.get().load(place.getCover1250()).into(imageView);
         title.setText(place.getName());
-        placeSubscribersCount.setText("" + place.getCountMembers());
+        placeSubscribersCount.setText("Подписчики: " + place.getCountMembers());
         usersInPlace.setText("Сейчас в заведении: " + place.getCountMembersInPlace());
 
         if(place.getIsMember()==1){
             Log.d("TAG21", "MEMBER ");
-            joinLeaveButton.setImageResource(R.drawable.ic_delete_subscription);
+            joinLeaveButton.setText("Отписаться");
+            joinLeaveButton.setBackgroundResource(R.drawable.places_top_bar_bg);
+            joinLeaveButton.setTextColor(Color.parseColor("#009688"));
+            joinLeaveButton.setVisibility(View.VISIBLE);
         } else {
             Log.d("TAG21", "NOT MEMBER " );
-            joinLeaveButton.setImageResource(R.drawable.ic_add_subscription);
+
+            joinLeaveButton.setText("Подписаться");
+            joinLeaveButton.setBackgroundResource(R.drawable.places_top_bar_bg_choosen);
+            joinLeaveButton.setTextColor(Color.WHITE);
+            joinLeaveButton.setVisibility(View.VISIBLE);
         }
     }
 
-    @OnClick(R.id.loinLeaveButton)
+    @OnClick(R.id.joinLeaveButton)
     public void dfkop(View v){
         if(place.getIsMember()==1){
             Log.d("TAG21", "LEAVE group " );
@@ -376,6 +386,10 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Log.d("TAG21", "onViewCreated");
+
+        joinLeaveButton.setVisibility(View.GONE);
+
+        EventBus.getDefault().post(new EventBusMessages.DefaultStatusBar());
 
         Util.setNawBarClickListener(view);
         Util.setNawBarIconColor(getContext(), view, -1);
@@ -453,6 +467,10 @@ public class PlaceFragment extends Fragment implements TabStacker.TabStackInterf
 
                     storage.remove(getArguments().get("name") + "_actionsPostList");
                     storage.remove(getArguments().get("name") + "_actionsGroups");
+
+                    storage.remove(getArguments().get("name") + "_servicesPostList");
+                    storage.remove(getArguments().get("name") + "_servicesGroups");
+                    storage.remove(getArguments().get("name") + "_servicesScrollPosition");
                 }
             }, 200);
 

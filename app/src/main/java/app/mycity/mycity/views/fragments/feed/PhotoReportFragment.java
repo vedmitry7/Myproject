@@ -100,6 +100,7 @@ public class PhotoReportFragment extends android.support.v4.app.Fragment impleme
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        EventBus.getDefault().post(new EventBusMessages.DefaultStatusBar());
 
         mLayoutManager = new GridLayoutManager(this.getActivity(), 3);
         recyclerView.addItemDecoration(new ImagesSpacesItemDecoration(3, App.dpToPx(getActivity(), 4), false));

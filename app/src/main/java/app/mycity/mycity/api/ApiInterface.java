@@ -32,6 +32,7 @@ import app.mycity.mycity.api.model.ResponseUploading;
 import app.mycity.mycity.api.model.ResponseVisit;
 import app.mycity.mycity.api.model.ResponseWall;
 import app.mycity.mycity.api.model.SendMessageResponse;
+import app.mycity.mycity.api.model.SettingsResponse;
 import app.mycity.mycity.api.model.Success;
 import app.mycity.mycity.api.model.SuccessResponceNumber;
 import app.mycity.mycity.api.model.User;
@@ -86,35 +87,38 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("users.getAll")
     Call<ResponseContainer<UsersContainer>> getTopUsersWithSearch(@Field("access_token") String accessToken,
-                                                        @Field("fields") String fields,
-                                                        @Field("order") String order,
-                                                        @Field("filter") String filter,
-                                                        @Field("q") String search);
+                                                                  @Field("fields") String fields,
+                                                                  @Field("order") String order,
+                                                                  @Field("filter") String filter,
+                                                                  @Field("q") String search);
 
 
     //TOP users
     @FormUrlEncoded
     @POST("users.getAll")
     Call<ResponseContainer<UsersContainer>> getTopUsersInPlaces(@Field("access_token") String accessToken,
-                                                        @Field("fields") String fields,
-                                                        @Field("order") String order,
-                                                        @Field("filter") String filter); //in_place
+                                                                @Field("fields") String fields,
+                                                                @Field("order") String order,
+                                                                @Field("filter") String filter); //in_place
 
     @FormUrlEncoded
     @POST("users.getAll")
     Call<ResponseContainer<UsersContainer>> getTopUsersInPlacesWithSorting(@Field("access_token") String accessToken,
-                                                                @Field("fields") String fields,
-                                                                @Field("order") String order,
-                                                                @Field("filter") String filter, //in_place
-                                                                @Field("sex") int sex,
-                                                                @Field("age_from") int from,
-                                                                @Field("age_to") int to,
-                                                                           @Field("extended") String extended);
+                                                                           @Field("city_id") int cityId,
+                                                                           @Field("offset") int offset,
+                                                                           @Field("fields") String fields,
+                                                                           @Field("order") String order,
+                                                                           @Field("filter") String filter, //in_place
+                                                                           @Field("q") String search, //in_place
+                                                                           @Field("sex") int sex,
+                                                                           @Field("age_from") int from,
+                                                                           @Field("age_to") int to, @Field("extended") String extended);
 
     //Subscribers
     @FormUrlEncoded
     @POST("subscribers.get")
     Call<ResponseContainer<UsersContainer>> getSubscribers(@Field("access_token") String accessToken,
+                                                           @Field("offset") int offset,
                                                            @Field("user_id") String id,
                                                            @Field("only_online") int online,
                                                            @Field("fields") String fields);
@@ -128,6 +132,7 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("subscribers.getSubscriptions")
     Call<ResponseContainer<UsersContainer>> getSubscriptions(@Field("access_token") String accessToken,
+                                                             @Field("offset") int offset,
                                                              @Field("user_id") String id,
                                                              @Field("only_online") int online,
                                                              @Field("fields") String fields);
@@ -140,8 +145,8 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("users.get")
     Call<ResponseContainer<Profile>> getUserById(@Field("access_token") String accessToken,
-                                              @Field("user_id") String id,
-                                              @Field("fields") String fields);
+                                                 @Field("user_id") String id,
+                                                 @Field("fields") String fields);
 
     @FormUrlEncoded
     @POST("friends.get")
@@ -183,7 +188,7 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("subscribers.delete")
     Call<ResponseContainer<Success>> deleteSubscription(@Field("access_token") String accessToken,
-                                                         @Field("user_id") String id);
+                                                        @Field("user_id") String id);
 
     @FormUrlEncoded
     @POST("users.search")
@@ -200,7 +205,7 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("messages.deleteDialog")
     Call<ResponseContainer<SuccessResponceNumber>> deleteDialogs(@Field("access_token") String accessToken,
-                                                         @Field("peer_id") String id);
+                                                                 @Field("peer_id") String id);
 
     //send message
     @FormUrlEncoded
@@ -214,12 +219,12 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("messages.markAsRead")
     Call<ResponseContainer<SuccessResponceNumber>> markAsRead(@Field("access_token") String accessToken,
-                                                           @Field("peer_id") String user_id);
+                                                              @Field("peer_id") String user_id);
 
     @FormUrlEncoded
     @POST("messages.markAsRead")
     Call<ResponseContainer<SuccessResponceNumber>> markAsReadMessages(@Field("access_token") String accessToken,
-                                                                    @Field("message_ids") long message_ids);
+                                                                      @Field("message_ids") long message_ids);
 
 
     @FormUrlEncoded
@@ -235,9 +240,9 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("messages.getHistory")
     Call<ResponseContainer<SendMessageResponse>> getMessagesFromId(@Field("access_token") String accessToken,
-                                                                    @Field("peer_id") long peerId,
-                                                                    @Field("start_message_id") long startMessageId,
-                                                                    @Field("offset") int offset);
+                                                                   @Field("peer_id") long peerId,
+                                                                   @Field("start_message_id") long startMessageId,
+                                                                   @Field("offset") int offset);
 
 
 
@@ -309,7 +314,8 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("photos.getAlbums")
     Call<ResponseContainer<ResponseAlbums>> getAllGroupAlbums(@Field("access_token") String accessToken,
-                                                           @Field("offset") int offset,
+                                                              @Field("city_id") int cityId,
+                                                              @Field("offset") int offset,
                                                               @Field("extended") String extended,
                                                               @Field("only_subscription") String subscriptionOnly);
 
@@ -320,6 +326,9 @@ public interface ApiInterface {
                                                      @Field("album_id") String albumId,
                                                      @Field("extended") String extended);
 
+    @FormUrlEncoded
+    @POST("account.removeAvatar")
+    Call<ResponseContainer<Success>> deletePhoto(@Field("access_token") String token);
 
     @Multipart
     @POST("wall.post")
@@ -354,9 +363,9 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("wall.get")
     Call<ResponseContainer<ResponseWall>> getWallExtended(@Field("access_token") String token,
-                                                  @Field("offset") int offset,
-                                                  @Field("count") int count,
-                                                  @Field("extended") String extended);
+                                                          @Field("offset") int offset,
+                                                          @Field("count") int count,
+                                                          @Field("extended") String extended);
 
 
 
@@ -388,13 +397,16 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("events.getById")
     Call<ResponseContainer<ResponseEvents>> getEventsById(@Field("access_token") String token,
-                                                          @Field("events") String events);
+                                                          @Field("events") String events,
+                                                          @Field("extended") String extended);
+    ;
 
 
     //PLACE EVENTS
     @FormUrlEncoded
     @POST("events.getAll")
     Call<ResponseContainer<ResponseWall>> getAllEvents(@Field("access_token") String token,
+                                                       @Field("city_id") int cityId,
                                                        @Field("extended") String type,
                                                        @Field("offset") int offset);
 
@@ -413,28 +425,55 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("events.getVisitors")
     Call<ResponseContainer<ResponseEventVisitors>> getVisitors(@Field("access_token") String token,
-                                                                     @Field("event_id") String eventId,
-                                                                     @Field("owner_id") String ownerId,
+                                                               @Field("event_id") String eventId,
+                                                               @Field("owner_id") String ownerId,
                                                                @Field("fields") String fields);
 
 
     @FormUrlEncoded
     @POST("actions.getAll")
     Call<ResponseContainer<ResponseWall>> getAllActions(@Field("access_token") String token,
-                                                       @Field("extended") String type,
-                                                       @Field("offset") int offset);
+                                                        @Field("city_id") int cityId,
+                                                        @Field("extended") String type,
+                                                        @Field("offset") int offset);
+
+    @FormUrlEncoded
+    @POST("services.getAll")
+    Call<ResponseContainer<ResponseWall>> getAllServices(@Field("access_token") String token,
+                                                         @Field("city_id") int cityId,
+                                                         @Field("extended") String type,
+                                                         @Field("offset") int offset);
 
     @FormUrlEncoded
     @POST("actions.getAll")
     Call<ResponseContainer<ResponseWall>> getAllActionsByGroupId(@Field("access_token") String token,
-                                                        @Field("extended") String type,
-                                                        @Field("offset") int offset,
-                                                        @Field("owner_id") String ownerId);
+                                                                 @Field("extended") String type,
+                                                                 @Field("offset") int offset,
+                                                                 @Field("owner_id") String ownerId);
+
+    @FormUrlEncoded
+    @POST("services.getAll")
+    Call<ResponseContainer<ResponseWall>> getAllServicesByGroupId(@Field("access_token") String token,
+                                                                  @Field("extended") String type,
+                                                                  @Field("offset") int offset,
+                                                                  @Field("owner_id") String ownerId);
+    @FormUrlEncoded
+    @POST("actions.get")
+    Call<ResponseContainer<ResponseEvents>> getActionById(@Field("access_token") String token,
+                                                          @Field("actions") String events,
+                                                          @Field("extended") String extended);
+
+    @FormUrlEncoded
+    @POST("services.get")
+    Call<ResponseContainer<ResponseEvents>> getServiceById(@Field("access_token") String token,
+                                                           @Field("services") String events,
+                                                           @Field("extended") String extended);
 
     //FEED
     @FormUrlEncoded
     @POST("feed.get")
     Call<ResponseContainer<ResponseWall>> getFeed(@Field("access_token") String token,
+                                                  @Field("city_id") int cityId,
                                                   @Field("extended") String type,
                                                   @Field("offset") int offset,
                                                   @Field("fields") String fields,
@@ -497,16 +536,16 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("photos.createComment")
     Call<ResponseContainer<ResponseAddComment>> addCommentPhoto(@Field("access_token") String token,
-                                                           @Field("photo_id") String postId,
-                                                           @Field("owner_id") String ownerId,
-                                                           @Field("text") String text);
+                                                                @Field("photo_id") String postId,
+                                                                @Field("owner_id") String ownerId,
+                                                                @Field("text") String text);
 
     @FormUrlEncoded
     @POST("events.createComment")
     Call<ResponseContainer<ResponseAddComment>> addCommentEvent(@Field("access_token") String token,
-                                                           @Field("event_id") String postId,
-                                                           @Field("owner_id") String ownerId,
-                                                           @Field("text") String text);
+                                                                @Field("event_id") String postId,
+                                                                @Field("owner_id") String ownerId,
+                                                                @Field("text") String text);
 
     @FormUrlEncoded
     @POST("wall.deleteComment")
@@ -517,8 +556,8 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("photos.deleteComment")
     Call<ResponseContainer<ResponseDeleteComment>> deleteCommentPhoto(@Field("access_token") String token,
-                                                                 @Field("comment_id") String postId,
-                                                                 @Field("owner_id") String ownerId);
+                                                                      @Field("comment_id") String postId,
+                                                                      @Field("owner_id") String ownerId);
 
     @FormUrlEncoded
     @POST("messages.getSocketServer")
@@ -528,7 +567,7 @@ public interface ApiInterface {
     @POST("groups.getAll")
     Call<ResponseContainer<ResponsePlaces>> getPlaces(@Field("access_token") String token,
                                                       @Field("offset") int offset,
-                                                      @Field("city_id ") int cityId,
+                                                      @Field("city_id") int cityId,
                                                       @Field("category_id") int category,
                                                       @Field("order") String order,
                                                       @Field("q") String filter);
@@ -536,9 +575,9 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("groups.get")
     Call<ResponseContainer<ResponsePlaces>> getPlacesByUserId(@Field("access_token") String token,
-                                                      @Field("offset") int offset,
-                                                      @Field("city_id ") int cityId,
-                                                      @Field("user_id") String user_id);
+                                                              @Field("offset") int offset,
+                                                              @Field("city_id") int cityId,
+                                                              @Field("user_id") String user_id);
 
 
     @FormUrlEncoded
@@ -549,6 +588,7 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("groups.getMembers")
     Call<ResponseContainer<UsersContainer>> getPlaceSubscribers(@Field("access_token") String token,
+                                                                @Field("offset") int offset,
                                                                 @Field("group_id") String groupIds,
                                                                 @Field("fields") String fields,
                                                                 @Field("subscriptions_only") String subscriptions);
@@ -556,19 +596,20 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("groups.getMembersinplace")
     Call<ResponseContainer<UsersContainer>> getUsersInPlace(@Field("access_token") String token,
-                                                                @Field("group_id") String groupIds,
-                                                                @Field("fields") String fields,
-                                                                @Field("subscriptions_only") String subscriptions);
+                                                            @Field("offset") int offset,
+                                                            @Field("group_id") String groupIds,
+                                                            @Field("fields") String fields,
+                                                            @Field("subscriptions_only") String subscriptions);
 
     @FormUrlEncoded
     @POST("groups.join")
     Call<ResponseContainer<Success>> joinToGroup(@Field("access_token") String token,
-                                                            @Field("group_id") String groupIds);
+                                                 @Field("group_id") String groupIds);
 
     @FormUrlEncoded
     @POST("groups.leave")
     Call<ResponseContainer<Success>>  leaveGroup(@Field("access_token") String token,
-                                                        @Field("group_id") String groupIds);
+                                                 @Field("group_id") String groupIds);
 
     @FormUrlEncoded
     @POST("groups.getNearby")
@@ -580,8 +621,8 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("account.setCoordinates")
     Call<ResponseContainer<UsersContainer>> setCoordinates(@Field("access_token") String token,
-                                                            @Field("latitude") Double latitude,
-                                                            @Field("longitude") Double longitude);
+                                                           @Field("latitude") Double latitude,
+                                                           @Field("longitude") Double longitude);
 
     @FormUrlEncoded
     @POST("database.getCategories")
@@ -596,8 +637,8 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("groups.rate")
     Call<ResponseContainer<Success>> rateGroup(@Field("access_token") String token,
-                                                @Field("group_id") String groupIds,
-                                                @Field("service") String service
+                                               @Field("group_id") String groupIds,
+                                               @Field("service") String service
                                               /* ,
                                                 @Field("quality") String quality,
                                                 @Field("price") String price,
@@ -607,9 +648,9 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("groups.rate")
     Call<ResponseContainer<Success>> rate(@Field("access_token") String token,
-                                                @Field("group_id") String groupIds,
-                                                @Field("type") String service,
-                                                @Field("rate") int rate);
+                                          @Field("group_id") String groupIds,
+                                          @Field("type") String service,
+                                          @Field("rate") int rate);
 
     @POST("database.getCountries")
     Call<ResponseContainer<ResponseCountries>> getCountries();
@@ -617,6 +658,10 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("database.getCities")
     Call<ResponseContainer<ResponseCities>> getCities(@Field("country_id") String countryId);
+
+    @FormUrlEncoded
+    @POST("database.getCities")
+    Call<ResponseContainer<ResponseCities>> getCitiesWithSearch(@Field("q") String search);
 
 
 
@@ -629,5 +674,36 @@ public interface ApiInterface {
     @FormUrlEncoded
     @POST("account.unregisterDevice")
     Call<ResponseContainer<Success>> unregisterDevice(@Field("access_token") String token,
-                                                    @Field("device_id") String deviceId);
+                                                      @Field("device_id") String deviceId);
+
+    @FormUrlEncoded
+    @POST("account.getSettings")
+    Call<ResponseContainer<SettingsResponse>> getSettings(@Field("access_token") String token);
+
+    @FormUrlEncoded
+    @POST("account.setSettings")
+    Call<ResponseContainer<SettingsResponse>> sendSettings(@Field("access_token") String token,
+                                                           @Field("new_message") int message,
+                                                           @Field("like_post") int likePost,
+                                                           @Field("like_comment") int likeComment,
+                                                           @Field("follow") int follow,
+                                                           @Field("comment_post") int commentPost,
+                                                           @Field("place_event") int events,
+                                                           @Field("place_action") int actions);
+
+    @FormUrlEncoded
+    @POST("account.saveProfileInfo")
+    Call<ResponseContainer<Success>> saveProfileInfo(@Field("access_token") String token,
+                                                     @Field("first_name") String firstName,
+                                                     @Field("last_name") String lastName,
+                                                     @Field("bdate") String birthday,
+                                                     @Field("about") String about);
+
+
+    @FormUrlEncoded
+    @POST("wall.getById")
+    Call<ResponseContainer<ResponseWall>> getPostById(@Field("access_token") String token,
+                                                      @Field("posts") String postIds,
+                                                      @Field("extended") String extended,
+                                                      @Field("fields") String fields);
 }

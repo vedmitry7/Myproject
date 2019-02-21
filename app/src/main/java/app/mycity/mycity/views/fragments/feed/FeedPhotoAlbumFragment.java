@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +13,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +30,7 @@ import app.mycity.mycity.api.model.Album;
 import app.mycity.mycity.api.model.Group;
 import app.mycity.mycity.api.model.ResponseAlbums;
 import app.mycity.mycity.api.model.ResponseContainer;
+import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.adapters.FeedPhotoReportAdapter;
@@ -36,7 +41,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment {
+public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
 
     @BindView(R.id.feedFragmentRecyclerView)
@@ -47,6 +52,10 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment {
 
     @BindView(R.id.chronicksHolder)
     RelativeLayout holderInfo;
+
+
+    @BindView(R.id.swipeContainer)
+    SwipeRefreshLayout swipeRefreshLayout;
 
     FeedPhotoReportAdapter adapter;
 
@@ -82,10 +91,13 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        EventBus.getDefault().post(new EventBusMessages.DefaultStatusBar());
+
+        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
 
         adapter = new FeedPhotoReportAdapter(albumsList, groups);
 
-     //   final LinearLayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
 
         RecyclerView.OnScrollListener scrollListener = new RecyclerView.OnScrollListener() {
@@ -126,7 +138,6 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment {
         storage = (Storage) context;
         Log.d("TAG24", "storage - " + String.valueOf(storage == null) + totalCount);
 
-
        albumsList = (List<Album>) storage.getDate(getArguments().get("name")+ "_albumsList" + getArguments().get("subscriptionOnly"));
        groups = (Map) storage.getDate(getArguments().get("name")+ "_groups" + getArguments().get("subscriptionOnly"));
 
@@ -155,13 +166,14 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment {
             placeHolder.setVisibility(View.GONE);
         } else {
             Log.d("TAG23", "Load date...");
-            ApiFactory.getApi().getAllGroupAlbums(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),  0, "1", getArguments().getString("subscriptionOnly"))
+            ApiFactory.getApi().getAllGroupAlbums(App.accessToken(), App.chosenCity(), 0, "1", getArguments().getString("subscriptionOnly"))
                     .enqueue(new Callback<ResponseContainer<ResponseAlbums>>() {
                         @Override
                         public void onResponse(Call<ResponseContainer<ResponseAlbums>> call, Response<ResponseContainer<ResponseAlbums>> response) {
                             Log.d("TAG24", "RESTORE");
 
                             if (response.body().getResponse() != null) {
+                                swipeRefreshLayout.setRefreshing(false);
 
                                 if(response.body().getResponse().getCount() !=0){
                                     placeHolder.setVisibility(View.GONE);
@@ -183,10 +195,7 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment {
                                     placeHolder.setVisibility(View.GONE);
                                     holderInfo.setVisibility(View.VISIBLE);
                                 }
-
-
                             }
-
                         }
 
                         @Override
@@ -212,5 +221,12 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment {
         storage.setDate(getArguments().get("name") + "_groups" + getArguments().get("subscriptionOnly"), groups);
         storage.setDate(getArguments().get("name") + "_scrollPosition" + getArguments().get("subscriptionOnly"), firstVisibleItem);
         super.onStop();
+    }
+
+    @Override
+    public void onRefresh() {
+        albumsList = new ArrayList<>();
+        loadFeed(0);
+        placeHolder.setVisibility(View.VISIBLE);
     }
 }
