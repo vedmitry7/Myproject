@@ -276,6 +276,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
                 }
                 ownerId = res.substring(type.length(), res.lastIndexOf("_"));
                 objectId = res.substring(res.lastIndexOf("_")+1, res.length());
+                Log.i("TAG23", "res : " + objectId + " " + ownerId);
 
                 switch (type){
                     case "event":
@@ -298,6 +299,14 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
                         break;
                     case "post":
                         checkinContentOne(new EventBusMessages.ProfileCheckinContentOne(objectId));
+                        break;
+
+                    case "album":
+                        openPhotoReportContent(new EventBusMessages.OpenPhotoReportContent(
+                                objectId,
+                                "",
+                                0l));
+
                         break;
                 }
             }
@@ -851,27 +860,30 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void openPlacePhoto(EventBusMessages.OpenPlacePhoto event){
         FeedPlacesCheckinFragmentNew2 placeFragment = FeedPlacesCheckinFragmentNew2.createInstance(
-                currentTab.name() + "_" + mTabStacker.getCurrentTabSize(),
+                currentTab.name(),
                 event.getPlaceId(),
                 event.getPostId());
         mTabStacker.replaceFragment(placeFragment, null);
     }
 
     /**
-     *      Open Album
+     *      Open Album Content
      */
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void openPhotoReportContent(EventBusMessages.OpenPhotoReportContent event){
         FeedPhotoReportFragmentContentNew placeFragment = FeedPhotoReportFragmentContentNew.createInstance(
                 getFragmentName(),
-                event.getPlaceId(),
-                event.getAlbumId(),
+                event.getPhotoId(),
                 event.getAlbumName(),
-                event.getAlbumDate(),
-                event.getPosition());
+                event.getAlbumDate());
+
         mTabStacker.replaceFragment(placeFragment, null);
     }
+
+    /**
+     *      Open Album Content
+     */
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void asdfasdfdas(EventBusMessages.OpenPhotoReport event){
@@ -919,7 +931,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
                     ProfileFragment.createInstance(getFragmentName()), null);
         }
     }
-        /**
+    /**
      *      Open Profile Content
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -1009,8 +1021,8 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void startSettings(EventBusMessages.MainSettings event){
-            mTabStacker.replaceFragment(
-                    new MainSettingsFragment(), null);
+        mTabStacker.replaceFragment(
+                new MainSettingsFragment(), null);
     }
 
     /**
@@ -1018,8 +1030,8 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void startNotificationSettings(EventBusMessages.OpenNotificationSettings event){
-            mTabStacker.replaceFragment(
-                    new NotificationSettingsFragment(), null);
+        mTabStacker.replaceFragment(
+                new NotificationSettingsFragment(), null);
         //currentFragment = CurrentFragment.MENU_FRAGMENT;
     }
     /**
@@ -1027,8 +1039,8 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void startProfileSettings(EventBusMessages.OpenProfileSettings event){
-            mTabStacker.replaceFragment(
-                    new ProfileSettingsFragment(), null);
+        mTabStacker.replaceFragment(
+                new ProfileSettingsFragment(), null);
         //currentFragment = CurrentFragment.MENU_FRAGMENT;
     }
 
@@ -1050,7 +1062,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
                 ServicesFragment.createInstance(getFragmentName()), null);
     }
 
-   /**
+    /**
      *      Open checkinContentOne
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -1153,7 +1165,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
             }
         } if(fragment!=null && fragment instanceof ProfileCheckinContentOne){
             Log.i("TAG26", "ProfileCheckinContentOne back 2");
-                ((ProfileCheckinContentOne) fragment).back(null);
+            ((ProfileCheckinContentOne) fragment).back(null);
         } else {
             Log.i("TAG26", "хз 2");
             if (!mTabStacker.onBackPressed()) {

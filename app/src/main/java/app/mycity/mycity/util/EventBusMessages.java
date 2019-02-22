@@ -31,32 +31,22 @@ public class EventBusMessages {
     public static class OpenPhotoReportContent {
         private final String albumName;
         private long albumDate;
-        private String placeId;
-        private String albumId;
-        private int position;
+        private String photoId;
 
-        public OpenPhotoReportContent (String placeId, String albumId, String albumName, Long albumDate, int position) {
-            this.placeId = placeId;
-            this.albumId = albumId;
+        public OpenPhotoReportContent (String photoId, String albumName, Long albumDate) {
+            this.photoId = photoId;
             this.albumName = albumName;
             this.albumDate = albumDate;
-            this.position = position;
         }
 
-        public int getPosition() {
-            return position;
-        }
-        public String getAlbumId() {
-            return albumId;
-        }
         public String getAlbumName() {
             return albumName;
         }
         public long getAlbumDate() {
             return albumDate;
         }
-        public String getPlaceId() {
-            return placeId;
+        public String getPhotoId() {
+            return photoId;
         }
     }
 

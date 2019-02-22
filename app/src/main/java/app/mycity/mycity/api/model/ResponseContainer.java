@@ -8,6 +8,9 @@ public class ResponseContainer<T> {
     @SerializedName("response")
     @Expose
     private T response;
+    @SerializedName("error")
+    @Expose
+    private Error error;
 
     public T getResponse() {
         return response;
@@ -15,5 +18,13 @@ public class ResponseContainer<T> {
 
     public void setResponse(T response) {
         this.response = response;
+    }
+
+    public Error getError() {
+        return error;
+    }
+
+    public void setError(Error error) {
+        this.error = error;
     }
 }

@@ -2,6 +2,7 @@ package app.mycity.mycity.api;
 
 import com.google.gson.JsonObject;
 
+import app.mycity.mycity.api.model.Album;
 import app.mycity.mycity.api.model.CheckTokenResponse;
 import app.mycity.mycity.api.model.DialogsContainer;
 import app.mycity.mycity.api.model.MessageResponse;
@@ -325,6 +326,16 @@ public interface ApiInterface {
                                                      @Field("group_id") String groupId,
                                                      @Field("album_id") String albumId,
                                                      @Field("extended") String extended);
+    @FormUrlEncoded
+    @POST("photos.getAlbumById")
+    Call<ResponseContainer<Album>> getAlbumById(@Field("access_token") String accessToken,
+                                                @Field("album_id") String groupId);
+
+    @FormUrlEncoded
+    @POST("photos.getAllInAlbumByPhotoId")
+    Call<ResponseContainer<PhotoContainer>> getAlbumByPhotoId(@Field("access_token") String accessToken,
+                                                              @Field("photo_id") String photoId,
+                                                              @Field("extended") String extended);
 
     @FormUrlEncoded
     @POST("account.removeAvatar")

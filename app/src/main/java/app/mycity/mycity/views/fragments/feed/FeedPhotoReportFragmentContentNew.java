@@ -28,9 +28,11 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
+import app.mycity.mycity.api.model.Album;
 import app.mycity.mycity.api.model.Group;
 import app.mycity.mycity.api.model.Photo;
 import app.mycity.mycity.api.model.PhotoContainer;
@@ -118,15 +120,17 @@ public class FeedPhotoReportFragmentContentNew extends android.support.v4.app.Fr
     boolean clearScreen;
 
 
-    public static FeedPhotoReportFragmentContentNew createInstance(String name, String placeId, String albumId, String albumName, Long albumDate, int position) {
+   // public static FeedPhotoReportFragmentContentNew createInstance(String name, String placeId, String albumId, String albumName, Long albumDate, int position) {
+    public static FeedPhotoReportFragmentContentNew createInstance(String name, String photoId, String albumName, Long albumDate) {
         FeedPhotoReportFragmentContentNew fragment = new FeedPhotoReportFragmentContentNew();
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
-        bundle.putString("placeId", placeId);
-        bundle.putString("albumId", albumId);
+        bundle.putString("photoId", photoId);
+       // bundle.putString("placeId", placeId);
+      //  bundle.putString("albumId", albumId);
         bundle.putString("albumName", albumName);
         bundle.putLong("albumDate", albumDate);
-        bundle.putInt("position", position);
+       // bundle.putInt("position", position);
 
         fragment.setArguments(bundle);
         return fragment;
@@ -134,6 +138,7 @@ public class FeedPhotoReportFragmentContentNew extends android.support.v4.app.Fr
 
     @OnClick(R.id.backButton)
     public void backButton(View v){
+
         getActivity().onBackPressed();
     }
 
@@ -141,23 +146,19 @@ public class FeedPhotoReportFragmentContentNew extends android.support.v4.app.Fr
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.feed_photo_report_content_new, container, false);
-
         placeId = getArguments().getString("placeId");
-
         ButterKnife.bind(this, view);
         return view;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void clickImage(EventBusMessages.ClickOnSliderImage event) {
-
         if(clearScreen){
             //    recyclerView.setVisibility(View.VISIBLE);
             buttonsContainer.animate().setDuration(200).translationYBy(-recyclerView.getLayoutParams().height);
             recyclerView.animate().setDuration(200).translationYBy(-recyclerView.getHeight());
             clearScreen = false;
         } else {
-
             buttonsContainer.animate().setDuration(200).translationY(recyclerView.getLayoutParams().height);
             recyclerView.animate().setDuration(200).translationY(recyclerView.getHeight());
             //recyclerView.setVisibility(View.GONE);
@@ -168,10 +169,6 @@ public class FeedPhotoReportFragmentContentNew extends android.support.v4.app.Fr
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-
-//        Util.setNawBarClickListener(view);
-  //      Util.setNawBarIconColor(getContext(), view, -1);
-
         EventBus.getDefault().post(new EventBusMessages.BlackStatusBar());
 
         time.setText(Util.getDatePretty(getArguments().getLong("albumDate")));
@@ -226,21 +223,25 @@ public class FeedPhotoReportFragmentContentNew extends android.support.v4.app.Fr
             setInfo(new EventBusMessages.ShowImage(currentPostIdPosition));
         } else {
             Log.d("TAG21", "Can not RESTORE PLACE CHECKIN ");
-            ApiFactory.getApi().getAlbum(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN),
-                    "12321", getArguments().getString("albumId"), "1").enqueue(new Callback<ResponseContainer<PhotoContainer>>() {
-                @RequiresApi(api = Build.VERSION_CODES.M)
+           // ApiFactory.getApi().getAlbum(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "12321", getArguments().getString("albumId"), "1")
+            ApiFactory.getApi().getAlbumByPhotoId(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), getArguments().getString("photoId"), "1")
+                    .enqueue(new Callback<ResponseContainer<PhotoContainer>>() {
                 @Override
                 public void onResponse(Call<ResponseContainer<PhotoContainer>> call, Response<ResponseContainer<PhotoContainer>> response) {
                     if(response.body().getResponse()!=null){
                         Log.d("TAG24", "Album " + " size - " + response.body().getResponse().getPhotos().size());
                         photoList.addAll(response.body().getResponse().getPhotos());
                         adapter.update(photoList);
-                        recyclerView.scrollToPosition(getArguments().getInt("position"));
+
+                        for (int i = 0; i < photoList.size(); i++) {
+                            if(photoList.get(i).getId().equals(getArguments().getString("photoId"))){
+                                currentPostIdPosition = i;
+                            }
+                        }
+                        recyclerView.scrollToPosition(currentPostIdPosition);
                         placeHolder.setVisibility(View.GONE);
-
                         totalCount = response.body().getResponse().getCount();
-
-                       initPagerAdapter(photoList);
+                        initPagerAdapter(photoList);
 
                         if(response.body().getResponse().getGroups()!=null){
                             Log.d("TAG24", "Groups GET");
@@ -250,19 +251,38 @@ public class FeedPhotoReportFragmentContentNew extends android.support.v4.app.Fr
                         } else {
                             Log.d("TAG24", "Groups NOT GET");
                         }
+                        setInfo(new EventBusMessages.ShowImage(currentPostIdPosition));
 
+                        if(getArguments().getString("albumName").length()==0){
 
-                        setInfo(new EventBusMessages.ShowImage(getArguments().getInt("position")));
-
+                            loadAlbumInfo(String.valueOf(response.body().getResponse().getPhotos().get(0).getAlbumId()));
+                        }
+                    } else {
+                        Log.d("TAG24", "Error " + response.body().getError().getErrorCode());
                     }
                 }
-
                 @Override
                 public void onFailure(Call<ResponseContainer<PhotoContainer>> call, Throwable t) {
                 }
             });
         }
+    }
 
+    private void loadAlbumInfo(String albumId) {
+       ApiFactory.getApi().getAlbumById(App.accessToken(), albumId).enqueue(new Callback<ResponseContainer<Album>>() {
+           @Override
+           public void onResponse(Call<ResponseContainer<Album>> call, Response<ResponseContainer<Album>> response) {
+               if(response.body().getResponse()!=null){
+                   placeName.setText(response.body().getResponse().getTitle());
+                   time.setText(Util.getDatePretty(response.body().getResponse().getDateCreated()));
+               }
+           }
+
+           @Override
+           public void onFailure(Call<ResponseContainer<Album>> call, Throwable t) {
+
+           }
+       });
     }
 
     private void initPagerAdapter(List<Photo> photoList) {
