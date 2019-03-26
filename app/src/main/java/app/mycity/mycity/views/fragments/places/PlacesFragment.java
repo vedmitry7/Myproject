@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -20,6 +21,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -74,11 +76,12 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
     @BindView(R.id.placesFragmentMessage)
     TextView placesFragmentMessage;
 
-    @BindView(R.id.editTextSearch)
-    TextView search;
+    EditText search;
 
-    @BindView(R.id.clearSearch)
-    ImageView clearSearch;
+    @BindView(R.id.searchView)
+    SearchView searchView;
+    @BindView(R.id.searchButton)
+    ImageView searchButton;
 
     PlacesRecyclerAdapter adapter;
 
@@ -114,6 +117,15 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
         return fragment;
     }
 
+    @OnClick(R.id.searchButton)
+    public void search(View v){
+        title.setVisibility(View.GONE);
+        searchButton.setVisibility(View.GONE);
+        searchView.setVisibility(View.VISIBLE);
+        searchView.setIconified(false);
+    }
+
+
 
     @Nullable
     @Override
@@ -139,24 +151,9 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
             order = SharedManager.getProperty("placesOrder");
         }
 
-        search.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if(s.length()==0){
-                    clearSearch.setVisibility(View.GONE);
-                } else {
-                    clearSearch.setVisibility(View.VISIBLE);
-                }
-            }
-        });
+        search = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        search.setTextColor(getResources().getColor(R.color.white));
+        search.setHintTextColor(getResources().getColor(R.color.white));
 
         search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -165,7 +162,7 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
                     placeList = new ArrayList<>();
                     adapter.notifyDataSetChanged();
                     placesProgressBar.setVisibility(View.VISIBLE);
-                    App.hideKeyboard(getActivity());
+                    App.closeKeyboard(getContext());
                     loadPlaces(0, 0, search.getText().toString(), order);
                     getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
                     search.clearFocus();
@@ -174,16 +171,6 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
                 return false;
             }
         });
-
-        clearSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                search.setText("");
-                clearSearch.setVisibility(View.GONE);
-                loadPlaces(0, placesCategoriesAdapter.getCategoryId(), "", order);
-            }
-        });
-
 
         Util.setNawBarClickListener(view);
         Util.setNawBarIconColor(getContext(), view, -1);
@@ -260,6 +247,18 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
             }
         };
         spinner.setOnItemSelectedListener(itemSelectedListener);*/
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                Log.d("TAG24", "Close " );
+                loadPlaces(0, placesCategoriesAdapter.getCategoryId(), "", order);
+                searchView.setVisibility(View.GONE);
+                title.setVisibility(View.VISIBLE);
+                searchButton.setVisibility(View.VISIBLE);
+                return true;
+            }
+        });
 
         loadCategories();
     }
@@ -340,7 +339,7 @@ public class PlacesFragment extends Fragment implements TabStacker.TabStackInter
     }
 
     private void loadPlaces(final int offset, int category, String search, String order) {
-        ApiFactory.getApi().getPlaces(App.accessToken(), offset, App.chosenCity(), category, order, search).enqueue(new retrofit2.Callback<ResponseContainer<ResponsePlaces>>() {
+        ApiFactory.getApi().getPlaces(App.accessToken(), offset, App.chosenCity(), category, order, search, 1).enqueue(new retrofit2.Callback<ResponseContainer<ResponsePlaces>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<ResponsePlaces>> call, retrofit2.Response<ResponseContainer<ResponsePlaces>> response) {
                 if(response.body()!=null){

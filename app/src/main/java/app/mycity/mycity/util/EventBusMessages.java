@@ -352,18 +352,6 @@ public class EventBusMessages {
         }
     }
 
-    public static class SwichTab {
-        private int tab;
-
-        public int getPos() {
-            return tab;
-        }
-
-        public SwichTab(int tab) {
-            this.tab = tab;
-        }
-    }
-
 
     public static class LoadAlbum{
         String albumId;
@@ -490,9 +478,6 @@ public class EventBusMessages {
     }
 
     public static class OpenPeople {
-    }
-
-    public static class OpenProfile {
     }
 
     public static class OpenMenu {
@@ -714,21 +699,53 @@ public class EventBusMessages {
 
     public static class ProfileCheckinContentOne {
         private String postId;
-        private boolean backToPlace;
+        private boolean backToProfile;
 
-        public ProfileCheckinContentOne(String eventId) {
+        public ProfileCheckinContentOne(String eventId, boolean backToProfile) {
             this.postId = eventId;
+            this.backToProfile = backToProfile;
         }
+
         public String getPostId() {
             return postId;
         }
 
-        public boolean isBackToPlace() {
-            return backToPlace;
+        public boolean isBackToProfile() {
+            return backToProfile;
         }
 
-        public void setBackToPlace(boolean backToPlace) {
-            this.backToPlace = backToPlace;
+        public void setBackToProfile(boolean backToProfile) {
+            this.backToProfile = backToProfile;
+        }
+    }
+
+    public static class ClickItem {
+        int position;
+        public ClickItem(int adapterPosition) {
+        position = adapterPosition;
+        }
+
+        public int getPosition() {
+            return position;
+        }
+    }
+
+    public static class LoseConnection {
+    }
+
+    public static class TryConnection {
+    }
+
+    public static class DeleteComment {
+
+        private int position;
+
+        public DeleteComment(int position) {
+            this.position = position;
+        }
+
+        public int getPosition() {
+            return position;
         }
     }
 }

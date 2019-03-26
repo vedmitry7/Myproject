@@ -144,6 +144,15 @@ public class DataFragment extends Fragment {
             }
         });
 
+        firstName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus){
+                    firstName.setText(firstName.getText().toString().trim());
+                }
+            }
+        });
+
         secondName.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -163,6 +172,14 @@ public class DataFragment extends Fragment {
             }
         });
 
+        secondName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus){
+                    secondName.setText(secondName.getText().toString().trim());
+                }
+            }
+        });
 
         countryEditText.setOnKeyListener(new View.OnKeyListener() {
             @Override

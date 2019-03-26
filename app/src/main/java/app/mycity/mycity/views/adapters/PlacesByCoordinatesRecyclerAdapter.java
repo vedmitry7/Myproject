@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
@@ -45,13 +46,21 @@ public class PlacesByCoordinatesRecyclerAdapter extends RecyclerView.Adapter<Pla
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
         Picasso.get().load(placeList.get(position).getPhoto360()).into(holder.image);
-
         holder.name.setText(placeList.get(position).getName());
 
         if(position==selectedItem){
             holder.radioButton.setChecked(true);
         } else {
             holder.radioButton.setChecked(false);
+        }
+
+       // if(placeList.get(position).getVerified()!=null)
+        if(placeList.get(position).getVerified()==1){
+            holder.official.setVisibility(View.GONE);
+            holder.officialText.setVisibility(View.VISIBLE);
+        } else {
+            holder.official.setVisibility(View.GONE);
+            holder.officialText.setVisibility(View.GONE);
         }
     }
 
@@ -76,8 +85,14 @@ public class PlacesByCoordinatesRecyclerAdapter extends RecyclerView.Adapter<Pla
         @BindView(R.id.placeName)
         TextView name;
 
+        @BindView(R.id.officialText)
+        TextView officialText;
+
         @BindView(R.id.radioButton)
         RadioButton radioButton;
+
+        @BindView(R.id.official)
+        ImageView official;
 
         public ViewHolder(View itemView) {
             super(itemView);

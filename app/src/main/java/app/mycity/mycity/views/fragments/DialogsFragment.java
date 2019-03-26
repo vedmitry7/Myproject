@@ -133,6 +133,8 @@ public class DialogsFragment extends Fragment implements TabStacker.TabStackInte
                     dialogList = dialogs.getDialogs();
                     Log.d("TAG", "Size list = " + dialogList.size());
                     adapter.update(dialogList);
+                    SharedManager.addBooleanProperty("unreadMessages", false);
+                    Util.setUnreadCount(fragmentView);
 
                     placesProgressBar.setVisibility(View.GONE);
                     for (Dialog d:dialogList

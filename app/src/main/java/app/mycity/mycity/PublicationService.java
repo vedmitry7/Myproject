@@ -66,7 +66,7 @@ public class PublicationService extends Service {
         startTime = System.currentTimeMillis();
         Log.d("TAG23","get server " + SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN));
 
-        ApiFactory.getApi().getUploadServer(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN)).enqueue(new Callback<ResponseContainer<ResponseUploadServer>>() {
+        ApiFactory.getApi().getUploadPhotoServer(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN)).enqueue(new Callback<ResponseContainer<ResponseUploadServer>>() {
             @Override
             public void onResponse(Call<ResponseContainer<ResponseUploadServer>> call, Response<ResponseContainer<ResponseUploadServer>> response) {
                 ResponseUploadServer uploadServer = response.body().getResponse();
@@ -84,14 +84,14 @@ public class PublicationService extends Service {
     }
 
     private void uploadFile(String server) {
-        Log.d("TAG23","getUploadServer - " + (startTime - System.currentTimeMillis()));
+        Log.d("TAG23","getUploadPhotoServer - " + (startTime - System.currentTimeMillis()));
         startTime = System.currentTimeMillis();
         final MultipartBody.Part filePart = MultipartBody.Part.createFormData("0", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
         final RequestBody action = RequestBody.create(MediaType.parse("text/plain"), "add_photo");
-        final RequestBody id = RequestBody.create(MediaType.parse("text/plain"), "3");
+        final RequestBody id = RequestBody.create(MediaType.parse("text/plain"), SharedManager.getProperty(Constants.KEY_MY_ID));
         Log.d("TAG23","create multipart - " + (startTime - System.currentTimeMillis()));
         startTime = System.currentTimeMillis();
-        ApiFactory.getmApiUploadServer(server).upload(action, id, filePart).enqueue(new Callback<ResponseContainer<ResponseUploading>>() {
+        ApiFactory.getmApiUploadServer(server).uploadPhoto(action, id, filePart).enqueue(new Callback<ResponseContainer<ResponseUploading>>() {
             @Override
             public void onResponse(Call<ResponseContainer<ResponseUploading>> call, Response<ResponseContainer<ResponseUploading>> response) {
                 Log.d("TAG23","response  - " + (startTime - System.currentTimeMillis()));
@@ -120,7 +120,7 @@ public class PublicationService extends Service {
         Log.d("TAG23","uploadFile - " + (startTime - System.currentTimeMillis()));
         startTime = System.currentTimeMillis();
 
-        ApiFactory.getApi().savePost(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), string, "1", server)
+        ApiFactory.getApi().savePhoto(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), string, "1", server)
                 .enqueue(new Callback<ResponseContainer<ResponseSavePhoto>>() {
                     @Override
                     public void onResponse(Call<ResponseContainer<ResponseSavePhoto>> call, Response<ResponseContainer<ResponseSavePhoto>> response) {
@@ -128,7 +128,7 @@ public class PublicationService extends Service {
                         ResponseSavePhoto savePhoto = response.body().getResponse();
                         Log.d("TAG21", "success - " + savePhoto.getSuccess());
 
-                        String attachment = "photo3_" + savePhoto.getPhotoId();
+                        String attachment = "photo" + SharedManager.getProperty(Constants.KEY_MY_ID) + "_" + savePhoto.getPhotoId();
 
                         postPicture(attachment);
                     }

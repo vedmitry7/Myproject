@@ -1,79 +1,159 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:paddingTop="16dp"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center_vertical"
-        android:orientation="vertical"
-        android:paddingLeft="@dimen/margin_horizontal"
-        android:paddingRight="@dimen/margin_horizontal"
-        tools:context=".filter_desc_post.FilterEditImageFragment">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingBottom="@dimen/padding_10"
-            android:paddingTop="@dimen/padding_10">
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!--        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:paddingTop="16dp"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    android:paddingLeft="@dimen/margin_horizontal"
+                    android:paddingRight="@dimen/margin_horizontal"
+                    tools:context=".filter_desc_post.FilterEditImageFragment">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingBottom="@dimen/padding_10"
+                        android:paddingTop="@dimen/padding_10">
+
+
+                        <TextView
+                            android:layout_width="@dimen/lbl_edit_image_control"
+                            android:layout_height="wrap_content"
+                            android:text="@string/lbl_brightness" />
+
+                        <SeekBar
+                            android:id="@+id/seekbar_brightness"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingBottom="@dimen/padding_10"
+                        android:paddingTop="@dimen/padding_10">
+
+
+                        <TextView
+                            android:layout_width="@dimen/lbl_edit_image_control"
+                            android:layout_height="wrap_content"
+                            android:text="@string/lbl_contrast" />
+
+                        <SeekBar
+                            android:id="@+id/seekbar_contrast"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingBottom="@dimen/padding_10"
+                        android:paddingTop="@dimen/padding_10">
+
+                        <TextView
+                            android:layout_width="@dimen/lbl_edit_image_control"
+                            android:layout_height="wrap_content"
+                            android:text="@string/lbl_saturation" />
+
+                        <SeekBar
+                            android:id="@+id/seekbar_saturation"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1" />
+                    </LinearLayout>
+
+                </LinearLayout>-->
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/linearLayout5"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:context=".filter_desc_post.FilterEditImageFragment">
 
 
             <TextView
-                android:layout_width="@dimen/lbl_edit_image_control"
-                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="16dp"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
                 android:text="@string/lbl_brightness" />
+
+            <TextView
+                android:gravity="center"
+                android:textSize="16dp"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="@string/lbl_contrast" />
+
+
+            <TextView
+                android:gravity="center"
+                android:textSize="16dp"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="@string/lbl_saturation" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/linearLayout5"
+            app:layout_constraintTop_toTopOf="parent">
+
 
             <SeekBar
                 android:id="@+id/seekbar_brightness"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingBottom="@dimen/padding_10"
-            android:paddingTop="@dimen/padding_10">
-
-
-            <TextView
-                android:layout_width="@dimen/lbl_edit_image_control"
-                android:layout_height="wrap_content"
-                android:text="@string/lbl_contrast" />
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                />
 
             <SeekBar
                 android:id="@+id/seekbar_contrast"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingBottom="@dimen/padding_10"
-            android:paddingTop="@dimen/padding_10">
-
-            <TextView
-                android:layout_width="@dimen/lbl_edit_image_control"
-                android:layout_height="wrap_content"
-                android:text="@string/lbl_saturation" />
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                />
 
             <SeekBar
                 android:id="@+id/seekbar_saturation"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                />
+
         </LinearLayout>
 
-    </LinearLayout>
+
+    </android.support.constraint.ConstraintLayout>
 
 </ScrollView>

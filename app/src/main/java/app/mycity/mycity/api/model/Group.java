@@ -71,6 +71,19 @@ public class Group {
     @Expose
     private Integer deactivated;
 
+    @SerializedName("verified")
+    @Expose
+    private Integer verified;
+
+
+    public Integer getVerified() {
+        return verified;
+    }
+
+    public void setVerified(Integer verified) {
+        this.verified = verified;
+    }
+
     public String getId() {
         return id;
     }

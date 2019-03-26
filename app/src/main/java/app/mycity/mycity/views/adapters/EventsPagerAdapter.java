@@ -13,6 +13,8 @@ public class EventsPagerAdapter extends FragmentPagerAdapter {
 
 
     String tabName;
+    AllEvents allEventsFragment;
+    AllActions allActionsFragment;
 
     public EventsPagerAdapter(FragmentManager fm, String tabName) {
         super(fm);
@@ -24,9 +26,11 @@ public class EventsPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position){
             case 0:
-                return AllEvents.createInstance(tabName, 4);
+                allEventsFragment = AllEvents.createInstance(tabName, 4);
+                return allEventsFragment;
             case 1:
-                return AllActions.createInstance(tabName, 4);
+                allActionsFragment = AllActions.createInstance(tabName, 4);
+                return allActionsFragment;
         }
         return null;
     }
@@ -45,5 +49,13 @@ public class EventsPagerAdapter extends FragmentPagerAdapter {
                 return "Акции";
         }
         return null;
+    }
+
+    public AllEvents getAllEventsFragment() {
+        return allEventsFragment;
+    }
+
+    public AllActions getAllActionsFragment() {
+        return allActionsFragment;
     }
 }

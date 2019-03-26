@@ -80,7 +80,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
                 if (messages.get(position).isWasRead()){
                     holder.indicator.setColorFilter(context.getResources().getColor(R.color.colorAccent));
                 } else {
-                    holder.indicator.setColorFilter(context.getResources().getColor(R.color.main_grey_color));
+                    holder.indicator.setColorFilter(context.getResources().getColor(R.color.white_50percent));
                 }
             }
         }

@@ -16,15 +16,12 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.vanniktech.emoji.EmojiEditText;
-import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.EmojiPopup;
-import com.vanniktech.emoji.google.GoogleEmojiProvider;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -32,8 +29,6 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
@@ -43,11 +38,8 @@ import app.mycity.mycity.api.model.Message;
 import app.mycity.mycity.api.model.MessageFromApi;
 import app.mycity.mycity.api.model.MessageResponse;
 import app.mycity.mycity.api.model.ResponseContainer;
-import app.mycity.mycity.api.model.ResponseMarkAsRead;
 import app.mycity.mycity.api.model.SendMessageResponse;
 import app.mycity.mycity.api.model.SuccessResponceNumber;
-import app.mycity.mycity.api.model.User;
-import app.mycity.mycity.api.model.UsersContainer;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
@@ -57,7 +49,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.realm.Realm;
-import io.realm.RealmResults;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -183,6 +174,9 @@ public class ChatActivity extends AppCompatActivity {
                 Log.d("chat22", "first visible " + (firstVisibleItem));
                 Log.d("chat22", "get " + (lastVisibleItems));
 
+                if(firstVisibleItem==-1){
+                    return;
+                }
 
 // error
                 if(results.size()!=0)  {
@@ -282,6 +276,11 @@ public class ChatActivity extends AppCompatActivity {
 
                 if(response.body()!=null && response.body().getResponse()!=null){
                     Log.d("TAG25", "Messages size - " + response.body().getResponse().getCount());
+
+                    Picasso.get().load(response.body().getResponse().getProfiles().get(1).getPhoto130()).into(imageView);
+                    nameText.setText(response.body().getResponse().getProfiles().get(1).getFirstName() + " " +
+                            response.body().getResponse().getProfiles().get(1).getLastName());
+
                     if(response.body().getResponse().getCount()==0){
                         dateIndicator.setVisibility(View.GONE);
                         progressBar.setVisibility(View.GONE);
@@ -289,8 +288,7 @@ public class ChatActivity extends AppCompatActivity {
                         return;
                     }
 
-                    nameText.setText(response.body().getResponse().getProfiles().get(1).getFirstName() + " " +
-                            response.body().getResponse().getProfiles().get(1).getLastName());
+
 
                     Picasso.get().load(response.body().getResponse().getProfiles().get(1).getPhoto130()).into(imageView);
 

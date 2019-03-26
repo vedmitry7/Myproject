@@ -2,13 +2,17 @@ package app.mycity.mycity.util;
 
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Environment;
 import android.support.constraint.ConstraintLayout;
+import android.support.v7.widget.CardView;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.util.Base64;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -28,6 +32,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.model.Place;
@@ -80,7 +85,7 @@ public class Util {
                             Log.d("TAG21", "click open menu");
                             break;
                         case 1:
-                            EventBus.getDefault().post(new EventBusMessages.OpenProfile());
+                            EventBus.getDefault().post(new EventBusMessages.OpenUser(SharedManager.getProperty(Constants.KEY_MY_ID)));
                             Log.d("TAG21", "click open pr");
                             break;
                         case 2:
@@ -112,17 +117,44 @@ public class Util {
     }
 
   public static void setUnreadCount(View view){
-      TextView textView = view.findViewById(R.id.totalUnreadCount);
+
+      View indicatorView = view.findViewById(R.id.unreadMessageIndicator);
+
+      if(SharedManager.getBooleanProperty("unreadMessages")){
+          indicatorView.setVisibility(View.VISIBLE);
+      } else {
+          indicatorView.setVisibility(View.GONE);
+      }
+
+
+  /*    TextView textView = view.findViewById(R.id.totalUnreadCount);
       if(SharedManager.getIntProperty("totalUnreadCount")>0){
           textView.setText(" " + SharedManager.getIntProperty("totalUnreadCount"));
           textView.setVisibility(View.VISIBLE);
       } else {
           textView.setVisibility(View.GONE);
-      }
+      }*/
       Log.i("TAG25", "SHOW UNREAD - " + SharedManager.getIntProperty("totalUnreadCount"));
   }
 
 
+  public static View.OnTouchListener getTouchTextListener(final TextView textView){
+
+        final ColorStateList color = textView.getTextColors();
+      View.OnTouchListener onTouchListener = new View.OnTouchListener() {
+          @Override
+          public boolean onTouch(View v, MotionEvent event) {
+              if(event.getAction()== MotionEvent.ACTION_DOWN){
+                  textView.setTextColor(Color.parseColor("#000000"));
+              }
+              if(event.getAction()== MotionEvent.ACTION_UP){
+                  textView.setTextColor(Color.parseColor("#999999"));
+              }
+              return false;
+          }
+      };
+      return onTouchListener;
+  }
 
     public static String convertToString(Place place){
         String serializedObject = "";
@@ -189,6 +221,28 @@ public class Util {
         }
         return fileName;
     }
+
+    public static String getExternalVideoFileName(){
+        SimpleDateFormat formatter = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss", Locale.US);
+        Date now = new Date();
+
+        File folder = new File(Environment.getExternalStorageDirectory() +
+                File.separator + "MyCity");
+        boolean success = true;
+        if (!folder.exists()) {
+            success = folder.mkdirs();
+        }
+
+        String fileName;
+        // if add folder file will not created
+        if(success){
+            fileName = Environment.getExternalStorageDirectory() + "/MyCity/checkin_" + formatter.format(now) + ".mp4";
+        } else {
+            fileName = Environment.getExternalStorageDirectory() + "/checkin_" + formatter.format(now) + "mp4";
+        }
+        return fileName;
+    }
+
 
 
     public static String getDate_ddMMyyyy(long time) {

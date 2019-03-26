@@ -89,11 +89,12 @@
         tools:layout_editor_absoluteX="0dp" />
 
     <LinearLayout
-        android:padding="8dp"
         android:id="@+id/linearLayout4"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginBottom="60dp"
         android:orientation="vertical"
+        android:padding="8dp"
         app:layout_constraintBottom_toTopOf="@+id/include5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -111,8 +112,8 @@
                 android:layout_height="match_parent"
                 android:layout_margin="@dimen/main_fragment_card_margin"
                 android:layout_weight="1"
-                app:cardElevation="5dp"
-                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius">
+                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius"
+                app:cardElevation="5dp">
 
                 <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
@@ -129,7 +130,8 @@
                         android:textColor="@android:color/black"
                         android:textSize="18dp"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:ignore="DuplicateIds" />
 
                     <ImageView
                         android:id="@+id/imageView11"
@@ -147,7 +149,8 @@
                         app:layout_constraintHorizontal_bias="0.0"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/textView14"
-                        app:srcCompat="@drawable/ic_card_checkins" />
+                        app:srcCompat="@drawable/ic_card_checkins"
+                        tools:ignore="DuplicateIds" />
 
                 </android.support.constraint.ConstraintLayout>
 
@@ -159,8 +162,8 @@
                 android:layout_height="match_parent"
                 android:layout_margin="@dimen/main_fragment_card_margin"
                 android:layout_weight="1"
-                app:cardElevation="5dp"
-                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius">
+                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius"
+                app:cardElevation="5dp">
 
                 <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
@@ -177,7 +180,8 @@
                         android:textColor="@android:color/black"
                         android:textSize="18dp"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:ignore="DuplicateIds" />
 
                     <ImageView
                         android:id="@+id/imageView11"
@@ -195,7 +199,8 @@
                         app:layout_constraintHorizontal_bias="0.0"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/textView14"
-                        app:srcCompat="@drawable/ic_card_chronics" />
+                        app:srcCompat="@drawable/ic_card_chronics"
+                        tools:ignore="DuplicateIds" />
 
                 </android.support.constraint.ConstraintLayout>
 
@@ -216,8 +221,8 @@
                 android:layout_height="match_parent"
                 android:layout_margin="@dimen/main_fragment_card_margin"
                 android:layout_weight="1"
-                app:cardElevation="5dp"
-                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius">
+                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius"
+                app:cardElevation="5dp">
 
                 <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
@@ -234,7 +239,8 @@
                         android:textColor="@android:color/black"
                         android:textSize="18dp"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:ignore="DuplicateIds" />
 
                     <ImageView
                         android:id="@+id/imageView11"
@@ -252,7 +258,8 @@
                         app:layout_constraintHorizontal_bias="0.0"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/textView14"
-                        app:srcCompat="@drawable/ic_card_places" />
+                        app:srcCompat="@drawable/ic_card_places"
+                        tools:ignore="DuplicateIds" />
 
                 </android.support.constraint.ConstraintLayout>
 
@@ -264,8 +271,8 @@
                 android:layout_height="match_parent"
                 android:layout_margin="@dimen/main_fragment_card_margin"
                 android:layout_weight="1"
-                app:cardElevation="5dp"
-                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius">
+                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius"
+                app:cardElevation="5dp">
 
                 <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
@@ -282,7 +289,8 @@
                         android:textColor="@android:color/black"
                         android:textSize="18dp"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:ignore="DuplicateIds" />
 
                     <ImageView
                         android:id="@+id/imageView11"
@@ -300,7 +308,8 @@
                         app:layout_constraintHorizontal_bias="0.0"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/textView14"
-                        app:srcCompat="@drawable/ic_card_people" />
+                        app:srcCompat="@drawable/ic_card_people"
+                        tools:ignore="DuplicateIds" />
 
                 </android.support.constraint.ConstraintLayout>
 
@@ -321,8 +330,8 @@
                 android:layout_height="match_parent"
                 android:layout_margin="@dimen/main_fragment_card_margin"
                 android:layout_weight="1"
-                app:cardElevation="5dp"
-                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius">
+                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius"
+                app:cardElevation="5dp">
 
                 <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
@@ -335,11 +344,12 @@
                         android:layout_marginLeft="12dp"
                         android:layout_marginStart="12dp"
                         android:layout_marginTop="8dp"
-                        android:text="События"
+                        android:text="Афиша"
                         android:textColor="@android:color/black"
                         android:textSize="18dp"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:ignore="DuplicateIds" />
 
                     <ImageView
                         android:id="@+id/imageView11"
@@ -357,7 +367,8 @@
                         app:layout_constraintHorizontal_bias="0.0"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/textView14"
-                        app:srcCompat="@drawable/ic_card_events" />
+                        app:srcCompat="@drawable/ic_card_events"
+                        tools:ignore="DuplicateIds" />
 
                 </android.support.constraint.ConstraintLayout>
 
@@ -369,8 +380,8 @@
                 android:layout_height="match_parent"
                 android:layout_margin="@dimen/main_fragment_card_margin"
                 android:layout_weight="1"
-                app:cardElevation="5dp"
-                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius">
+                app:cardCornerRadius="@dimen/main_fragment_card_corner_radius"
+                app:cardElevation="5dp">
 
                 <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
@@ -387,7 +398,8 @@
                         android:textColor="@android:color/black"
                         android:textSize="18dp"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:ignore="DuplicateIds" />
 
                     <ImageView
                         android:id="@+id/imageView11"
@@ -405,7 +417,8 @@
                         app:layout_constraintHorizontal_bias="0.0"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/textView14"
-                        app:srcCompat="@drawable/ic_promotion" />
+                        app:srcCompat="@drawable/ic_promotion"
+                        tools:ignore="DuplicateIds" />
 
                 </android.support.constraint.ConstraintLayout>
 

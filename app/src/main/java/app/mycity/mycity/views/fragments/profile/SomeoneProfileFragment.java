@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -14,9 +13,12 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -26,7 +28,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +43,7 @@ import app.mycity.mycity.api.model.ResponseLike;
 import app.mycity.mycity.api.model.ResponsePlaces;
 import app.mycity.mycity.api.model.ResponseWall;
 import app.mycity.mycity.api.model.Success;
+import app.mycity.mycity.util.BitmapUtils;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
@@ -83,9 +85,6 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
     @BindView(R.id.someoneFragChat)
     Button someoneFragChat;
 
-    @BindView(R.id.profileFragCurrentPointContainer)
-    RelativeLayout currentPoint;
-
     @BindView(R.id.someOneProfileFragRecyclerView)
     RecyclerView recyclerView;
 
@@ -106,6 +105,15 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
     @BindView(R.id.profileAbout)
     TextView profileAbout;
+
+    @BindView(R.id.onlineIndicator)
+    ImageView onlineIndicator;
+
+    @BindView(R.id.placeContainer)
+    RelativeLayout placeContainer;
+
+    @BindView(R.id.userPlace)
+    TextView userPlace;
 
     CheckinRecyclerAdapter adapter;
 
@@ -129,6 +137,7 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
     Profile profile;
     Map groups;
     private View fragmentView;
+    private int subscribersCountValue;
 
 
     public void showContent() {
@@ -200,7 +209,7 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
         recyclerView.setAdapter(adapter);
 
         getInfo();
-        getSubscriberCount();
+        getCounts();
         getCheckins();
 
         Log.i("TAG21", "My profile - stack count - " + getActivity().getFragmentManager().getBackStackEntryCount());
@@ -282,6 +291,8 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
                             subscribeButton.setText("Подписаться");
 
+                            subscribersCount.setText("" + --subscribersCountValue);
+
                             //                subscribeButton.setImageResource(R.drawable.ic_add_subscription);
                         }
                     }
@@ -306,6 +317,8 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
                             subscribeButton.setTextColor(Color.parseColor("#009688"));
                             subscribeButton.setText("Отписаться");
            //                 subscribeButton.setImageResource(R.drawable.ic_delete_subscription);
+
+                            subscribersCount.setText("" + ++subscribersCountValue);
                         }
                     }
                 }
@@ -323,7 +336,7 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
     private void getInfo() {
         Log.i("TAG21", "Get Info");
-        ApiFactory.getApi().getUserById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId, "about,photo_550,photo_130,is_subscription,is_subscriber").enqueue(new retrofit2.Callback<ResponseContainer<Profile>>() {
+        ApiFactory.getApi().getUserById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), userId, "about,photo_550,photo_130,is_subscription,is_subscriber,place").enqueue(new retrofit2.Callback<ResponseContainer<Profile>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<Profile>> call, retrofit2.Response<ResponseContainer<Profile>> response) {
                 profile = response.body().getResponse();
@@ -348,6 +361,12 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
                         //subscribeButton.setBackgroundResource(R.drawable.ic_add_subscription);
                     }
 
+                    if(profile.getOnline()==1){
+                        onlineIndicator.setVisibility(View.VISIBLE);
+                    } else {
+                        onlineIndicator.setVisibility(View.GONE);
+                    }
+
                     name.setText(profile.getFirstName() + " " + profile.getLastName());
 
                     infoLoad = true;
@@ -365,6 +384,19 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
                 } else {
 
                 }
+
+
+                if(profile.getPlace()!=null){
+                    placeContainer.setVisibility(View.VISIBLE);
+                    userPlace.setText(profile.getPlace().getName());
+
+                    placeContainer.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            EventBus.getDefault().post(new EventBusMessages.OpenPlace(profile.getPlace().getId()));
+                        }
+                    });
+                }
             }
 
             @Override
@@ -374,7 +406,7 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
         });
     }
 
-    private void getSubscriberCount(){
+    private void getCounts(){
 
         ApiFactory.getApi().getSubscribers(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), 0, getArguments().getString("userId"), 0, "").enqueue(new Callback<ResponseContainer<UsersContainer>>() {
             @Override
@@ -382,6 +414,7 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
 
                 if(response.body()!= null && response.body().getResponse()!= null){
                     Log.i("TAG24", "1 count - " + response.body().getResponse().getCount());
+                    subscribersCountValue = response.body().getResponse().getCount();
                     subscribersCount.setText("" + response.body().getResponse().getCount());
                 }
                 friendLoad = true;
@@ -561,8 +594,34 @@ public class SomeoneProfileFragment extends Fragment implements CheckinRecyclerA
                 }
             });
         }
+    }
 
+    @OnClick(R.id.menuButton)
+    public void menu(View v) {
+        PopupMenu popupMenu = new PopupMenu(getContext(), v);
 
+        popupMenu.inflate(R.menu.profile_menu);
+
+        popupMenu
+                .setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.complain:
+
+                                return true;
+                            case R.id.copy:
+
+                                return true;
+                            case R.id.share:
+
+                                return true;
+                        }
+                        return true;
+                    }
+                });
+
+        popupMenu.show();
     }
 
     @Override

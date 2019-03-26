@@ -66,6 +66,7 @@ public class AllActions extends android.support.v4.app.Fragment implements TabSt
     boolean mayRestore;
     private LinearLayoutManager layoutManager;
     private int position;
+    private String search;
 
     @Nullable
     @Override
@@ -103,11 +104,11 @@ public class AllActions extends android.support.v4.app.Fragment implements TabSt
                 int lastVisibleItems = layoutManager.findLastVisibleItemPosition();
 
                 if (!isLoading) {
-                    if ( lastVisibleItems >= totalItemCount -10 ) {
+                    if (lastVisibleItems >= totalItemCount - 10) {
                         Log.d("TAG21", "ЗАГРУЗКА ДАННЫХ " + postList.size());
                         isLoading = true;
                         // load if we don't load all
-                        if(totalCount > postList.size()){
+                        if (totalCount > postList.size()) {
                             Log.d("TAG21", "load feed ");
                             loadFeed(postList.size());
                         }
@@ -125,24 +126,24 @@ public class AllActions extends android.support.v4.app.Fragment implements TabSt
     private void loadFeed(int offset) {
         Log.d("TAG21", "LOAD EVENTS");
 
-        if(mayRestore){
+        if (mayRestore) {
             adapter.update(postList, groups);
             layoutManager.scrollToPosition(position);
             mayRestore = false;
             placeHolder.setVisibility(View.GONE);
         } else {
-            ApiFactory.getApi().getAllActions(App.accessToken(), App.chosenCity(),"1", offset).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
+            ApiFactory.getApi().getAllActions(App.accessToken(), App.chosenCity(), search, "1", offset).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
                 @Override
                 public void onResponse(retrofit2.Call<ResponseContainer<ResponseWall>> call, retrofit2.Response<ResponseContainer<ResponseWall>> response) {
                     Log.d("TAG21", "RESPONSE EVENTS");
-                    if(response!=null && response.body().getResponse()!=null){
+                    if (response != null && response.body().getResponse() != null) {
                         Log.d("TAG21", "RESPONSE ACTION OK");
 
                         swipeRefreshLayout.setRefreshing(false);
                         placeHolder.setVisibility(View.GONE);
 
 
-                        if(response.body().getResponse().getCount()==0){
+                        if (response.body().getResponse().getCount() == 0) {
                             placeHolderNoEvents.setVisibility(View.VISIBLE);
                         } else {
                             placeHolderNoEvents.setVisibility(View.GONE);
@@ -150,9 +151,9 @@ public class AllActions extends android.support.v4.app.Fragment implements TabSt
                         totalCount = response.body().getResponse().getCount();
                         Log.d("TAG21", "RESPONSE ACTION OK " + totalCount);
 
-                        if(totalCount>0){
+                        if (totalCount > 0) {
                             postList.addAll(response.body().getResponse().getItems());
-                            for (Group g: response.body().getResponse().getGroups()
+                            for (Group g : response.body().getResponse().getGroups()
                                     ) {
                                 groups.put(g.getId(), g);
                             }
@@ -177,7 +178,7 @@ public class AllActions extends android.support.v4.app.Fragment implements TabSt
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(final EventBusMessages.LikePost event) {
-        Log.d("TAG21", "Like itemId - " + event.getItemId() + " owner - " +  postList.get(event.getAdapterPosition()).getOwnerId().toString());
+        Log.d("TAG21", "Like itemId - " + event.getItemId() + " owner - " + postList.get(event.getAdapterPosition()).getOwnerId().toString());
 
         if (postList.get(event.getAdapterPosition()).getLikes().getUserLikes() == 1) {
             Log.d("TAG21", "unlike");
@@ -289,11 +290,11 @@ public class AllActions extends android.support.v4.app.Fragment implements TabSt
 
         storage = (Storage) context;
 
-        postList = (List<Post>) storage.getDate(getArguments().get("name")+ "_actionsPostList");
-        groups = (HashMap<String, Group>) storage.getDate(getArguments().get("name")+ "_actionsGroups");
+        postList = (List<Post>) storage.getDate(getArguments().get("name") + "_actionsPostList");
+        groups = (HashMap<String, Group>) storage.getDate(getArguments().get("name") + "_actionsGroups");
 
 
-        if(postList==null){
+        if (postList == null) {
             Log.d("TAG21", "restore null");
             postList = new ArrayList<>();
             groups = new HashMap();
@@ -314,7 +315,7 @@ public class AllActions extends android.support.v4.app.Fragment implements TabSt
     @Override
     public void onStop() {
         EventBus.getDefault().unregister(this);
-        if(storage!=null){
+        if (storage != null) {
             storage.setDate(getArguments().getString("name") + "_actionsPostList", postList);
             storage.setDate(getArguments().getString("name") + "_actionsGroups", groups);
             storage.setDate(getArguments().getString("name") + "_actionsScrollPosition", layoutManager.findFirstVisibleItemPosition());
@@ -348,5 +349,13 @@ public class AllActions extends android.support.v4.app.Fragment implements TabSt
         postList = new ArrayList<>();
         loadFeed(0);
         placeHolder.setVisibility(View.VISIBLE);
+    }
+
+    public void filter(String s) {
+        search = s;
+        totalCount = 0;
+        placeHolder.setVisibility(View.VISIBLE);
+        postList.clear();
+        loadFeed(0);
     }
 }

@@ -37,6 +37,16 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <ImageView
+            android:id="@+id/menuButton"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:padding="6dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_dots_white" />
+
 
 
     </android.support.constraint.ConstraintLayout>
@@ -123,11 +133,26 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/profileFragRoundImage" />
 
+            <ImageView
+                android:id="@+id/onlineIndicator"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/profileFragName"
+                app:layout_constraintStart_toEndOf="@+id/profileFragName"
+                app:layout_constraintTop_toTopOf="@+id/profileFragName"
+                app:srcCompat="@drawable/ic_dot" />
+
             <RelativeLayout
-                android:id="@+id/profileFragCurrentPointContainer"
+                android:id="@+id/placeContainer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/profileFragName">
@@ -140,10 +165,11 @@
                     app:srcCompat="@drawable/ic_marker_vector" />
 
                 <TextView
+                    android:id="@+id/userPlace"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@+id/profileFragMarker"
-                    android:text="Ночной клуб Сахар"
+                    android:text=""
                     android:textColor="@color/black_30percent" />
 
             </RelativeLayout>
@@ -157,7 +183,7 @@
                 android:text="Всем Привет, я в MyCity!"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/profileFragCurrentPointContainer" />
+                app:layout_constraintTop_toBottomOf="@+id/placeContainer" />
 
 
             <android.support.constraint.ConstraintLayout
@@ -235,6 +261,36 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:background="@color/black_10percent" />
+                    <RelativeLayout
+                        android:id="@+id/profileFragSubscriptionsButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:id="@+id/profileFragLabelSubscribers"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/profileFragSubscriptionTv"
+                            android:layout_centerHorizontal="true"
+                            android:text="Подписки" />
+
+                        <TextView
+                            android:id="@+id/profileFragSubscriptionTv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerHorizontal="true"
+                            android:text=""
+                            android:textColor="@android:color/black" />
+
+                    </RelativeLayout>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:background="@color/black_10percent" />
 
                     <RelativeLayout
                         android:id="@+id/profilePlaces"
@@ -258,37 +314,6 @@
                             android:layout_height="wrap_content"
                             android:layout_centerHorizontal="true"
                             android:text="3"
-                            android:textColor="@android:color/black" />
-
-                    </RelativeLayout>
-
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-                        android:background="@color/black_10percent" />
-
-                    <RelativeLayout
-                        android:id="@+id/profileFragSubscriptionsButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_weight="1">
-
-                        <TextView
-                            android:id="@+id/profileFragLabelSubscribers"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/profileFragSubscriptionTv"
-                            android:layout_centerHorizontal="true"
-                            android:text="Подписки" />
-
-                        <TextView
-                            android:id="@+id/profileFragSubscriptionTv"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerHorizontal="true"
-                            android:text=""
                             android:textColor="@android:color/black" />
 
                     </RelativeLayout>
@@ -334,7 +359,7 @@
 
             <Button
                 android:id="@+id/someoneFragChat"
-                android:layout_width="wrap_content"
+                android:layout_width="140dp"
                 android:layout_height="36dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
@@ -349,14 +374,14 @@
 
             <Button
                 android:id="@+id/someoneFragAdd"
-                android:layout_width="wrap_content"
+                android:layout_width="140dp"
                 android:layout_height="36dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
+                android:background="@drawable/button_border_bg"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:background="@drawable/button_border_bg"
                 android:text="Подписаться"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/profileAbout"

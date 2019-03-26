@@ -303,7 +303,7 @@ public class SocketService extends Service {
                         message.setWasRead(false);
                         EventBus.getDefault().post(new EventBusMessages.NewChatMessage(message, out));
 
-                        if(out!=1){
+                   /*     if(out!=1){
                             if(((App) getApplicationContext()).isChatActivityStarted){
                                 Log.i("TAG21", "chat started");
                                 if(!((App) getApplicationContext()).getCurrentChatUser().equals(String.valueOf(userId))){
@@ -315,8 +315,7 @@ public class SocketService extends Service {
                                 Log.i("TAG21", "chat not started");
                                 generateNotificationNewMessage(text, String.valueOf(userId));
                             }
-
-                        }
+                        }*/
                         break;
                     case 6:
                         unreadCount = array.getInt(4);
@@ -325,8 +324,9 @@ public class SocketService extends Service {
                         }
                         break;
                     case 7:
-                        Log.i("TAG25", "TOTAL UNREAD - " + array.getInt(2));
-                        SharedManager.addIntProperty("totalUnreadCount", array.getInt(2));
+                      //  Log.i("TAG25", "TOTAL UNREAD - " + array.getInt(2));
+                      //  SharedManager.addIntProperty("totalUnreadCount", array.getInt(2));
+                        SharedManager.addBooleanProperty("unreadMessages", true);
                         EventBus.getDefault().postSticky(new EventBusMessages.UnreadCountUpdate());
                         break;
                     case 21:

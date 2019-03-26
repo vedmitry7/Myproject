@@ -79,7 +79,10 @@ public class NotificationRecyclerAdapter extends RecyclerView.Adapter<Notificati
         final Notification notification = notifications.get(position);
 
         holder.time.setText(Util.getDatePretty(notification.getDate()));
-        holder.name.setText(position + " " +notification.getFeedback().getFirstName() + " " + notification.getFeedback().getLastName());
+        holder.name.setText(notification.getFeedback().getFirstName() + " " + notification.getFeedback().getLastName());
+
+        holder.name.setOnTouchListener(Util.getTouchTextListener(holder.name));
+
         Picasso.get().load(notification.getFeedback().getPhoto130()).into(holder.photo);
 
         if(notification.getType().equals("follow")){
@@ -93,6 +96,13 @@ public class NotificationRecyclerAdapter extends RecyclerView.Adapter<Notificati
 
         if(notification.getType().equals("like_post")){
             Picasso.get().load(notification.getParents().get(0).getAttachments().get(0).getPhoto360()).into(holder.contentImage);
+
+            holder.contentImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EventBus.getDefault().post(new EventBusMessages.ProfileCheckinContentOne(notifications.get(position).getParents().get(0).getId(), false));
+                }
+            });
         }
         if(notification.getType().equals("like_comment")){
             holder.commentText.setText(notification.getParents().get(0).getText());
@@ -109,7 +119,12 @@ public class NotificationRecyclerAdapter extends RecyclerView.Adapter<Notificati
             });
         }
         if(notification.getType().equals("comment_post")){
-
+            holder.contentImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EventBus.getDefault().post(new EventBusMessages.ProfileCheckinContentOne(notifications.get(position).getParents().get(0).getId(), false));
+                }
+            });
             Picasso.get().load(notification.getParents().get(0).getAttachments().get(0).getPhoto360()).into(holder.contentImage);
             holder.commentText.setText(notification.getFeedback().getComment().getText());
             holder.mainContainer.setOnClickListener(new View.OnClickListener() {
@@ -206,6 +221,8 @@ public class NotificationRecyclerAdapter extends RecyclerView.Adapter<Notificati
                     }
                 });
             }
+
+
         }
     }
 

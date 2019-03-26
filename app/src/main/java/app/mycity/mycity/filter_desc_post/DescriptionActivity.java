@@ -117,7 +117,7 @@ public class DescriptionActivity extends AppCompatActivity {
     void getUploadServer(){
         Log.d("TAG21","get server " + SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN));
 
-        ApiFactory.getApi().getUploadServer(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN)).enqueue(new Callback<ResponseContainer<ResponseUploadServer>>() {
+        ApiFactory.getApi().getUploadPhotoServer(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN)).enqueue(new Callback<ResponseContainer<ResponseUploadServer>>() {
             @Override
             public void onResponse(Call<ResponseContainer<ResponseUploadServer>> call, Response<ResponseContainer<ResponseUploadServer>> response) {
                 ResponseUploadServer uploadServer = response.body().getResponse();
@@ -137,7 +137,7 @@ public class DescriptionActivity extends AppCompatActivity {
         final RequestBody action = RequestBody.create(MediaType.parse("text/plain"), "add_photo");
         final RequestBody id = RequestBody.create(MediaType.parse("text/plain"), "3");
 
-        ApiFactory.getmApiUploadServer(server).upload(action, id, filePart).enqueue(new Callback<ResponseContainer<ResponseUploading>>() {
+        ApiFactory.getmApiUploadServer(server).uploadPhoto(action, id, filePart).enqueue(new Callback<ResponseContainer<ResponseUploading>>() {
             @Override
             public void onResponse(Call<ResponseContainer<ResponseUploading>> call, Response<ResponseContainer<ResponseUploading>> response) {
 
@@ -175,7 +175,7 @@ public class DescriptionActivity extends AppCompatActivity {
 
     void savePhoto(String string, String server){
 
-        ApiFactory.getApi().savePost(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), string, "1", server)
+        ApiFactory.getApi().savePhoto(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), string, "1", server)
                 .enqueue(new Callback<ResponseContainer<ResponseSavePhoto>>() {
             @Override
             public void onResponse(Call<ResponseContainer<ResponseSavePhoto>> call, Response<ResponseContainer<ResponseSavePhoto>> response) {

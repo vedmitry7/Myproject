@@ -46,6 +46,18 @@ public class Profile {
     @Expose
     private Comment comment;
 
+    @SerializedName("place")
+    @Expose
+    private Place place;
+
+    public Place getPlace() {
+        return place;
+    }
+
+    public void setPlace(Place place) {
+        this.place = place;
+    }
+
     @SerializedName("is_subscription")
     @Expose
     private Integer isSubscription;

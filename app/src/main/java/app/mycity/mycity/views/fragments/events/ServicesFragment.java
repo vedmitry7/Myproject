@@ -7,11 +7,16 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -26,15 +31,18 @@ import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
 import app.mycity.mycity.api.model.Group;
+import app.mycity.mycity.api.model.Place;
 import app.mycity.mycity.api.model.Post;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponseLike;
+import app.mycity.mycity.api.model.ResponsePlaces;
 import app.mycity.mycity.api.model.ResponseVisit;
 import app.mycity.mycity.api.model.ResponseWall;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.adapters.AllActionRecyclerAdapter;
+import app.mycity.mycity.views.adapters.SearchRecyclerAdapter;
 import app.mycity.mycity.views.adapters.ServicesRecyclerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -53,6 +61,21 @@ public class ServicesFragment extends android.support.v4.app.Fragment implements
     @BindView(R.id.swipeContainer)
     SwipeRefreshLayout swipeRefreshLayout;
 
+    TextView search;
+    @BindView(R.id.searchView)
+    SearchView searchView;
+    @BindView(R.id.searchButton)
+    ImageView searchButton;
+
+    @BindView(R.id.infoHolder)
+    RelativeLayout infoHolder;
+
+    @BindView(R.id.searchResultRecyclerView)
+    RecyclerView searchResultRecyclerView;
+
+    @BindView(R.id.toolBarTitle)
+    TextView toolBarTitle;
+
     ServicesRecyclerAdapter adapter;
 
     List<Post> postList;
@@ -63,9 +86,21 @@ public class ServicesFragment extends android.support.v4.app.Fragment implements
 
     Storage storage;
 
+    @BindView(R.id.searchContainer)
+    ConstraintLayout searchContainer;
+
     boolean mayRestore;
     private LinearLayoutManager layoutManager;
     private int position;
+
+    String searchText;
+    private boolean dontSearch;
+    private Integer totalSearchCount;
+
+    SearchRecyclerAdapter searchRecyclerAdapter;
+    List<String> searchResult = new ArrayList<>();
+    List<String> groupImage = new ArrayList<>();
+    private boolean searched;
 
     @Nullable
     @Override
@@ -83,6 +118,28 @@ public class ServicesFragment extends android.support.v4.app.Fragment implements
         return fragment;
     }
 
+    @OnClick(R.id.searchButton)
+    public void search(View v){
+        toolBarTitle.setVisibility(View.GONE);
+        searchButton.setVisibility(View.GONE);
+        searchView.setVisibility(View.VISIBLE);
+        searchView.setIconified(false);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(final EventBusMessages.ClickItem event) {
+        Log.d("TAG23", "Place click" );
+        dontSearch = true;
+        searched = true;
+        searchContainer.setVisibility(View.GONE);
+        searchText = searchResult.get(event.getPosition());
+        search.setText(searchResult.get(event.getPosition()));
+        postList.clear();
+        loadFeed(0);
+
+        App.closeKeyboard(getContext());
+    }
+
     @OnClick(R.id.backButton)
     public void back(View v){
         getActivity().onBackPressed();
@@ -92,6 +149,14 @@ public class ServicesFragment extends android.support.v4.app.Fragment implements
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         EventBus.getDefault().post(new EventBusMessages.DefaultStatusBar());
+
+        searchRecyclerAdapter = new SearchRecyclerAdapter(searchResult);
+        searchResultRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        searchResultRecyclerView.setAdapter(searchRecyclerAdapter);
+
+        search = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        search.setTextColor(getResources().getColor(R.color.white));
+        search.setHintTextColor(getResources().getColor(R.color.white));
 
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
@@ -121,10 +186,100 @@ public class ServicesFragment extends android.support.v4.app.Fragment implements
             }
         };
 
+        search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    App.closeKeyboard(getContext());
+                    searchText = search.getText().toString();
+                    search.clearFocus();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Log.d("TAG24", "sublime " + query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                Log.d("TAG24", "change " + newText);
+                if(newText.length()==0)
+                    return true;
+                if(!dontSearch){
+                    loadPlaces(0, 0, newText, "rate");
+                } else {
+                    dontSearch = false;
+                }
+                return false;
+            }
+        });
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                Log.d("TAG24", "Close " );
+
+                searchView.setVisibility(View.GONE);
+                toolBarTitle.setVisibility(View.VISIBLE);
+                searchButton.setVisibility(View.VISIBLE);
+                searchContainer.setVisibility(View.GONE);
+
+                if(searched){
+                    searchText = "";
+                    postList.clear();
+                    placeHolder.setVisibility(View.VISIBLE);
+                    loadFeed(0);
+                    searched = false;
+                }
+
+                return true;
+            }
+        });
+
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
         recyclerView.addOnScrollListener(scrollListener);
         loadFeed(postList.size());
+    }
+
+
+    private void loadPlaces(final int offset, int category, String search, String order) {
+        ApiFactory.getApi().getPlaces(App.accessToken(), offset, App.chosenCity(), category, order, search, 1).enqueue(new retrofit2.Callback<ResponseContainer<ResponsePlaces>>() {
+            @Override
+            public void onResponse(retrofit2.Call<ResponseContainer<ResponsePlaces>> call, retrofit2.Response<ResponseContainer<ResponsePlaces>> response) {
+                if(response.body()!=null){
+                    totalSearchCount = response.body().getResponse().getCount();
+                    if(response.body().getResponse().getItems().size()==0){
+                        Log.d("TAG21", "Places size НОООООООООООООООООООООЛЬ!" );
+                    } else {
+                        Log.d("TAG21", "Places size не НОООООООООООООООООООООЛЬ!" );
+                        searchResult.clear();
+                        groupImage.clear();
+                        for (Place p:response.body().getResponse().getItems()
+                                ) {
+                            searchResult.add(p.getName());
+                            groupImage.add(p.getPhoto130());
+                            Log.d("TAG21", "Name place "  + p.getName());
+                        }
+                        searchContainer.setVisibility(View.VISIBLE);
+                        searchRecyclerAdapter.update2(searchResult, groupImage);
+
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<ResponseContainer<ResponsePlaces>> call, Throwable t) {
+                Log.d("TAG21", "places fail "  + t.getLocalizedMessage());
+            }
+        });
     }
 
     private void loadFeed(int offset) {
@@ -136,12 +291,17 @@ public class ServicesFragment extends android.support.v4.app.Fragment implements
             mayRestore = false;
             placeHolder.setVisibility(View.GONE);
         } else {
-            ApiFactory.getApi().getAllServices(App.accessToken(), App.chosenCity(),"1", offset).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
+            ApiFactory.getApi().getAllServices(App.accessToken(), App.chosenCity(), searchText,"1", offset).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
                 @Override
                 public void onResponse(retrofit2.Call<ResponseContainer<ResponseWall>> call, retrofit2.Response<ResponseContainer<ResponseWall>> response) {
                     Log.d("TAG21", "RESPONSE EVENTS");
                     if(response!=null && response.body().getResponse()!=null){
                         Log.d("TAG21", "RESPONSE ACTION OK");
+
+
+                        if(response.body().getResponse().getCount() == 0){
+                            infoHolder.setVisibility(View.VISIBLE);
+                        }
 
                         swipeRefreshLayout.setRefreshing(false);
                         placeHolder.setVisibility(View.GONE);

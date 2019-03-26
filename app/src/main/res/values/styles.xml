@@ -83,4 +83,17 @@
         <item name="android:textSize">14sp</item>
     </style>
 
+    <style name="SearchViewStyle" parent="Widget.AppCompat.SearchView">
+        <!-- Gets rid of the search icon -->
+        <item name="searchIcon">@drawable/ic_search</item>
+        <item name="closeIcon">@drawable/ic_clear_edittext_white</item>
+        <!-- Gets rid of the "underline" in the text --><!--
+        <item name="queryBackground">@color/white</item>-->
+        <!-- Gets rid of the search icon when the SearchView is expanded -->
+        <item name="searchHintIcon">@drawable/ic_search</item>
+        <item name="android:editTextColor">@android:color/white</item>
+        <item name="colorAccent">@color/white</item>
+        <!-- The hint text that appears when the user has not typed anything -->
+    </style>
+
 </resources>

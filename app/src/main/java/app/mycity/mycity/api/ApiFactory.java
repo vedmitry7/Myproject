@@ -24,6 +24,7 @@ public class ApiFactory {
                     .writeTimeout(20, TimeUnit.SECONDS)
                     .readTimeout(20, TimeUnit.SECONDS)
                     .addInterceptor(interceptor)
+
                     .build();
 
             Retrofit builder = new Retrofit.Builder()

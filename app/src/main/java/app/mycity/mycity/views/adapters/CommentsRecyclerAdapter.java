@@ -40,15 +40,6 @@ public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecycl
 
     int layout;
     Context context;
-    CommnentClickListener commnentClickListener;
-
-    public interface CommnentClickListener{
-        void deleteComment(int position);
-    }
-
-    public void setCommentClickListener(CommnentClickListener commnentClickListener){
-        this.commnentClickListener = commnentClickListener;
-    }
 
     public CommentsRecyclerAdapter(List<Comment> commentList, Map profiles) {
         this.commentList = commentList;
@@ -189,7 +180,7 @@ public class CommentsRecyclerAdapter extends RecyclerView.Adapter<CommentsRecycl
                         public boolean onMenuItemClick(MenuItem item) {
                             switch (item.getItemId()){
                                 case R.id.deleteComment:
-                                    commnentClickListener.deleteComment(getAdapterPosition());
+                                    EventBus.getDefault().post(new EventBusMessages.DeleteComment(getAdapterPosition()));
                                     break;
                             }
                             return true;

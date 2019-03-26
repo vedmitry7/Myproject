@@ -16,6 +16,10 @@
         android:title="Поделится"
         android:id="@+id/share"
         android:orderInCategory="101"/>
+    <item
+        android:title="Сохранить"
+        android:id="@+id/save"
+        android:orderInCategory="101"/>
 
 
 </menu>

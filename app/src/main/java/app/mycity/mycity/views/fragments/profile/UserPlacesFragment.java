@@ -125,7 +125,7 @@ public class UserPlacesFragment extends Fragment implements TabStacker.TabStackI
         ApiFactory.getApi().getPlacesByUserId(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), offset, 552, getArguments().getString("id")).enqueue(new retrofit2.Callback<ResponseContainer<ResponsePlaces>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<ResponsePlaces>> call, retrofit2.Response<ResponseContainer<ResponsePlaces>> response) {
-                if(response.body()!=null){
+                if(response.body().getResponse()!=null){
 
                     placesProgressBar.setVisibility(View.GONE);
                     if(response.body().getResponse().getCount()==0){

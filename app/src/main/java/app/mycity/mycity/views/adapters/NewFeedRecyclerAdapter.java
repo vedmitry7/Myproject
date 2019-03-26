@@ -69,6 +69,12 @@ public class NewFeedRecyclerAdapter extends RecyclerView.Adapter<NewFeedRecycler
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+
+        if(postList.get(position).getAttachments().get(0).getType().equals("video")){
+            holder.indicatorVideo.setVisibility(View.VISIBLE);
+        } else {
+            holder.indicatorVideo.setVisibility(View.GONE);
+        }
         Picasso.get()
                 .load(postList.get(position).getAttachments()
                 .get(0).getPhoto550())
@@ -101,12 +107,17 @@ public class NewFeedRecyclerAdapter extends RecyclerView.Adapter<NewFeedRecycler
         @BindView(R.id.feedImage)
         ImageView photo;
 
+        @BindView(R.id.indicatorVideo)
+        ImageView indicatorVideo;
+
         @BindView(R.id.placeLabel)
         TextView place;
 
         @Nullable
         @BindView(R.id.likesCount)
         TextView likesCount;
+
+
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);

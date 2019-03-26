@@ -98,7 +98,7 @@ public class LoadImageActivity extends AppCompatActivity {
     void getUploadServer(){
         Log.d("TAG21","get server " + SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN));
 
-        ApiFactory.getApi().getUploadServer(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN)).enqueue(new Callback<ResponseContainer<ResponseUploadServer>>() {
+        ApiFactory.getApi().getUploadPhotoServer(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN)).enqueue(new Callback<ResponseContainer<ResponseUploadServer>>() {
             @Override
             public void onResponse(Call<ResponseContainer<ResponseUploadServer>> call, Response<ResponseContainer<ResponseUploadServer>> response) {
                 ResponseUploadServer uploadServer = response.body().getResponse();
@@ -119,7 +119,7 @@ public class LoadImageActivity extends AppCompatActivity {
         final RequestBody action = RequestBody.create(MediaType.parse("text/plain"), "add_photo");
         final RequestBody id = RequestBody.create(MediaType.parse("text/plain"), "3");
 
-        ApiFactory.getmApiUploadServer("http://192.168.0.104/").upload(action, id, filePart).enqueue(new Callback<ResponseContainer<ResponseUploading>>() {
+        ApiFactory.getmApiUploadServer("http://192.168.0.104/").uploadPhoto(action, id, filePart).enqueue(new Callback<ResponseContainer<ResponseUploading>>() {
             @Override
             public void onResponse(Call<ResponseContainer<ResponseUploading>> call, Response<ResponseContainer<ResponseUploading>> response) {
 

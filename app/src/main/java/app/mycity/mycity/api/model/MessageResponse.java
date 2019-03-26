@@ -20,6 +20,18 @@ public class MessageResponse {
     @Expose
     private List<Profile> profiles = null;
 
+    @SerializedName("attachments")
+    @Expose
+    private List<MessageAttachment> attachments = null;
+
+    public List<MessageAttachment> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<MessageAttachment> attachments) {
+        this.attachments = attachments;
+    }
+
     public Integer getCount() {
         return count;
     }

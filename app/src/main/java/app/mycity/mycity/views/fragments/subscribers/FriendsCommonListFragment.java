@@ -14,14 +14,9 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
-import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
-import app.mycity.mycity.util.SharedManager;
-import app.mycity.mycity.api.ApiFactory;
-import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.User;
-import app.mycity.mycity.api.model.UsersContainer;
-import app.mycity.mycity.views.adapters.FriendsRecyclerAdapter;
+import app.mycity.mycity.views.adapters.UserRecyclerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -31,7 +26,7 @@ public class FriendsCommonListFragment extends Fragment {
     @BindView(R.id.myAllFriendsRecyclerAdapter)
     RecyclerView recyclerView;
 
-    FriendsRecyclerAdapter adapter;
+    UserRecyclerAdapter adapter;
     List<User> userList;
 
 
@@ -53,7 +48,7 @@ public class FriendsCommonListFragment extends Fragment {
 
         userList = new ArrayList<>();
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
-        adapter = new FriendsRecyclerAdapter(userList);
+        adapter = new UserRecyclerAdapter(userList);
         recyclerView.setAdapter(adapter);
 
       //  getFriendsList();
@@ -65,29 +60,6 @@ public class FriendsCommonListFragment extends Fragment {
         super.onAttach(context);
         Log.d("TAG", "Attach " + this.getClass().getSimpleName());
 
-    }
-
-    private void getFriendsList(){
-
-        Log.d("TAG", "Get friends List");
-        ApiFactory.getApi().getUsersOnlineWithFields(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
-            @Override
-            public void onResponse(retrofit2.Call<ResponseContainer<UsersContainer>> call, retrofit2.Response<ResponseContainer<UsersContainer>> response) {
-                UsersContainer users = response.body().getResponse();
-                if(users != null){
-                    userList = users.getFriends();
-                    Log.d("TAG", "Users online loaded. List size = " + userList.size());
-                    adapter.update(userList);
-                } else {
-
-                }
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<ResponseContainer<UsersContainer>> call, Throwable t) {
-
-            }
-        });
     }
 
     public void onStart() {

@@ -159,8 +159,10 @@ public class SubscribersFragment extends Fragment implements TabStacker.TabStack
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    storage.setDate(getArguments().get("name") + "_userlist", null);
-                    storage.setDate(getArguments().get("name") + "_userListOnline", null);
+                    storage.remove(getArguments().get("name") + "_key_subscribers_userlist");
+                    storage.remove(getArguments().get("name") + "_key_subscribers_online_userlist");
+                    Log.d("TAG24", "remove" + getArguments().get("name") + "_key_subscribers_online_userlist");
+                    Log.d("TAG24", "remove" + getArguments().get("name") + "_key_subscribers_userlist");
                 }
             }, 200);
             Log.d("TAG21", "Delete - " + getArguments().get("name") + "_userlist");

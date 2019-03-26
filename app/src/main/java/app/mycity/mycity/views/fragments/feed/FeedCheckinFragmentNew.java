@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -50,6 +51,9 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment impl
     @BindView(R.id.progressBarPlaceHolder)
     ConstraintLayout placeHolder;
 
+    @BindView(R.id.chronicksHolder)
+    RelativeLayout chronicksHolder;
+
     @BindView(R.id.swipeContainer)
     SwipeRefreshLayout swipeRefreshLayout;
 
@@ -68,6 +72,7 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment impl
     boolean mayRestore;
 
     int scrollPos;
+    private String search = "";
 
     @Nullable
     @Override
@@ -139,6 +144,7 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment impl
         storage = (Storage) context;
         Log.d("TAG24", "storage - " + String.valueOf(storage == null) + totalCount);
 
+        Log.i("TAG23", "! get - " + getArguments().get("name")+ "_postList_" + getArguments().getString("filter"));
 
         postList = (List<Post>) storage.getDate(getArguments().get("name")+ "_postList_" + getArguments().getString("filter"));
         profiles = (Map) storage.getDate(getArguments().get("name")+ "_profiles_" + getArguments().getString("filter"));
@@ -150,6 +156,7 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment impl
             groups = new HashMap();
             totalCount = 0;
         } else {
+            Log.i("TAG23", "! size - " + postList.size());
             totalCount = (int) storage.getDate(getArguments().get("name")+ "_postListTotalCount_" + getArguments().getString("filter"));
             Log.d("TAG24", "Scroll position - " + storage.getDate(getArguments().get("name")+ "_scrollPosition_" + getArguments().getString("filter")));
             scrollPos = (Integer) storage.getDate(getArguments().get("name")+ "_scrollPosition_" + getArguments().getString("filter"));
@@ -168,11 +175,11 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment impl
             placeHolder.setVisibility(View.GONE);
         } else {
 
-            ApiFactory.getApi().getFeed(App.accessToken(), App.chosenCity(),"1", offset, "photo_130", getArguments().getString("filter")).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
+            ApiFactory.getApi().getFeed(App.accessToken(), App.chosenCity(), search,"1", offset, "photo_130", getArguments().getString("filter")).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
                 @Override
                 public void onResponse(retrofit2.Call<ResponseContainer<ResponseWall>> call, retrofit2.Response<ResponseContainer<ResponseWall>> response) {
 
-                    if(response.body().getResponse()!=null && response.body().getResponse().getCount()!=0){
+                    if(response.body().getResponse()!=null){
                         Log.d("TAG21", "RESPONSE FEED OK !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
                         swipeRefreshLayout.setRefreshing(false);
@@ -180,8 +187,15 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment impl
 
                         totalCount = response.body().getResponse().getCount();
 
+                        if(totalCount==0){
+                            chronicksHolder.setVisibility(View.VISIBLE);
+                        } else {
+                            chronicksHolder.setVisibility(View.GONE);
+                        }
+
                         postList.addAll(response.body().getResponse().getItems());
 
+                        if(response.body().getResponse().getProfiles()!=null)
                         for (Profile p: response.body().getResponse().getProfiles()
                                 ) {
                          //   Log.d("TAG21", "P - " + p.getFirstName()+ " " + p.getLastName());
@@ -199,7 +213,7 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment impl
                         isLoading = false;
 
                     } else {
-                        Log.d("TAG21", "RESPONSE ERROR ");
+                        Log.d("TAG21", "RESPONSE ERROR");
                     }
 
                     adapter.update(postList, profiles, groups);
@@ -280,6 +294,9 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment impl
 
     @Override
     public void onStop() {
+
+        Log.i("TAG23", "! save - " + getArguments().get("name") + "_postList_" + getArguments().getString("filter"));
+
         storage.setDate(getArguments().get("name") + "_postList_" + getArguments().getString("filter"), postList);
         storage.setDate(getArguments().get("name") + "_postListTotalCount_" + getArguments().getString("filter"), totalCount);
         storage.setDate(getArguments().get("name") + "_profiles_" + getArguments().getString("filter"), profiles);
@@ -292,12 +309,10 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment impl
 
     @Override
     public void onTabFragmentPresented(TabStacker.PresentReason presentReason) {
-
     }
 
     @Override
     public void onTabFragmentDismissed(TabStacker.DismissReason dismissReason) {
-
     }
 
     @Override
@@ -307,7 +322,6 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment impl
 
     @Override
     public void onRestoreTabFragmentInstance(Bundle bundle) {
-
     }
 
     @Override
@@ -315,5 +329,13 @@ public class FeedCheckinFragmentNew extends android.support.v4.app.Fragment impl
         postList = new ArrayList<>();
         loadFeed(0);
         placeHolder.setVisibility(View.VISIBLE);
+    }
+
+    public void filter(String s) {
+        search = s;
+        totalCount = 0;
+        postList.clear();
+        placeHolder.setVisibility(View.VISIBLE);
+        loadFeed(0);
     }
 }

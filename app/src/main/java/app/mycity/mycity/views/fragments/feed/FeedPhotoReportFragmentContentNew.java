@@ -12,10 +12,12 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.github.nkzawa.socketio.client.On;
@@ -38,6 +40,7 @@ import app.mycity.mycity.api.model.Photo;
 import app.mycity.mycity.api.model.PhotoContainer;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponseLike;
+import app.mycity.mycity.util.BitmapUtils;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
@@ -45,6 +48,7 @@ import app.mycity.mycity.views.activities.Storage;
 import app.mycity.mycity.views.adapters.AlbumSliderAdapter;
 import app.mycity.mycity.views.adapters.CheckinSliderAdapter;
 import app.mycity.mycity.views.adapters.FeedPhotoReportContentAdapter;
+import app.mycity.mycity.views.fragments.VideoContentFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -164,7 +168,6 @@ public class FeedPhotoReportFragmentContentNew extends android.support.v4.app.Fr
             //recyclerView.setVisibility(View.GONE);
             clearScreen = true;
         }
-
     }
 
     @Override
@@ -287,9 +290,9 @@ public class FeedPhotoReportFragmentContentNew extends android.support.v4.app.Fr
 
     private void initPagerAdapter(List<Photo> photoList) {
         Log.d("TAG24", "init pager");
-        AlbumSliderAdapter albumSliderAdapter = new AlbumSliderAdapter(getContext(), photoList);
+        final AlbumSliderAdapter albumSliderAdapter = new AlbumSliderAdapter(getContext(), photoList);
         viewPager.setAdapter(albumSliderAdapter);
-
+        viewPager.setOffscreenPageLimit(3);
         //Picasso.get().load(photoList.get(getArguments().getInt("position")).getPhoto780()).into(image);
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -397,7 +400,39 @@ public class FeedPhotoReportFragmentContentNew extends android.support.v4.app.Fr
         }
     }
 
+    @OnClick(R.id.menuButton)
+    public void menu(View v) {
+        PopupMenu popupMenu = new PopupMenu(getContext(), v);
+
+        popupMenu.inflate(R.menu.content_menu);
+
+        popupMenu
+                .setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.complain:
+
+                                return true;
+                            case R.id.copy:
+
+                                return true;
+                            case R.id.share:
+
+                                return true;
+                            case R.id.save:
+                                BitmapUtils.downloadFile(photoList.get(currentPostIdPosition).getPhotoOrig(), getActivity());
+                                return true;
+                        }
+                        return true;
+                    }
+                });
+
+        popupMenu.show();
+    }
+
     private void setNumeration(int current){
+        currentPostIdPosition = current;
         numeration.setText((current+1)+"/"+totalCount);
         recyclerView.smoothScrollToPosition(current);
     }

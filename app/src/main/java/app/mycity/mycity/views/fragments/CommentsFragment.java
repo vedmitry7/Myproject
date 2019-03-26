@@ -36,6 +36,7 @@ import app.mycity.mycity.api.model.ResponseComments;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponseDeleteComment;
 import app.mycity.mycity.api.model.ResponseLike;
+import app.mycity.mycity.api.model.Success;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.adapters.CommentsRecyclerAdapter;
@@ -48,7 +49,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CommentsFragment extends android.support.v4.app.Fragment implements CommentsRecyclerAdapter.CommnentClickListener, TabStacker.TabStackInterface {
+public class CommentsFragment extends android.support.v4.app.Fragment implements TabStacker.TabStackInterface {
 
 
     @BindView(R.id.commentsFragmentRecyclerView)
@@ -67,7 +68,6 @@ public class CommentsFragment extends android.support.v4.app.Fragment implements
 
     @BindView(R.id.commentsPlaceHolder)
     ConstraintLayout placeHolder;
-
 
     @BindView(R.id.addCommentProgress)
     ProgressBar progressBar;
@@ -152,7 +152,6 @@ public class CommentsFragment extends android.support.v4.app.Fragment implements
         layoutManager.setStackFromEnd(true);
 
         recyclerView.setLayoutManager(layoutManager);
-        adapter.setCommentClickListener(this);
         recyclerView.setAdapter(adapter);
         recyclerView.addOnScrollListener(scrollListener);
         loadComments(commentList.size());
@@ -362,18 +361,20 @@ public class CommentsFragment extends android.support.v4.app.Fragment implements
         }
     }
 
-    @Override
-    public void deleteComment(final int position) {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(final EventBusMessages.DeleteComment event) {
+
+        final int position = event.getPosition();
         Log.d("TAG21", "delete comments in act");
-        Callback callback = new Callback<ResponseContainer<ResponseDeleteComment>>() {
+        Callback callback = new Callback<ResponseContainer<Success>>() {
             @Override
-            public void onResponse(Call<ResponseContainer<ResponseDeleteComment>> call, Response<ResponseContainer<ResponseDeleteComment>> response) {
-                if(response!=null&&response.body().getResponse() != null && response.body().getResponse().getSuccess())
+            public void onResponse(Call<ResponseContainer<Success>> call, Response<ResponseContainer<Success>> response) {
+                if(response!=null&&response.body().getResponse() != null && response.body().getResponse().getSuccess()==1)
                     commentList.remove(position);
                 adapter.notifyItemRemoved(position);
             }
             @Override
-            public void onFailure(Call<ResponseContainer<ResponseDeleteComment>> call, Throwable t) {
+            public void onFailure(Call<ResponseContainer<Success>> call, Throwable t) {
             }
         };
 

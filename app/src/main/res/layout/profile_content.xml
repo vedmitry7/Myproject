@@ -35,7 +35,7 @@
 
     <RelativeLayout
         android:gravity="center"
-        android:id="@+id/profileFragCurrentPointContainer"
+        android:id="@+id/placeContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -70,7 +70,7 @@
         android:text="Всем Привет, я в MyCity!"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/profileFragCurrentPointContainer" />
+        app:layout_constraintTop_toBottomOf="@+id/placeContainer" />
 
 
     <android.support.constraint.ConstraintLayout

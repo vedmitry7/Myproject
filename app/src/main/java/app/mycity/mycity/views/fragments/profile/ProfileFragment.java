@@ -52,6 +52,7 @@ import app.mycity.mycity.api.model.Post;
 import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponseLike;
+import app.mycity.mycity.api.model.ResponsePlaces;
 import app.mycity.mycity.api.model.ResponseSavePhoto;
 import app.mycity.mycity.api.model.ResponseUploadServer;
 import app.mycity.mycity.api.model.ResponseUploading;
@@ -106,12 +107,6 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
     @BindView(R.id.profileFragSubscriptionTv)
     TextView subscriptionsCount;
 
- /*   @BindView(R.id.checkinCount)
-    TextView checkinCount;*/
-
-    @BindView(R.id.profileFragCurrentPointContainer)
-    RelativeLayout currentPoint;
-
     @BindView(R.id.someOneProfileFragRecyclerView)
     RecyclerView recyclerView;
 
@@ -121,33 +116,31 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
     @BindView(R.id.profileNestedScrollView)
     NestedScrollView scrollView;
 
+    @BindView(R.id.profileFragPlacesCount)
+    TextView placesCount;
+
+    @BindView(R.id.placeContainer)
+    RelativeLayout placeContainer;
+
+    @BindView(R.id.userPlace)
+    TextView userPlace;
+
     CheckinRecyclerAdapter adapter;
-
     List<Post> postList;
-
     MainAct activity;
-
     private RecyclerView.ItemDecoration spaceDecoration;
-
     RecyclerView.LayoutManager mLayoutManager;
-
     File file;
     Uri fileUri;
-
     ProgressDialog progressDialog;
-
     boolean friendLoad, checkinLoad, infoLoad;
-
     Storage storage;
     boolean mayRestore;
-
     Map groups;
-
     Profile profile;
     private View fragmentView;
 
     public void showContent(){
-
         if(friendLoad && checkinLoad && infoLoad){
             placeHolder.setVisibility(View.GONE);
         }
@@ -320,13 +313,9 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
         };
     }
 
-    private void getInfoViaRetrofit(){
-        //  getObservable().subscribeWith(getObserver());
-    }
-
     private void getInfo(){
         Log.i("TAG21", "Get Info");
-        ApiFactory.getApi().getUser(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "about,photo_550,photo_130").enqueue(new retrofit2.Callback<ResponseContainer<Profile>>() {
+        ApiFactory.getApi().getUser(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), "about,photo_550,photo_130,place").enqueue(new retrofit2.Callback<ResponseContainer<Profile>>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseContainer<Profile>> call, retrofit2.Response<ResponseContainer<Profile>> response) {
                 profile = response.body().getResponse();
@@ -354,6 +343,18 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
 
                 } else {
 
+                }
+
+                if(profile.getPlace()!=null){
+                    placeContainer.setVisibility(View.VISIBLE);
+                    userPlace.setText(profile.getPlace().getName());
+
+                    placeContainer.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            EventBus.getDefault().post(new EventBusMessages.OpenPlace(profile.getPlace().getId()));
+                        }
+                    });
                 }
             }
 
@@ -402,6 +403,20 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
         });
 
 
+        ApiFactory.getApi().getPlacesByUserId(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), 0, 552, SharedManager.getProperty(Constants.KEY_MY_ID)).enqueue(new retrofit2.Callback<ResponseContainer<ResponsePlaces>>() {
+            @Override
+            public void onResponse(retrofit2.Call<ResponseContainer<ResponsePlaces>> call, retrofit2.Response<ResponseContainer<ResponsePlaces>> response) {
+                if(response.body()!=null){
+                    placesCount.setText("" + response.body().getResponse().getCount());
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<ResponseContainer<ResponsePlaces>> call, Throwable t) {
+
+            }
+        });
+
     }
 
     private void getCheckins(){
@@ -423,7 +438,6 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
                             groups.put(g.getId(), g);
                         }
                     }
-
                     adapter.notifyDataSetChanged();
                     checkinLoad = true;
                     showContent();
@@ -432,8 +446,10 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
                 @Override
                 public void onFailure(Call<ResponseContainer<ResponseWall>> call, Throwable t) {
                     Log.d("TAG21", "fail get wall - " + t.getLocalizedMessage());
+
                 }
             });
+
         } else {
             Log.i("TAG21", "Restore checkins");
             adapter.notifyDataSetChanged();
@@ -447,7 +463,6 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
     public void settings(View v){
         Log.d("TAG", "SETTINGS");
         activity.startSettings(0);
-
     }
 
     @OnClick(R.id.profileFragSubscribersButton)
@@ -486,7 +501,7 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
                                     Intent pickPhoto = new Intent(Intent.ACTION_PICK,
                                             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                                     //pickPhoto.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
-                                    startActivityForResult(pickPhoto , 122);
+                                    getActivity().startActivityForResult(pickPhoto , 122);
                                     dialog.dismiss();
                                 }
                             });
@@ -506,7 +521,7 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
                                             "app.mycity.mycity.provider", //(use your app signature + ".provider" )
                                             file);*/
                                     intent.putExtra(MediaStore.EXTRA_OUTPUT, file);
-                                    startActivityForResult(intent, 0);
+                                    getActivity().startActivityForResult(intent, 123);
 
                                     dialog.dismiss();
                                 }
@@ -546,12 +561,12 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+       // super.onActivityResult(requestCode, resultCode, data);
 
-        Log.d("TAG23","activity Result ");
+        Log.d("TAG23","activity Result " + requestCode);
 
         switch(requestCode) {
-            case 0:
+            case 123:
                 if(resultCode == RESULT_OK){
 
                     progressDialog = new ProgressDialog(getActivity());
@@ -617,7 +632,7 @@ public class ProfileFragment extends Fragment implements CheckinRecyclerAdapter.
         final RequestBody action = RequestBody.create(MediaType.parse("text/plain"), uploadAction);
         final RequestBody id = RequestBody.create(MediaType.parse("text/plain"), userId);
 
-        ApiFactory.getmApiUploadServer(uploadServer).upload(action, id, filePart).enqueue(new Callback<ResponseContainer<ResponseUploading>>() {
+        ApiFactory.getmApiUploadServer(uploadServer).uploadPhoto(action, id, filePart).enqueue(new Callback<ResponseContainer<ResponseUploading>>() {
             @Override
             public void onResponse(Call<ResponseContainer<ResponseUploading>> call, Response<ResponseContainer<ResponseUploading>> response) {
 

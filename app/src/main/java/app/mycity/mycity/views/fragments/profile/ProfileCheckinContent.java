@@ -9,9 +9,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -36,6 +38,7 @@ import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponseLike;
 import app.mycity.mycity.api.model.ResponseWall;
 import app.mycity.mycity.api.model.User;
+import app.mycity.mycity.util.BitmapUtils;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
@@ -346,6 +349,37 @@ public class ProfileCheckinContent extends android.support.v4.app.Fragment imple
             }
             adapter.update(postList);
         }
+    }
+
+    @OnClick(R.id.menuButton)
+    public void menu(View v) {
+        PopupMenu popupMenu = new PopupMenu(getContext(), v);
+
+        popupMenu.inflate(R.menu.content_menu);
+
+        popupMenu
+                .setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.complain:
+
+                                return true;
+                            case R.id.copy:
+
+                                return true;
+                            case R.id.share:
+
+                                return true;
+                            case R.id.save:
+                                BitmapUtils.downloadFile(postList.get(currentPostIdPosition).getAttachments().get(0).getPhotoOrig(), getContext());
+                                return true;
+                        }
+                        return true;
+                    }
+                });
+
+        popupMenu.show();
     }
 
     @Override

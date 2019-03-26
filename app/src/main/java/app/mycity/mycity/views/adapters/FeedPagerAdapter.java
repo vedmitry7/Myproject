@@ -3,16 +3,15 @@ package app.mycity.mycity.views.adapters;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.util.Log;
 
-import app.mycity.mycity.views.fragments.SimpleFragment;
-import app.mycity.mycity.views.fragments.events.AllEvents;
 import app.mycity.mycity.views.fragments.feed.FeedCheckinFragmentNew;
-import app.mycity.mycity.views.fragments.feed.FeedPhotoAlbumFragment;
 
 public class FeedPagerAdapter extends FragmentPagerAdapter {
 
     String tabName;
+
+    FeedCheckinFragmentNew allCheckinFragment;
+    FeedCheckinFragmentNew subscriptionsCheckinFragment;
 
     public FeedPagerAdapter(FragmentManager fm, String tabName) {
         super(fm);
@@ -23,9 +22,11 @@ public class FeedPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position){
             case 0:
-                return FeedCheckinFragmentNew.createInstance(tabName, "all");
+                allCheckinFragment = FeedCheckinFragmentNew.createInstance(tabName, "all");
+                return allCheckinFragment;
             case 1:
-                return FeedCheckinFragmentNew.createInstance(tabName, "subscriptions");
+                subscriptionsCheckinFragment = FeedCheckinFragmentNew.createInstance(tabName, "subscriptions");
+                return subscriptionsCheckinFragment;
         }
         return null;
     }
@@ -44,5 +45,13 @@ public class FeedPagerAdapter extends FragmentPagerAdapter {
                 return "ПОДПИСКИ";
         }
         return null;
+    }
+
+    public FeedCheckinFragmentNew getAllCheckinFragment() {
+        return allCheckinFragment;
+    }
+
+    public FeedCheckinFragmentNew getSubscriptionsCheckinFragment() {
+        return subscriptionsCheckinFragment;
     }
 }

@@ -15,11 +15,13 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -27,6 +29,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,16 +62,19 @@ import app.mycity.mycity.LocationService;
 import app.mycity.mycity.SocketService;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
+import app.mycity.mycity.api.SuccessCreatePlace;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponsePlaces;
 import app.mycity.mycity.api.model.ResponseSocketServer;
 import app.mycity.mycity.api.model.Success;
 import app.mycity.mycity.filter_desc_post.FilterImageActivity;
+import app.mycity.mycity.filter_desc_post.VideoActivity;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.adapters.PlacesByCoordinatesRecyclerAdapter;
 import app.mycity.mycity.views.fragments.CommentsFragment;
 import app.mycity.mycity.views.fragments.DialogsFragment;
+import app.mycity.mycity.views.fragments.LoseConnectionFragment;
 import app.mycity.mycity.views.fragments.MenuFragment;
 import app.mycity.mycity.views.fragments.NotificationsFragment;
 import app.mycity.mycity.views.fragments.events.ActionContentFragment;
@@ -95,37 +102,25 @@ import app.mycity.mycity.views.fragments.settings.ProfileSettingsFragment;
 import app.mycity.mycity.views.fragments.subscribers.SubscribersFragment;
 import app.mycity.mycity.views.fragments.subscribers.SubscriptionFragment;
 import app.mycity.mycity.views.fragments.people.SuperPeoplesFragment;
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import fr.arnaudguyon.tabstacker.TabStacker;
-import io.realm.Realm;
-import io.realm.RealmConfiguration;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity3 extends AppCompatActivity implements MainAct, Storage {
 
-
-/*
-    getSupportFragmentManager()
-                .beginTransaction()
-                .detach(mTabStacker.getCurrentTopFragment())
-            .attach(mTabStacker.getCurrentTopFragment())
-            .commit();*/
+    @BindView(R.id.choseMediaTypeContainer)
+    CardView choseMediaTypeContainer;
 
     private TabStacker mTabStacker;
-    Tab currentTab;
     HashMap<String, Object> date = new HashMap<>();
     android.support.v4.app.FragmentManager fragmentManager;
-
-    private enum Tab {
-        TAB_MENU(0);
-        private int mButtonResId;
-
-        Tab(int buttonResId) {
-            mButtonResId = buttonResId;
-        }
-    }
+    private boolean video;
+    Timer hideButtonsTimer = new Timer();
+    private boolean startProfile;
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -141,6 +136,12 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_main_activity_3);
         Log.i("TAG23", "start activity ");
+
+        ButterKnife.bind(this);
+        choseMediaTypeContainer.setBackgroundResource(R.drawable.chose_media_type);
+
+        choseMediaTypeContainer.setVisibility(View.GONE);
+
 
         setStatusBarColor();
 
@@ -188,8 +189,6 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
 
         openMenuFragment(new EventBusMessages.OpenMenu());
 
-        currentTab = Tab.values()[0];
-
    /*     String manufacturer = "xiaomi";
         if(manufacturer.equalsIgnoreCase(android.os.Build.MANUFACTURER)) {
             //this will open auto start screen where user can enable permission for your app
@@ -197,8 +196,6 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
             intent.setComponent(new ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity"));
             startActivity(intent);
         }*/
-
-
 
 
         Intent intent = getIntent();
@@ -298,7 +295,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
                                 true));
                         break;
                     case "post":
-                        checkinContentOne(new EventBusMessages.ProfileCheckinContentOne(objectId));
+                        checkinContentOne(new EventBusMessages.ProfileCheckinContentOne(objectId, true));
                         break;
 
                     case "album":
@@ -329,8 +326,38 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
         else {
             Log.i("TAG25", "INTENT null " );
         }*/
+
+        Log.i("TAG26", "onCreate" );
     }
 
+    @Override
+    protected void onResume() {
+        Log.i("TAG26", "resume" );
+        if(startProfile){
+            if(mTabStacker.getCurrentTopFragment() instanceof ProfileFragment){
+                mTabStacker.onBackPressed();
+                openUser(new EventBusMessages.OpenUser(SharedManager.getProperty(Constants.KEY_MY_ID)));
+            } else {
+                openUser(new EventBusMessages.OpenUser(SharedManager.getProperty(Constants.KEY_MY_ID)));
+                startProfile = false;
+            }
+        }
+        super.onResume();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i("TAG23", "request code " + requestCode );
+        if (requestCode == 24) {
+            if(resultCode == RESULT_OK){
+                startProfile = true;
+            }
+        }
+
+        if(requestCode == 122 || requestCode == 123){
+            mTabStacker.getCurrentTopFragment().onActivityResult(requestCode, resultCode, data);
+        }
+    }
 
 
     private void registrationDevice(String token) {
@@ -376,43 +403,6 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
         startService(locServiceIntent);
     }
 
-
-    private void onClickOnTab(Tab clickedTab) {
-        Log.i("TAG21", "Clicked on Tab " + clickedTab.name());
-
-        String tabName = clickedTab.name();
-        if (mTabStacker.getCurrentTabName().equals(tabName)) {  // The user clicked again on the current stack
-            mTabStacker.popToTop(true);  // Pop all but 1st fragment instantly
-        } else {
-            selectTab(clickedTab);
-        }
-    }
-
-    private void selectTab(Tab clickedTab) {
-
-        Log.i("TAG21", "Select Tab " + clickedTab.name());
-
-        //updateButtonStates(clickedTab);
-
-        // switch to Tab Stack
-        String tabName = clickedTab.name();
-        currentTab = clickedTab;
-
-        if (!mTabStacker.switchToTab(tabName)) {    // tries to switch to the TAB STACK
-            // no fragment yet on this stack -> push the 1st fragment of the stack
-
-            android.support.v4.app.Fragment fragment = null;
-
-            switch (clickedTab){
-                case TAB_MENU:
-                    fragment = new MenuFragment();
-            }
-
-            mTabStacker.replaceFragment(fragment, null);  // no animation
-
-        }
-    }
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void blackStatusBar(EventBusMessages.BlackStatusBar event){
 
@@ -436,24 +426,6 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
 
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void clickTab(EventBusMessages.SwichTab event) {
-        Log.i("TAG21", "Click new Tab " + event.getPos());
-        onClickOnTab(Tab.values()[event.getPos()]);
-    }
-
-    // Update Button state (white / black)
-/*    private void updateButtonStates(Tab clickedTab) {
-        for(final Tab tab : Tab.values()) {
-            ImageView button = findViewById(tab.mButtonResId);
-            if(tab == clickedTab){
-                button.setColorFilter(getResources().getColor(R.color.colorAccent));
-            } else {
-                button.setColorFilter(getResources().getColor(R.color.colorDefaultButton));
-            }
-        }
-    }*/
-
     private void updateTimestemp() {
         ApiFactory.getApi().getSocketServer(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN)).enqueue(new Callback<ResponseContainer<ResponseSocketServer>>() {
             @Override
@@ -472,16 +444,6 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
 
             }
         });
-    }
-
-    public void initRealm() {
-        Realm.init(this);
-        RealmConfiguration config = new RealmConfiguration.Builder()
-                .name("chat.realm_" + SharedManager.getProperty(Constants.KEY_LOGIN))
-                .schemaVersion(1)
-                .deleteRealmIfMigrationNeeded()
-                .build();
-        Realm.setDefaultConfiguration(config);
     }
 
     private void makePlaceRequestAndMakeCheckin(){
@@ -518,7 +480,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
                     lon = "39.2961263";
                 }
 
-                ApiFactory.getApi().getPlaceByCoordinates(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), lat, lon, 300).enqueue(new Callback<ResponseContainer<ResponsePlaces>>() {
+                ApiFactory.getApi().getPlaceByCoordinates(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), lat, lon, 300, 0).enqueue(new Callback<ResponseContainer<ResponsePlaces>>() {
                     @Override
                     public void onResponse(Call<ResponseContainer<ResponsePlaces>> call, Response<ResponseContainer<ResponsePlaces>> response) {
                         Log.d("TAG23", "response");
@@ -550,14 +512,25 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
                 dialog.dismiss();
             }
         });
+
+        dialogBuilder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+            }
+        });
         dialogBuilder.setPositiveButton("Ок", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 SharedManager.addProperty("currentPlace", adapter.getSelectedPlaceId());
 
                 if(placeList.size()>0){
 
-                    Intent intent = new Intent(MainActivity3.this, FilterImageActivity.class);
-                    startActivity(intent);
+                    if(video){
+                        Intent intent = new Intent(MainActivity3.this, VideoActivity.class);
+                        startActivityForResult(intent, 24);
+                    } else {
+                        Intent intent = new Intent(MainActivity3.this, FilterImageActivity.class);
+                        startActivityForResult(intent, 24);
+                    }
                     Dexter.withActivity(MainActivity3.this).withPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.LOCATION_HARDWARE)
                             .withListener(new MultiplePermissionsListener() {
                                 @Override
@@ -580,13 +553,96 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
             }
         });
 
-        AlertDialog b = dialogBuilder.create();
+        final AlertDialog b = dialogBuilder.create();
+        b.setButton(AlertDialog.BUTTON_NEUTRAL, "Создать место", new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int id) {
+
+
+                b.dismiss();
+
+                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity3.this)
+                        .setPositiveButton("Ok", null);
+
+                LayoutInflater inflater = (LayoutInflater) MainActivity3.this.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+                final View dialogView = inflater.inflate(R.layout.create_location_dialog, null);
+
+                final TextInputLayout textInputLayout = dialogView.findViewById(R.id.textInputLayout);
+                final EditText createPlaceEt = dialogView.findViewById(R.id.createPlaceEt);
+
+                dialogBuilder.setView(dialogView);
+                dialogBuilder.setTitle("Создание места");
+
+                final AlertDialog c = dialogBuilder.create();
+                c.setButton(AlertDialog.BUTTON_NEGATIVE, "Отмена", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        c.dismiss();
+                        App.closeKeyboard(getApplicationContext());
+                    }
+                });
+
+                c.setOnShowListener(new DialogInterface.OnShowListener() {
+                    @Override
+                    public void onShow(DialogInterface dialog) {
+                        Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
+                        button.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if(createPlaceEt.getText().toString().length()<3){
+                                    textInputLayout.setError("Не менее трех символов");
+                                    return;
+                                }
+
+                                String lat = SharedManager.getProperty("latitude");
+                                String lon = SharedManager.getProperty("longitude");
+                                ApiFactory.getApi().createPlace(App.accessToken(), createPlaceEt.getText().toString().trim(), SharedManager.getIntProperty("chosen_city_id"), lat, lon).enqueue(new Callback<ResponseContainer<SuccessCreatePlace>>() {
+                                    @Override
+                                    public void onResponse(Call<ResponseContainer<SuccessCreatePlace>> call, Response<ResponseContainer<SuccessCreatePlace>> response) {
+                                        if(response.body()!=null){
+
+                                            if(response.body().getError()!=null){
+                                                textInputLayout.setError("Такая локация уже существует");
+
+                                                return;
+                                            }
+                                            if(response.body().getResponse().getSuccess()==1){
+                                                Log.d("TAG23", "Place created");
+                                                SharedManager.addProperty("currentPlace", response.body().getResponse().getId());
+                                                if(video){
+                                                    Intent intent = new Intent(MainActivity3.this, VideoActivity.class);
+                                                    startActivityForResult(intent, 24);
+                                                } else {
+                                                    Intent intent = new Intent(MainActivity3.this, FilterImageActivity.class);
+                                                    startActivityForResult(intent, 24);
+                                                }
+                                                c.dismiss();
+                                            }
+
+                                        }
+                                    }
+                                    @Override
+                                    public void onFailure(Call<ResponseContainer<SuccessCreatePlace>> call, Throwable t) {
+                                    }
+                                });
+                                // c.dismiss();
+                            }
+                        });
+                    }
+                });
+                c.show();
+                App.showKeyboard(MainActivity3.this);
+            }});
         b.show();
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(EventBusMessages.MakeCheckin event){
 
+    @OnClick(R.id.photoButton)
+    public void makePhoto(View v){
+
+        choseMediaTypeContainer.setVisibility(View.GONE);
+
+        video = false;
         EventBus.getDefault().post(new EventBusMessages.UpdateCoordinates());
 
         if(hasPermissionWriteExternalStorageAndLocation()){
@@ -596,24 +652,48 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
             Log.d("TAG21", "HAS NOT ALL PERMISSIONS");
         }
         Log.d("TAG21", "PHOTO - ");
+
     }
 
-  /*  @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case 14:
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission granted
-                    Log.d("TAG21", "take granted");
-                    //  readContacts();
-                } else {
-                    Log.d("TAG21", "take not granted");
-                    // permission denied
-                }
-                return;
+
+    @OnClick(R.id.videoButton)
+    public void makeVideo(View v){
+        video = true;
+        choseMediaTypeContainer.setVisibility(View.GONE);
+        EventBus.getDefault().post(new EventBusMessages.UpdateCoordinates());
+
+        if(hasPermissionWriteExternalStorageAndLocation()){
+            Log.d("TAG21", "HAS All PERMISSIONS");
+            makePlaceRequestAndMakeCheckin();
+        } else {
+            Log.d("TAG21", "HAS NOT ALL PERMISSIONS");
         }
-    }*/
+        Log.d("TAG21", "PHOTO - ");
+
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(EventBusMessages.MakeCheckin event){
+        if(hideButtonsTimer !=null)
+            hideButtonsTimer.cancel();
+
+        hideButtonsTimer = new Timer();
+        hideButtonsTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        choseMediaTypeContainer.setVisibility(View.GONE);
+                    }
+                });
+            }
+        }, 3000);
+        if(choseMediaTypeContainer.getVisibility()==View.VISIBLE)
+            choseMediaTypeContainer.setVisibility(View.GONE);
+        else
+            choseMediaTypeContainer.setVisibility(View.VISIBLE);
+    }
 
     public boolean hasPermissionWriteExternalStorage() {
         if (Build.VERSION.SDK_INT >= 23) {
@@ -810,7 +890,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(EventBusMessages.OpenUser event){
+    public void openUser(EventBusMessages.OpenUser event){
 
         if(event.isCloseCurrent()){
             Log.d("TAG26", "close current");
@@ -829,7 +909,6 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
             Log.d("TAG21", "Start someone");
         }
         mTabStacker.replaceFragment(profileFragment, null);
-
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -860,7 +939,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void openPlacePhoto(EventBusMessages.OpenPlacePhoto event){
         FeedPlacesCheckinFragmentNew2 placeFragment = FeedPlacesCheckinFragmentNew2.createInstance(
-                currentTab.name(),
+                getFragmentName(),
                 event.getPlaceId(),
                 event.getPostId());
         mTabStacker.replaceFragment(placeFragment, null);
@@ -922,7 +1001,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
     /**
      *      Open Profile
      */
-    @Subscribe(threadMode = ThreadMode.MAIN)
+/*    @Subscribe(threadMode = ThreadMode.MAIN)
     public void openProfile(EventBusMessages.OpenProfile event){
 
         Log.d("TAG21", "... open profile");
@@ -930,17 +1009,14 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
             mTabStacker.replaceFragment(
                     ProfileFragment.createInstance(getFragmentName()), null);
         }
-    }
+    }*/
     /**
      *      Open Profile Content
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void openProfileContent(EventBusMessages.OpenCheckinProfileContent event){
-
         mTabStacker.replaceFragment(ProfileCheckinContent.createInstance(getFragmentName(), event.getPostId(), event.getStorageKey()), null);
-
         Log.d("TAG21", "... open profile content");
-
     }
 
     /**
@@ -951,9 +1027,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
         Log.d("TAG26", "");
         mTabStacker.replaceFragment(
                 EventContentFragment.createInstance(getFragmentName(), event.getEventId(), event.getOwnerId(), event.isBackToPlace()), null);
-
         Log.d("TAG21", "... open profile content " + event.getOwnerId());
-
     }
 
 
@@ -964,9 +1038,7 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
     public void openActionContent(EventBusMessages.OpenActionContent event){
         mTabStacker.replaceFragment(
                 ActionContentFragment.createInstance(getFragmentName(), event.getEventId(), event.getOwnerId(), event.isBackToPlace()), null);
-
         Log.d("TAG21", "... open profile content " + event.getOwnerId());
-
     }
 
     /**
@@ -975,7 +1047,6 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void openServiceContent(EventBusMessages.OpenServiceContent event){
         mTabStacker.replaceFragment(ServiceContentFragment.createInstance(getFragmentName(), event.getEventId(), event.getOwnerId(), event.isBackToPlace()), null);
-
         Log.d("TAG21", "... open profile content " + event.getOwnerId());
     }
 
@@ -1068,13 +1139,46 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void checkinContentOne(EventBusMessages.ProfileCheckinContentOne event){
         mTabStacker.replaceFragment(
-                ProfileCheckinContentOne.createInstance(getFragmentName(), event.getPostId()), null);
+                ProfileCheckinContentOne.createInstance(getFragmentName(), event.getPostId(), event.isBackToProfile()), null);
+    }
+
+    /**
+     *      lose connection
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void loseConnection(EventBusMessages.LoseConnection event){
+        Log.d("TAG24", "exc. - catched" );
+        mTabStacker.replaceFragment(
+                LoseConnectionFragment.createInstance(getFragmentName()), null);
     }
 
 
+    /*
+    getSupportFragmentManager()
+                .beginTransaction()
+                .detach(mTabStacker.getCurrentTopFragment())
+            .attach(mTabStacker.getCurrentTopFragment())
+            .commit();*/
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void tryConnection(EventBusMessages.TryConnection event){
+        Log.d("TAG24", "exc. - catched" );
+        mTabStacker.onBackPressed();
+        recreateFragment();
+    }
+
+
+    void recreateFragment(){
+        getSupportFragmentManager()
+                .beginTransaction()
+                .detach(mTabStacker.getCurrentTopFragment())
+                .attach(mTabStacker.getCurrentTopFragment())
+                .commit();
+    }
 
     @Override
     public void onStart() {
+        Log.i("TAG26", "start" );
         super.onStart();
         EventBus.getDefault().register(this);
     }
@@ -1084,19 +1188,6 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
         super.onStop();
         Log.d("TAG23","stop Main Activity");
         EventBus.getDefault().unregister(this);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void closefragment() {
-        getFragmentManager().beginTransaction().remove(getVisibleFragment()).commit();
-    }
-
-    public Fragment getActiveFragment() {
-        if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
-            return null;
-        }
-        String tag = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName();
-        return getFragmentManager().findFragmentByTag(tag);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -1141,10 +1232,52 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
         Log.i("TAG26", "onBackPressed");
         Log.i("TAG21", "name " + mTabStacker.getCurrentTabName());
 
-        android.support.v4.app.Fragment fragment = mTabStacker.getCurrentTopFragment();
 
-        if(fragment!=null && fragment instanceof EventContentFragment){
+        android.support.v4.app.Fragment fragment = mTabStacker.getCurrentTopFragment();
+        if (fragment != null && fragment instanceof EventContentFragment) {
+            Log.i("TAG26", "EventContentFragment back 2");
+            if (fragment.getArguments().getBoolean("backToPlace")) {
+                ((EventContentFragment) fragment).back(null);
+            } else {
+                if (!mTabStacker.onBackPressed()) {
+                    super.onBackPressed();
+                }
+            }
+            return;
+        }
+
+        if (fragment != null && fragment instanceof ActionContentFragment) {
             Log.i("TAG26", "ActionContentFragment back 2");
+            if (fragment.getArguments().getBoolean("backToPlace")) {
+                ((ActionContentFragment) fragment).back(null);
+            } else {
+                if (!mTabStacker.onBackPressed()) {
+                    super.onBackPressed();
+                }
+            }
+            return;
+        }
+
+        if (fragment != null && fragment instanceof ProfileCheckinContentOne) {
+            Log.i("TAG26", "ProfileCheckinContentOne back 2");
+            if (fragment.getArguments().getBoolean("backToProfile")) {
+                ((ProfileCheckinContentOne) fragment).back(null);
+            } else {
+                Log.i("TAG26", "хз 2");
+                if (!mTabStacker.onBackPressed()) {
+                    super.onBackPressed();
+                }
+            }
+            return;
+        }
+
+        if (!mTabStacker.onBackPressed()) {
+            super.onBackPressed();
+        }
+
+        /*   android.support.v4.app.Fragment fragment = mTabStacker.getCurrentTopFragment();
+        if(fragment!=null && fragment instanceof EventContentFragment){
+            Log.i("TAG26", "EventContentFragment back 2");
             if(fragment.getArguments().getBoolean("backToPlace")){
                 ((EventContentFragment) fragment).back(null);
             } else {
@@ -1162,15 +1295,17 @@ public class MainActivity3 extends AppCompatActivity implements MainAct, Storage
                         super.onBackPressed();
                     }
                 }
+            } else {
+                if(fragment!=null && fragment instanceof ProfileCheckinContentOne){
+                    Log.i("TAG26", "ProfileCheckinContentOne back 2");
+                    ((ProfileCheckinContentOne) fragment).back(null);
+                } else {
+                    Log.i("TAG26", "хз 2");
+                    if (!mTabStacker.onBackPressed()) {
+                        super.onBackPressed();
+                    }
+                }
             }
-        } if(fragment!=null && fragment instanceof ProfileCheckinContentOne){
-            Log.i("TAG26", "ProfileCheckinContentOne back 2");
-            ((ProfileCheckinContentOne) fragment).back(null);
-        } else {
-            Log.i("TAG26", "хз 2");
-            if (!mTabStacker.onBackPressed()) {
-                super.onBackPressed();
-            }
-        }
+        }*/
     }
 }

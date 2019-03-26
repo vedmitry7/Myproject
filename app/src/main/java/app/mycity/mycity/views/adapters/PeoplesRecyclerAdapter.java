@@ -60,6 +60,12 @@ public class PeoplesRecyclerAdapter extends RecyclerView.Adapter<PeoplesRecycler
             holder.placeName.setVisibility(View.GONE);
             holder.imageMarker.setVisibility(View.GONE);
         }
+
+        if(userList.get(position).getOnline()==1){
+            holder.onlineIndicator.setVisibility(View.VISIBLE);
+        } else {
+            holder.onlineIndicator.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -87,6 +93,9 @@ public class PeoplesRecyclerAdapter extends RecyclerView.Adapter<PeoplesRecycler
 
         @BindView(R.id.imageMarker)
         ImageView imageMarker;
+
+        @BindView(R.id.onlineIndicator)
+        ImageView onlineIndicator;
 
         ViewHolder(View itemView) {
             super(itemView);

@@ -14,6 +14,7 @@ public class ApiRetrofitFactory {
     public static ApiRetrofitInterface getApi(){
         if(mApi==null){
 
+
             Retrofit builder = new Retrofit.Builder()
                     .baseUrl(Constants.URL_BASE)
                     .addConverterFactory(GsonConverterFactory.create())

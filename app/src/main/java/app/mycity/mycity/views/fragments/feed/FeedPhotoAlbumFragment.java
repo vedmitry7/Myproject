@@ -69,6 +69,7 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment impl
 
     boolean mayRestore;
     private int firstVisibleItem = 0;
+    private String search;
 
     @Nullable
     @Override
@@ -166,7 +167,7 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment impl
             placeHolder.setVisibility(View.GONE);
         } else {
             Log.d("TAG23", "Load date...");
-            ApiFactory.getApi().getAllGroupAlbums(App.accessToken(), App.chosenCity(), 0, "1", getArguments().getString("subscriptionOnly"))
+            ApiFactory.getApi().getAllGroupAlbums(App.accessToken(), App.chosenCity(), search,0, "1", getArguments().getString("subscriptionOnly"))
                     .enqueue(new Callback<ResponseContainer<ResponseAlbums>>() {
                         @Override
                         public void onResponse(Call<ResponseContainer<ResponseAlbums>> call, Response<ResponseContainer<ResponseAlbums>> response) {
@@ -228,5 +229,13 @@ public class FeedPhotoAlbumFragment extends android.support.v4.app.Fragment impl
         albumsList = new ArrayList<>();
         loadFeed(0);
         placeHolder.setVisibility(View.VISIBLE);
+    }
+
+    public void filter(String s) {
+        search = s;
+        totalCount = 0;
+        albumsList.clear();
+        placeHolder.setVisibility(View.VISIBLE);
+        loadFeed(0);
     }
 }

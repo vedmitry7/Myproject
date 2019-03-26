@@ -102,17 +102,7 @@ public class FilterImageActivity extends AppCompatActivity implements FiltersLis
 
         Log.d("TAG21", "MAin OnCreate");
 
-/*        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(getString(R.string.activity_title_main));*/
 
-
-/*        path = "/storage/emulated/0/test.jpg";
-        //path = getIntent().getStringExtra("path");
-        loadImage();
-        setupViewPager(viewPager);
-        tabLayout.setupWithViewPager(viewPager);*/
 
         if(savedInstanceState==null){
             makeCheckin();
@@ -296,7 +286,7 @@ public class FilterImageActivity extends AppCompatActivity implements FiltersLis
     }
 
     public void makeCheckin() {
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); // what is capture secure
         file = new File(Util.getExternalFileName());
         Log.d("TAG21", file.getAbsolutePath());
         Log.d("TAG21", file.getAbsolutePath());
@@ -437,6 +427,7 @@ public class FilterImageActivity extends AppCompatActivity implements FiltersLis
         EventBus.getDefault().removeStickyEvent(event);
         Log.i("Test2", "hide dialog");
         progressDialog.hide();
+        this.setResult(RESULT_OK);
         this.finish();
     }
 

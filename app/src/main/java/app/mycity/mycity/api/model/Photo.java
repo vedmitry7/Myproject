@@ -8,9 +8,12 @@ public class Photo {
     @SerializedName("id")
     @Expose
     private String id;
+    @SerializedName("type")
+    @Expose
+    private String type;
     @SerializedName("group_id")
     @Expose
-    private Integer groupId;
+    private String groupId;
     @SerializedName("owner_id")
     @Expose
     private String ownerId;
@@ -38,7 +41,6 @@ public class Photo {
     @SerializedName("photo_780")
     @Expose
     private String photo780;
-
     @SerializedName("photo_360")
     @Expose
     private String photo360;
@@ -51,6 +53,26 @@ public class Photo {
     @SerializedName("comments")
     @Expose
     private Comments comments;
+
+    @SerializedName("video_orig")
+    @Expose
+    private String videoOrig;
+
+    public String getVideoOrig() {
+        return videoOrig;
+    }
+
+    public void setVideoOrig(String videoOrig) {
+        this.videoOrig = videoOrig;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public String getPhoto550() {
         return photo550;
@@ -92,11 +114,11 @@ public class Photo {
         this.id = id;
     }
 
-    public Integer getGroupId() {
+    public String getGroupId() {
         return groupId;
     }
 
-    public void setGroupId(Integer groupId) {
+    public void setGroupId(String groupId) {
         this.groupId = groupId;
     }
 

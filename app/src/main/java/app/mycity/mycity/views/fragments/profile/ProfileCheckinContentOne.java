@@ -9,9 +9,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.github.chrisbanes.photoview.PhotoView;
@@ -35,6 +37,7 @@ import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponseLike;
 import app.mycity.mycity.api.model.ResponseWall;
+import app.mycity.mycity.util.BitmapUtils;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
@@ -89,11 +92,12 @@ public class ProfileCheckinContentOne extends android.support.v4.app.Fragment im
     Storage storage;
     Profile profile;
 
-    public static ProfileCheckinContentOne createInstance(String name, String postId) {
+    public static ProfileCheckinContentOne createInstance(String name, String postId, boolean backToProfile) {
         ProfileCheckinContentOne fragment = new ProfileCheckinContentOne();
         Bundle bundle = new Bundle();
         bundle.putString("name", name);
         bundle.putString("postId", postId);
+        bundle.putBoolean("backToProfile", backToProfile);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -162,7 +166,7 @@ public class ProfileCheckinContentOne extends android.support.v4.app.Fragment im
     @OnClick(R.id.backButton)
     public void back(View v){
 
-        if(post!=null){
+        if(getArguments().getBoolean("backToProfile")){
             EventBusMessages.OpenUser openUser = new EventBusMessages.OpenUser(post.getOwnerId());
             openUser.setCloseCurrent(true);
             EventBus.getDefault().post(openUser);
@@ -233,6 +237,37 @@ public class ProfileCheckinContentOne extends android.support.v4.app.Fragment im
                 }
             });
         }
+    }
+
+    @OnClick(R.id.menuButton)
+    public void menu(View v) {
+        PopupMenu popupMenu = new PopupMenu(getContext(), v);
+
+        popupMenu.inflate(R.menu.content_menu);
+
+        popupMenu
+                .setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.complain:
+
+                                return true;
+                            case R.id.copy:
+
+                                return true;
+                            case R.id.share:
+
+                                return true;
+                            case R.id.save:
+                                BitmapUtils.downloadFile(post.getAttachments().get(0).getPhotoOrig(), getActivity());
+                                return true;
+                        }
+                        return true;
+                    }
+                });
+
+        popupMenu.show();
     }
 
     @Override

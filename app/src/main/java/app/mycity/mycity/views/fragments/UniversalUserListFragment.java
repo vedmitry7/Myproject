@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -23,13 +24,13 @@ import app.mycity.mycity.api.model.User;
 import app.mycity.mycity.api.model.UsersContainer;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.views.activities.Storage;
-import app.mycity.mycity.views.adapters.FriendsRecyclerAdapter;
+import app.mycity.mycity.views.adapters.UserRecyclerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Response;
 
-public class UniversalUserListFragment extends Fragment {
+public class UniversalUserListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     @BindView(R.id.myAllFriendsRecyclerAdapter)
     RecyclerView recyclerView;
@@ -38,9 +39,12 @@ public class UniversalUserListFragment extends Fragment {
     ConstraintLayout listEmptyContainer;
 
     @BindView(R.id.progressBarPlaceHolder)
-    ConstraintLayout progressBarPlaceHolder;
+    ConstraintLayout placeHolder;
 
-    FriendsRecyclerAdapter adapter;
+    @BindView(R.id.swipeContainer)
+    SwipeRefreshLayout swipeRefreshLayout;
+
+    UserRecyclerAdapter adapter;
     List<User> userList;
 
     String id;
@@ -74,12 +78,14 @@ public class UniversalUserListFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
 
         type = getArguments().getString("type");
         //userList = new ArrayList<>();
         layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new FriendsRecyclerAdapter(userList);
+        adapter = new UserRecyclerAdapter(userList);
         recyclerView.setAdapter(adapter);
         Log.d("TAG21", "ViewCreated " + this.getClass().getSimpleName());
 
@@ -132,14 +138,15 @@ public class UniversalUserListFragment extends Fragment {
         storage = (Storage) context;
 
         userList = (List<User>) storage.getDate(getArguments().get("name")+ "_" + getArguments().getString("type") + "_userlist");
+        Log.d("TAG24", "get " + getArguments().get("name")+ "_" + getArguments().getString("type") + "_userlist");
 
         if(userList==null){
-            Log.d("TAG21", "restore user list - null");
+            Log.d("TAG24", "restore user list - null");
             Log.d("TAG23", getArguments().getString("type") + " Get date - " + getArguments().get("name") + "_" + getArguments().getString("type") + "_userlist" + " - null");
             userList = new ArrayList<>();
         } else {
             Log.d("TAG23", getArguments().getString("type") + " Get date - " + getArguments().get("name") + "_" + getArguments().getString("type") + "_userlist" + " - zbs");
-            Log.d("TAG21", "restore user list size - " + userList.size());
+            Log.d("TAG24", "restore user list size - " + userList.size());
             mayRestore = true;
         }
     }
@@ -149,7 +156,8 @@ public class UniversalUserListFragment extends Fragment {
 
         if(mayRestore){
             Log.d("TAG21", "restore " + this.getClass().getSimpleName() + " " + userList.size());
-            progressBarPlaceHolder.setVisibility(View.GONE);
+            placeHolder.setVisibility(View.GONE);
+            mayRestore = false;
             if(userList.size()==0){
                 listEmptyContainer.setVisibility(View.VISIBLE);
             }
@@ -163,10 +171,12 @@ public class UniversalUserListFragment extends Fragment {
                 public void onResponse(Call<ResponseContainer<UsersContainer>> call, Response<ResponseContainer<UsersContainer>> response) {
                     UsersContainer users = response.body().getResponse();
                     if(users != null){
+
+                        swipeRefreshLayout.setRefreshing(false);
                         userList = users.getFriends();
                         totalCount = response.body().getResponse().getCount();
                         isLoading = false;
-                        progressBarPlaceHolder.setVisibility(View.GONE);
+                        placeHolder.setVisibility(View.GONE);
                         if(userList.size()==0){
                             listEmptyContainer.setVisibility(View.VISIBLE);
                         }
@@ -212,32 +222,6 @@ public class UniversalUserListFragment extends Fragment {
         }
     }
 
-    private void getFriendsListById(){
-        Log.d("TAG21", "getFriendsListById " + this.getClass().getSimpleName());
-
-        ApiFactory.getApi().getUsersById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), id, "photo_780").enqueue(new retrofit2.Callback<ResponseContainer<UsersContainer>>() {
-            @Override
-            public void onResponse(retrofit2.Call<ResponseContainer<UsersContainer>> call, retrofit2.Response<ResponseContainer<UsersContainer>> response) {
-
-
-                UsersContainer users = response.body().getResponse();
-
-                if(users != null){
-                    userList = users.getFriends();
-                    Log.d("TAG", "Users all loaded. List size = " + userList.size());
-                    adapter.update(userList);
-                } else {
-
-                }
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<ResponseContainer<UsersContainer>> call, Throwable t) {
-
-            }
-        });
-    }
-
 
     public void onStart() {
         super.onStart();
@@ -261,7 +245,7 @@ public class UniversalUserListFragment extends Fragment {
     public void onStop() {
         super.onStop();
         storage.setDate(getArguments().get("name") + "_" + getArguments().getString("type") + "_userlist", userList);
-        Log.d("TAG23", type + " Save date - " + getArguments().get("name") + "_" + getArguments().getString("type") + "_userlist");
+        Log.d("TAG24", type + " Save date - " + getArguments().get("name") + "_" + getArguments().getString("type") + "_userlist");
     }
 
     public void onDestroyView() {
@@ -284,4 +268,10 @@ public class UniversalUserListFragment extends Fragment {
 
     }
 
+    @Override
+    public void onRefresh() {
+        userList = new ArrayList<>();
+        getUsers(0);
+        placeHolder.setVisibility(View.VISIBLE);
+    }
 }

@@ -10,10 +10,16 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,6 +27,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Date;
 
 public class BitmapUtils {
 
@@ -31,6 +38,49 @@ public class BitmapUtils {
         DisplayMetrics metrics = resources.getDisplayMetrics();
         float px = dp * ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
         return px;
+    }
+
+
+    public static void downloadFile(String uRl, final Context context) {
+
+        Picasso.get()
+                .load(uRl)
+                .into(new Target() {
+                    @Override
+                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                        try {
+                            String root = Environment.getExternalStorageDirectory().toString();
+                            File myDir = new File(root + "/MyCity/Downloads");
+
+                            if (!myDir.exists()) {
+                                myDir.mkdirs();
+                            }
+
+                            String name = new Date().toString() + ".jpg";
+                            myDir = new File(myDir, name);
+                            FileOutputStream out = new FileOutputStream(myDir);
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+
+                            out.flush();
+                            out.close();
+
+                            Toast.makeText(context, "Файл сохранен в " + myDir + name, Toast.LENGTH_SHORT).show();
+                        } catch (Exception e) {
+                            // some action
+                        }
+                    }
+
+                    @Override
+                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+                    }
+
+                    @Override
+                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                    }
+
+                });
     }
 
     /**

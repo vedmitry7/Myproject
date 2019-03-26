@@ -10,6 +10,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -69,14 +70,15 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
     @BindView(R.id.horizontalRecyclerView)
     RecyclerView categoriesRecyclerView;
 
-    @BindView(R.id.editTextSearch)
     TextView search;
+    @BindView(R.id.searchView)
+    SearchView searchView;
+    @BindView(R.id.searchButton)
+    ImageView searchButton;
+
 
     @BindView(R.id.toolBarTitle)
     TextView toolBarTitle;
-
-    @BindView(R.id.clearSearch)
-    ImageView clearSearch;
 
     PeoplesRecyclerAdapter adapter;
     List<User> userList;
@@ -99,6 +101,15 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
         ButterKnife.bind(this, view);
         return view;
     }
+
+    @OnClick(R.id.searchButton)
+    public void search(View v){
+        toolBarTitle.setVisibility(View.GONE);
+        searchButton.setVisibility(View.GONE);
+        searchView.setVisibility(View.VISIBLE);
+        searchView.setIconified(false);
+    }
+
 
     public static SuperPeoplesFragment createInstance(String name, int stackPos, int tabPos) {
         SuperPeoplesFragment fragment = new SuperPeoplesFragment();
@@ -123,6 +134,10 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
 
         Util.setNawBarClickListener(view);
         Util.setNawBarIconColor(getContext(), view, -1);
+
+        search = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        search.setTextColor(getResources().getColor(R.color.white));
+        search.setHintTextColor(getResources().getColor(R.color.white));
 
         final LinearLayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
 
@@ -187,24 +202,6 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
         placesCategoriesAdapter = new PeoplesTopBarAdapter(placeCategories);
         categoriesRecyclerView.setAdapter(placesCategoriesAdapter);
 
-        search.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if(s.length()==0){
-                    clearSearch.setVisibility(View.GONE);
-                } else {
-                    clearSearch.setVisibility(View.VISIBLE);
-                }
-            }
-        });
 
         search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -212,7 +209,7 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     userList = new ArrayList<>();
                     adapter.notifyDataSetChanged();
-                    App.hideKeyboard(getActivity());
+                    App.closeKeyboard(getContext());
                     getUsersList(filter, search.getText().toString(), userList.size());
                     search.clearFocus();
                     return true;
@@ -221,13 +218,20 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
             }
         });
 
-        clearSearch.setOnClickListener(new View.OnClickListener() {
+
+
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
-            public void onClick(View v) {
-                search.setText("");
-                clearSearch.setVisibility(View.GONE);
+            public boolean onClose() {
+                Log.d("TAG24", "Close " );
+
                 userList = new ArrayList<>();
                 getUsersList(filter, "", userList.size());
+                searchView.setVisibility(View.GONE);
+                toolBarTitle.setVisibility(View.VISIBLE);
+                searchButton.setVisibility(View.VISIBLE);
+                return true;
             }
         });
     }
@@ -305,7 +309,9 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
 
             @Override
             public void onFailure(retrofit2.Call<ResponseContainer<UsersContainer>> call, Throwable t) {
-
+                Log.d("TAG24", "exc. - " + t.getLocalizedMessage());
+                Log.d("TAG24", "exc. - " + t.getCause());
+                EventBus.getDefault().post(new EventBusMessages.LoseConnection());
             }
         });
     }
@@ -405,7 +411,7 @@ public class SuperPeoplesFragment extends Fragment implements TabStackInterface 
         }
 
         final int[] positionFrom = {SharedManager.getIntProperty("ageFrom")};
-         final int[] positionTo = {SharedManager.getIntProperty("ageTo")};
+        final int[] positionTo = {SharedManager.getIntProperty("ageTo")};
 
         spinnerFrom.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

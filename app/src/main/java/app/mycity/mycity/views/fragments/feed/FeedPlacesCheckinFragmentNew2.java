@@ -1,11 +1,18 @@
 package app.mycity.mycity.views.fragments.feed;
 
-import android.animation.Animator;
+import android.app.DownloadManager;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -19,32 +26,44 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import app.mycity.mycity.App;
 import app.mycity.mycity.Constants;
 import app.mycity.mycity.R;
 import app.mycity.mycity.api.ApiFactory;
+import app.mycity.mycity.api.model.Group;
 import app.mycity.mycity.api.model.Likes;
 import app.mycity.mycity.api.model.Post;
 import app.mycity.mycity.api.model.Profile;
 import app.mycity.mycity.api.model.ResponseContainer;
 import app.mycity.mycity.api.model.ResponseLike;
 import app.mycity.mycity.api.model.ResponseWall;
+import app.mycity.mycity.util.BitmapUtils;
 import app.mycity.mycity.util.EventBusMessages;
 import app.mycity.mycity.util.SharedManager;
 import app.mycity.mycity.util.Util;
 import app.mycity.mycity.views.activities.Storage;
-import app.mycity.mycity.views.adapters.CheckinSliderAdapter;
+import app.mycity.mycity.views.adapters.CheckinFragmentStateSliderAdapter;
 import app.mycity.mycity.views.adapters.FeedPlacesCheckinRecyclerAdapter;
+import app.mycity.mycity.views.fragments.VideoContentFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -62,6 +81,9 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
 
     @BindView(R.id.feedPhoto)
     ImageView photo;
+
+    @BindView(R.id.placePhoto)
+    ImageView placePhoto;
 
 
     @BindView(R.id.commentButton)
@@ -120,6 +142,8 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
     private boolean mayRestore;
 
     boolean clearScreen;
+
+    CheckinFragmentStateSliderAdapter checkinSliderAdapter;
 
     public static FeedPlacesCheckinFragmentNew2 createInstance(String name, String placeId, String postId) {
         FeedPlacesCheckinFragmentNew2 fragment = new FeedPlacesCheckinFragmentNew2();
@@ -185,13 +209,14 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
                         isLoading = true;
                         // load if we don't load all
                         if(totalCount >= postList.size()){
-                            Log.d("TAG23", "load feed ");
+                            Log.d("TAG24", "load feed from scroll listener");
                             loadMedia(postList.size());
                         }
                     }
                 }
             }
         };
+        Log.d("TAG24", "load feed from create");
         loadMedia(postList.size());
 
         recyclerView.addOnScrollListener(scrollListener);
@@ -211,11 +236,12 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
         getActivity().onBackPressed();
     }
 
-    private void loadMedia(final int offset) {
+    protected void loadMedia(final int offset) {
 
         if(mayRestore){
             Log.d("TAG21", "RESTORE PLACE CHECKIN");
             placeHolder.setVisibility(View.GONE);
+            Log.d("TAG24", "init pager from mayRestore");
             initPagerAdapter(postList);
             adapter.update(postList);
             openPlace(new EventBusMessages.ShowImage(currentPostIdPosition));
@@ -223,7 +249,7 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
             Log.d("TAG21", "Can not RESTORE PLACE CHECKIN ");
             ApiFactory.getApi().getGroupWallById(SharedManager.getProperty(Constants.KEY_ACCESS_TOKEN), placeId, "checkin", "1", "photo_130", offset, 100).enqueue(new Callback<ResponseContainer<ResponseWall>>() {
                 @Override
-                public void onResponse(Call<ResponseContainer<ResponseWall>> call, Response<ResponseContainer<ResponseWall>> response) {
+                public void onResponse(Call<ResponseContainer<ResponseWall>> call, final Response<ResponseContainer<ResponseWall>> response) {
 
 
                     if(response.body()!= null && response.body().getResponse()!=null){
@@ -231,9 +257,33 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
                         Log.d("TAG23", "RESPONSE FEED OK");
 
                         totalCount = response.body().getResponse().getCount();
+                        Log.d("TAG23", "total count - " + totalCount);
 
-                        if(response.body().getResponse().getGroups()!=null)
+                        if(response.body().getResponse().getGroups()!=null){
+                            final Group group = response.body().getResponse().getGroups().get(0);
+
                             placeName.setText(response.body().getResponse().getGroups().get(0).getName());
+                            Picasso.get().load(group.getPhoto130()).into(placePhoto);
+
+                            placePhoto.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if(group.getVerified()==1){
+                                        EventBus.getDefault().post(new EventBusMessages.OpenPlace(group.getId()));
+                                    } else {
+                                        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+                                        alertDialog.setMessage("Данная локация не имеет официальной страницы");
+                                        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                                new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        dialog.dismiss();
+                                                    }
+                                                });
+                                        alertDialog.show();
+                                    }
+                                }
+                            });
+                        }
 
                         postList.addAll(response.body().getResponse().getItems());
 
@@ -255,6 +305,7 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
                             }
                         }
 
+                        Log.d("TAG24", "init pager from load");
                         initPagerAdapter(postList);
 
                         if(offset==0){
@@ -284,10 +335,12 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
         }
     }
 
-    private void initPagerAdapter(List<Post> postList) {
+
+    int mCurrentItem;
+    private void initPagerAdapter(final List<Post> postList) {
         Log.d("TAG24", "initPagerAdapter " + postList.size());
 
-        CheckinSliderAdapter checkinSliderAdapter = new CheckinSliderAdapter(getContext(), postList);
+        checkinSliderAdapter = new CheckinFragmentStateSliderAdapter(getFragmentManager(), getContext(), postList);
         viewPager.setAdapter(checkinSliderAdapter);
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -297,7 +350,18 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
 
             @Override
             public void onPageSelected(int position) {
+                currentPostIdPosition = position;
                 setNumeration(position);
+
+                VideoContentFragment cachedFragmentLeaving = checkinSliderAdapter.getCachedItem(mCurrentItem);
+                if (cachedFragmentLeaving != null) {
+                    cachedFragmentLeaving.losingVisibility();
+                }
+                mCurrentItem = position;
+                VideoContentFragment cachedFragmentEntering = checkinSliderAdapter.getCachedItem(mCurrentItem);
+                if (cachedFragmentEntering != null) {
+                    cachedFragmentEntering.gainVisibility();
+                }
             }
 
             @Override
@@ -309,7 +373,7 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void clickImage(EventBusMessages.ClickOnSliderImage event) {
 
-
+        Log.d("TAG24", "click slider image");
         if(clearScreen){
             //    recyclerView.setVisibility(View.VISIBLE);
             buttonsContainer.animate().setDuration(200).translationYBy(-recyclerView.getLayoutParams().height);
@@ -378,7 +442,6 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
         if(getContext() == null){
             return;
         }
-
         if(b){
             likeIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_heart_vector_white));
         } else {
@@ -387,7 +450,7 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
     }
 
     @OnClick(R.id.menuButton)
-    public void qwe(View v) {
+    public void menu(View v) {
         PopupMenu popupMenu = new PopupMenu(getContext(), v);
 
         popupMenu.inflate(R.menu.content_menu);
@@ -406,17 +469,16 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
                             case R.id.share:
 
                                 return true;
-
-                            default:
-                                return false;
+                            case R.id.save:
+                                BitmapUtils.downloadFile(postList.get(currentPostIdPosition).getAttachments().get(0).getPhotoOrig(), getContext());
+                                return true;
                         }
+                        return true;
                     }
                 });
 
         popupMenu.show();
-
     }
-
 
     @OnClick(R.id.likeIcon)
     public void like(View v) {
@@ -527,6 +589,8 @@ public class FeedPlacesCheckinFragmentNew2 extends android.support.v4.app.Fragme
         super.onStop();
         EventBus.getDefault().unregister(this);
         Log.d("TAG21", "Stop CHECKIN FRAGMENT Save " + getArguments().getString("name"));
+
+      //  checkinSliderAdapter.releaseAllPlayers();
     }
 
     @Override

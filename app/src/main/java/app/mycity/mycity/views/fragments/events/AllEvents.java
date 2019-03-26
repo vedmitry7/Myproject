@@ -72,6 +72,7 @@ public class AllEvents extends android.support.v4.app.Fragment implements TabSta
 
     LinearLayoutManager layoutManager;
     private int position;
+    private String search;
 
     @Nullable
     @Override
@@ -138,7 +139,7 @@ public class AllEvents extends android.support.v4.app.Fragment implements TabSta
             placeHolder.setVisibility(View.GONE);
             mayRestore = false;
         } else {
-            ApiFactory.getApi().getAllEvents(App.accessToken(), App.chosenCity(),"1", offset).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
+            ApiFactory.getApi().getAllEvents(App.accessToken(), App.chosenCity(),search,"1", offset).enqueue(new retrofit2.Callback<ResponseContainer<ResponseWall>>() {
                 @Override
                 public void onResponse(retrofit2.Call<ResponseContainer<ResponseWall>> call, retrofit2.Response<ResponseContainer<ResponseWall>> response) {
                     Log.d("TAG21", "RESPONSE EVENTS");
@@ -355,5 +356,14 @@ public class AllEvents extends android.support.v4.app.Fragment implements TabSta
         postList = new ArrayList<>();
         loadFeed(0);
         placeHolder.setVisibility(View.VISIBLE);
+    }
+
+    public void filter(String s) {
+            search = s;
+            totalCount = 0;
+            postList.clear();
+            placeHolder.setVisibility(View.VISIBLE);
+            loadFeed(0);
+
     }
 }

@@ -92,6 +92,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar.Fullscreen" />
         <activity
+            android:name=".filter_desc_post.VideoActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar.Fullscreen" />
+
+        <activity
             android:name=".filter_desc_post.DescriptionActivity"
             android:theme="@style/AppTheme.NoActionBar.Fullscreen" />
         <activity
@@ -132,6 +137,11 @@
 
         <service
             android:name=".PublicationService"
+            android:enabled="true"
+            android:exported="true"></service>
+
+        <service
+            android:name=".PublicationVideoService"
             android:enabled="true"
             android:exported="true"></service>
 

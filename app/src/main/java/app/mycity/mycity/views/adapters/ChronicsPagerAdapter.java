@@ -12,6 +12,8 @@ public class ChronicsPagerAdapter extends FragmentPagerAdapter {
 
 
     String tabName;
+    FeedPhotoAlbumFragment allAlbumFragment;
+    FeedPhotoAlbumFragment subscriptionAlbumFragment;
 
     public ChronicsPagerAdapter(FragmentManager fm, String tabName) {
         super(fm);
@@ -23,9 +25,11 @@ public class ChronicsPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position){
             case 0:
-                return FeedPhotoAlbumFragment.createInstance(tabName, "0");
+                allAlbumFragment = FeedPhotoAlbumFragment.createInstance(tabName, "0");
+                return allAlbumFragment;
             case 1:
-                return FeedPhotoAlbumFragment.createInstance(tabName, "1");
+                subscriptionAlbumFragment = FeedPhotoAlbumFragment.createInstance(tabName, "1");
+                return subscriptionAlbumFragment;
         }
         return null;
     }
@@ -44,5 +48,13 @@ public class ChronicsPagerAdapter extends FragmentPagerAdapter {
                 return "ПОДПИСКИ";
         }
         return null;
+    }
+
+    public FeedPhotoAlbumFragment getAllAlbumFragment() {
+        return allAlbumFragment;
+    }
+
+    public FeedPhotoAlbumFragment getSubscriptionAlbumFragment() {
+        return subscriptionAlbumFragment;
     }
 }
